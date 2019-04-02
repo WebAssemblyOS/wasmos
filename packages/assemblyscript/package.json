@@ -1,0 +1,23 @@
+{
+  "name": "as-node",
+  "version": "0.0.1",
+  "description": "Compiles and executes AssemblyScript files",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": ""
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/WebAssemblyOS/wasmos/tree/master/packages/as-node"
+  },
+  "keywords": [
+    "AssemblyScript",
+    "WebAssembly",
+    "WebAssemblyOS"
+  ],
+  "author": "Willem Wyndham",
+  "license": "MIT",
+  "dependencies": {
+    "assemblyscript": "github:willemneal/assemblyscript#b7d8e1300a578fb76ff25f9dfab9de8c5a1cde94"
+  }
+}

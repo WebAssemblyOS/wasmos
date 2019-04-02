@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "lib": ["webworker", "es6", "scripthost"],
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "target": "es6",
+    "allowJs": true,
+    "strict": false
+  },
+  "include": [
+    "src/**/*.ts",
+    "./build.ts"
+  ]
+}

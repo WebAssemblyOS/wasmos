@@ -1,0 +1,6 @@
+10 error TypeError: Cannot read property 'replace' of null
+10 error     at Object.keys.forEach.depName (/home/willem/.npm/_npx/6449/lib/node_modules/lerna/node_modules/@lerna/package-graph/index.js:108:49)
+10 error     at Array.forEach (<anonymous>)
+10 error     at PackageGraph.forEach (/home/willem/.npm/_npx/6449/lib/node_modules/lerna/node_modules/@lerna/package-graph/index.js:103:38)
+10 error     at Map.forEach (<anonymous>)
+10 error     at new PackageGraph (/home/willem/.npm/_npx/6449/lib/node_modules/lerna/node_modules/@lerna/package-graph/index.js:92:10)

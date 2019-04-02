@@ -1,0 +1,66 @@
+{
+  "name": "wasmos",
+  "version": "0.0.1",
+  "description": "A set of runtime tools for WebAssembly and AssemblyScript",
+  "main": "dist/index.js",
+  "scripts": {
+    "build:test": "tsc -p spec/tsconfig.json && cd spec && zip -r build.zip build/",
+    "test": "npm run build:test && jest",
+    "build": "webpack --mode development",
+    "watch": "webpack-dev-server --mode development --env=dev",
+    "test:browsers": "npm run build && ts-node experiments/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/WebAssemblyOS/wasmos.git"
+  },
+  "keywords": [
+    "WebAssembly",
+    "AssemblyScript",
+    "loader",
+    "runtime"
+  ],
+  "author": "Willem Wyndham",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/WebAssemblyOS/wasmos/issues"
+  },
+  "homepage": "https://github.com/WebAssemblyOS/wasmos#readme",
+  "devDependencies": {
+    "@types/jest": "^24.0.6",
+    "@types/node": "^11.9.5",
+    "@types/webassembly-js-api": "0.0.2",
+    "as-pect": "github:jtenner/as-pect",
+    "assemblyscript": "github:willemneal/assemblyscript#c76310302753cc812fe26bfda969e431b4741971",
+    "browserfs": "^1.4.3",
+    "jest": "^24.1.0",
+    "jsdom-worker": "^0.1.0",
+    "lerna": "^3.13.1",
+    "node-fetch": "^2.3.0",
+    "ts-loader": "^5.3.3",
+    "ts-node": "^8.0.2",
+    "webpack": "^4.29.5",
+    "webpack-cli": "^3.2.3",
+    "webpack-dev-server": "^3.2.0"
+  },
+  "dependencies": {
+    "@babel/plugin-syntax-dynamic-import": "^7.2.0",
+    "@babel/plugin-syntax-import-meta": "^7.2.0",
+    "@babel/plugin-transform-modules-systemjs": "^7.3.4",
+    "@babel/preset-typescript": "^7.3.3",
+    "@types/filesystem": "0.0.29",
+    "@types/fs-extra": "^5.0.5",
+    "browserfs": "^1.4.3",
+    "@types/selenium-webdriver": "^3.0.15",
+    "@types/webpack-dev-server": "^3.1.2",
+    "fs-extra": "^7.0.1",
+    "selenium-webdriver": "^4.0.0-alpha.1",
+    "ntypescript": "github:willemneal/ntypescript",
+    "systemjs": "github:willemneal/systemjs",
+    "ts-jest": "^24.0.0",
+    "typescript": "^3.3.3333",
+    "vue": "^2.6.7",
+    "vue-compiler": "^4.2.0",
+    "vue-template-compiler": "^2.6.8"
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "name": "@wasmos/kernel",
+  "version": "0.0.1",
+  "description": "Core OS kernel for assemblyscript and WebAssembly",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/WebAssemblyOS/wasmos/tree/master/packages/kernel"
+  },
+  "keywords": [
+    "AssemblyScript",
+    "Kernel",
+    "OS",
+    "WebAssembly",
+    "WebAssemblyOS"
+  ],
+  "author": "Willem Wyndham",
+  "license": "MIT",
+  "dependencies": {
+    "assemblyscript": "github:willemneal/assemblyscript#b7d8e1300a578fb76ff25f9dfab9de8c5a1cde94",
+    "browserfs": "^1.4.3",
+    "ts-node": "^8.0.3",
+    "typescript": "^3.4.1"
+  }
+}
