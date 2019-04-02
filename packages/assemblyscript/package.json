@@ -1,7 +1,7 @@
 {
-  "name": "as-node",
+  "name": "@wasmos/assemblyscript",
   "version": "0.0.1",
-  "description": "Compiles and executes AssemblyScript files",
+  "description": "Fork of AssemblyScript",
   "main": "dist/index.js",
   "scripts": {
     "build": ""
