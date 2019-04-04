@@ -1,14 +1,19 @@
 {
-  "name": "@wasmos/assemblyscript",
+  "name": "assemblyscript",
   "version": "0.0.1",
   "description": "Fork of AssemblyScript",
   "main": "dist/index.js",
+  "types": "index.d.ts",
   "scripts": {
     "build": ""
   },
+  "files": [
+    "lib/",
+    "src/"
+  ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/WebAssemblyOS/wasmos/tree/master/packages/as-node"
+    "url": "https://github.com/WebAssemblyOS/wasmos/tree/master/packages/assemblyscript"
   },
   "keywords": [
     "AssemblyScript",
@@ -17,7 +22,10 @@
   ],
   "author": "Willem Wyndham",
   "license": "MIT",
-  "dependencies": {
+  "devDependencies": {
     "assemblyscript": "github:willemneal/assemblyscript#b7d8e1300a578fb76ff25f9dfab9de8c5a1cde94"
+  },
+  "dependencies": {
+    "acorn": "^6.0.0"
   }
 }
