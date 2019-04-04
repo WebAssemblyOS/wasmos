@@ -1,5 +1,5 @@
 {
-  "name": "@wasmos/kernel",
+  "name": "@wasmos/fs",
   "version": "0.0.1",
   "description": "Core OS kernel for assemblyscript and WebAssembly",
   "main": "dist/index.js",
@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/WebAssemblyOS/wasmos/tree/master/packages/kernel"
+    "url": "https://github.com/WebAssemblyOS/wasmos/tree/master/packages/kernel/packages/fs"
   },
   "keywords": [
     "AssemblyScript",
@@ -20,8 +20,7 @@
   "author": "Willem Wyndham",
   "license": "MIT",
   "dependencies": {
-    "@wasmos/assemblyscript": "file:../assemblyscript",
-    "assemblyscript": "file:../assemblyscript",
+    "@wasmos/assemblyscript": "file:../../assemblyscript",
     "browserfs": "^1.4.3",
     "ts-node": "^8.0.3",
     "typescript": "^3.4.1"

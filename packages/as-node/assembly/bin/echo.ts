@@ -1,6 +1,6 @@
 // import {_process, Process} from "../preamble";
-import { log } from "../../node_modules/assemblyscript/lib/host/assembly";
-
+import { log } from "../../node_modules/@wasmos/assemblyscript/lib/host/assembly";
+import { process } from "../process";
 export const enum ExitStatus {
   EXIT_FAILURE = -1,
   EXIT_SUCCESS = 0

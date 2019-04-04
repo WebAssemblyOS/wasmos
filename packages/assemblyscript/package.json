@@ -1,15 +1,16 @@
 {
-  "name": "assemblyscript",
+  "name": "@wasmos/assemblyscript",
   "version": "0.0.1",
   "description": "Fork of AssemblyScript",
   "main": "dist/index.js",
-  "types": "index.d.ts",
+  "types": "src/index.ts",
   "scripts": {
     "build": ""
   },
   "files": [
     "lib/",
-    "src/"
+    "tsconfig.json",
+    "tsconfig-base.json"
   ],
   "repository": {
     "type": "git",
@@ -23,7 +24,9 @@
   "author": "Willem Wyndham",
   "license": "MIT",
   "devDependencies": {
-    "assemblyscript": "github:willemneal/assemblyscript#b7d8e1300a578fb76ff25f9dfab9de8c5a1cde94"
+    "assemblyscript": "github:willemneal/assemblyscript#b7d8e1300a578fb76ff25f9dfab9de8c5a1cde94",
+    "ts-node": "^8.0.3",
+    "typescript": "^3.4.1"
   },
   "dependencies": {
     "acorn": "^6.0.0"

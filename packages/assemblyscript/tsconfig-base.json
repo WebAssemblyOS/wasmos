@@ -6,6 +6,9 @@
     "noImplicitThis": true,
     "noEmitOnError": true,
     "strictNullChecks": true,
-    "experimentalDecorators": true
+    "experimentalDecorators": true,
+    "target": "es6",
+    "moduleResolution": "node",
+    "esModuleInterop": true
   }
 }
