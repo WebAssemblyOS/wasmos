@@ -1,3 +1,4 @@
 {
-  "extends": "../node_modules/assemblyscript/assembly/tsconfig.json"
+  "extends": "../node_modules/@wasmos/assemblyscript/assembly/tsconfig.json",
+  "include": ["**/assembly/**/*.ts"]
 }

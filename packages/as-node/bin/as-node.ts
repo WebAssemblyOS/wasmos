@@ -1,4 +1,4 @@
-import { exec } from "../src/exec";
+import { exec } from "../src";
 // let opts = Compiler.opts;
 
 console.log(process.argv);

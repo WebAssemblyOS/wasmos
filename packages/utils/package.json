@@ -2,7 +2,6 @@
   "name": "@wasmos/utils",
   "version": "0.0.1",
   "description": "Core OS kernel for assemblyscript and WebAssembly",
-  "main": "src/index.ts",
   "types": "src/index.ts",
   "scripts": {
     "test": "jest"
@@ -19,5 +18,8 @@
     "WebAssemblyOS"
   ],
   "author": "Willem Wyndham",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "@wasmos/assemblyscript": "file:../assemblyscript"
+  }
 }

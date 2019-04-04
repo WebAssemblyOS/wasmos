@@ -1,3 +1,1 @@
-import { exec } from "./exec";
-
-exec(process.argv[2]);
+export * from "./exec";

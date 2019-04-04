@@ -10,17 +10,15 @@ import "allocator/arena";
  * Always needto export memory
  */
 export { memory };
-import { Process, InputStream, OutputStream } from "kernel/process";
-import { log } from "../node_modules/assemblyscript/lib/host/assembly";
+import { Process, InputStream, OutputStream, process } from "./process";
 
 /**
  * The entry function to start the Instance after it's been initialized.
  */
+@start()
 export function main(): void {}
 
 declare function setUpProcess(): void;
-
-var process: Process;
 
 setUpProcess();
 
@@ -31,5 +29,5 @@ export function _process(): Process {
 }
 
 export function createProcess(command: string, currentDir: string): void {
-  process = new Process(command, currentDir);
+  Process.create(command, currentDir);
 }

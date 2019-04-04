@@ -21,7 +21,7 @@
   "license": "MIT",
   "dependencies": {
     "@wasmos/utils": "file:../utils",
-    "assemblyscript": "file:../assemblyscript",
+    "@wasmos/assemblyscript": "file:../assemblyscript",
     "ts-node": "^8.0.3",
     "typescript": "^3.4.1"
   }
