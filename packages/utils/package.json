@@ -19,11 +19,5 @@
     "WebAssemblyOS"
   ],
   "author": "Willem Wyndham",
-  "license": "MIT",
-  "dependencies": {
-    "assemblyscript": "github:willemneal/assemblyscript#b7d8e1300a578fb76ff25f9dfab9de8c5a1cde94",
-    "browserfs": "^1.4.3",
-    "ts-node": "^8.0.3",
-    "typescript": "^3.4.1"
-  }
+  "license": "MIT"
 }
