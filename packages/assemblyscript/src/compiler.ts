@@ -1,10 +1,14 @@
 import * as fs from "fs";
 import * as asc from "assemblyscript/cli/asc";
 import * as path from "path";
-import { promisfy } from "@wasmos/utils";
+import { promisfy, assemblyFolders } from "@wasmos/utils";
 
 let stat = promisfy(fs.stat);
-
+let mkdir = promisfy(fs.mkdir);
+let symlink = promisfy(fs.symlink);
+let join = path.join;
+let readdir = promisfy<string[]>(fs.readdir);
+let readlink = promisfy<string>(fs.readlink);
 interface CompilerOptions {
   /** Standard output stream to use. */
   stdout: asc.OutputStream;
@@ -24,6 +28,25 @@ interface CompilerOptions {
   outDir: string;
   /** Base directory for assembly source */
   baseDir: string;
+}
+
+export async function init(folder: string): Promise<string[]> {
+  let folders = await assemblyFolders(folder);
+  // let libFolder = join(folder, "node_modules", ".assembly");
+  // try {
+  //   await mkdir(libFolder);
+  // } catch (error) {}
+
+  // let res = await Promise.all(
+  //   folders.map(async folder => {
+  //     var target = join(libFolder, path.basename(path.dirname(folder)));
+  //     try {
+  //       await symlink(folder, target);
+  //     } catch (error) {}
+  //     return target;
+  //   })
+  // );
+  return folders;
 }
 
 export class Compiler {
@@ -52,10 +75,20 @@ export class Compiler {
       promisfy(fs.mkdir)(folder, { recursive: true }); //Create parent folders
       await promisfy(fs.writeFile)(file, content, { flag: "w" });
     },
-    listFiles: (basename: string, baseDir: string): Promise<string[]> => {
+    listFiles: async (basename: string, baseDir: string): Promise<string[]> => {
       let base = baseDir ? baseDir : "";
-      let file = path.join(base, basename);
-      return promisfy<string[]>(fs.readdir)(file);
+      let dir = path.join(base, basename);
+      var files: string[] = [];
+      try {
+        files = await readdir(dir);
+      } catch (error) {
+        try {
+          files = await readdir(await readlink(dir));
+        } catch (error) {
+          throw error;
+        }
+      }
+      return files;
     },
     stdout: asc.createMemoryStream(),
     stderr: asc.createMemoryStream(),
@@ -65,7 +98,7 @@ export class Compiler {
 
   static async compileOne(bin: string, _opts?: CompilerOptions): Promise<void> {
     let opts: CompilerOptions = { ..._opts, ...this.opts };
-
+    let libFolders = await init(join(opts.baseDir, ".."));
     let folder = bin.split(".")[0];
     var preamble: string[] = [];
     try {
@@ -75,7 +108,7 @@ export class Compiler {
 
     let outDir = `${opts.outDir}/${folder}`;
     await promisfy(fs.mkdir)(outDir, { recursive: true }); //Create parent folders
-
+    debugger;
     let asc_opts = [
       "bin/" + bin,
       "--baseDir",
@@ -89,7 +122,9 @@ export class Compiler {
       "--importMemory",
       "--measure",
       "--validate",
-      "--debug"
+      "--debug",
+      "--lib",
+      libFolders.join(",")
     ];
     let mesg = `
       -----------------------------------------------

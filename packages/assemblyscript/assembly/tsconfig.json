@@ -2,6 +2,6 @@
   "extends": "../node_modules/assemblyscript/std/assembly.json",
   "include": ["**/*.ts"],
   "compilerOptions": {
-    "typeRoots": ["**/assembly", "../node_modules/assemblyscript/std/types"]
+    "typeRoots": ["**/assembly", ".."]
   }
 }
