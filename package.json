@@ -6,10 +6,8 @@
   "scripts": {
     "build:test": "tsc -p spec/tsconfig.json && cd spec && zip -r build.zip build/",
     "test": "npm run build:test && jest",
-    "build": "webpack --mode development",
-    "watch": "webpack-dev-server --mode development --env=dev",
     "test:browsers": "npm run build && ts-node experiments/",
-    "install": "lerna bootstrap"
+    "bootstrap": "lerna bootstrap"
   },
   "repository": {
     "type": "git",

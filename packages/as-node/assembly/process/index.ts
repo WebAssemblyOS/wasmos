@@ -1,9 +1,7 @@
 type EnvVar = Map<string, string>;
-
 export class InputStream {
   constructor() {}
 }
-
 export class OutputStream {
   constructor() {}
 }

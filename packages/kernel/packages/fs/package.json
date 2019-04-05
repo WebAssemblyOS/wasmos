@@ -2,7 +2,7 @@
   "name": "@wasmos/fs",
   "version": "0.0.1",
   "description": "Core OS kernel for assemblyscript and WebAssembly",
-  "main": "dist/index.js",
+  "types": "src/index.ts",
   "scripts": {
     "test": "jest"
   },
@@ -20,7 +20,7 @@
   "author": "Willem Wyndham",
   "license": "MIT",
   "dependencies": {
-    "@wasmos/assemblyscript": "file:../../assemblyscript",
+    "@wasmos/utils": "file:../../../utils",
     "browserfs": "^1.4.3",
     "ts-node": "^8.0.3",
     "typescript": "^3.4.1"

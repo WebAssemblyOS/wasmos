@@ -10,6 +10,8 @@
   },
   "include": [
     "src/**/*.ts",
-    "./build.ts"
+    "./build.ts",
+    "packages/kernel/src/threading/worker.ts",
+    "packages/kernel/src/threading/actor.ts"
   ]
 }

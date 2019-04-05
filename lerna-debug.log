@@ -1,6 +1,13 @@
-10 error TypeError: Cannot read property 'replace' of null
-10 error     at Object.keys.forEach.depName (/home/willem/.npm/_npx/6449/lib/node_modules/lerna/node_modules/@lerna/package-graph/index.js:108:49)
-10 error     at Array.forEach (<anonymous>)
-10 error     at PackageGraph.forEach (/home/willem/.npm/_npx/6449/lib/node_modules/lerna/node_modules/@lerna/package-graph/index.js:103:38)
-10 error     at Map.forEach (<anonymous>)
-10 error     at new PackageGraph (/home/willem/.npm/_npx/6449/lib/node_modules/lerna/node_modules/@lerna/package-graph/index.js:92:10)
+0 silly argv { _: [ 'add' ],
+0 silly argv   globs: [ 'packages/ash' ],
+0 silly argv   lernaVersion: '3.13.1',
+0 silly argv   '$0': 'node_modules/.bin/lerna',
+0 silly argv   pkg: './packages/kernel/packages/fs' }
+1 notice cli v3.13.1
+2 verbose rootPath /Users/willem/Research/wasmos
+3 info versioning independent
+4 error TypeError: Cannot read property 'split' of undefined
+4 error     at new Range (/Users/willem/Research/wasmos/node_modules/semver/semver.js:800:20)
+4 error     at Function.intersects (/Users/willem/Research/wasmos/node_modules/semver/semver.js:1333:8)
+4 error     at AddCommand.packageSatisfied (/Users/willem/Research/wasmos/node_modules/@lerna/add/index.js:209:19)
+4 error     at AddCommand.initialize (/Users/willem/Research/wasmos/node_modules/@lerna/add/index.js:32:31)
