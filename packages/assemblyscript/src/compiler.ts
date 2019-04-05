@@ -106,7 +106,7 @@ export class Compiler {
       preamble.push("preamble.ts");
     } catch (error) {}
 
-    let outDir = `${opts.outDir}/${folder}`;
+    let outDir = join(opts.baseDir, "..", opts.outDir, folder);
     await promisfy(fs.mkdir)(outDir, { recursive: true }); //Create parent folders
     debugger;
     let asc_opts = [

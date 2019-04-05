@@ -1,3 +1,3 @@
-import { log } from "host";
+import { TestClass } from "assemblyscript";
 
-log("hello world");
+let t = new TestClass();
