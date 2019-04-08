@@ -30,6 +30,7 @@
   },
   "dependencies": {
     "@wasmos/wasa": "github:WebAssemblyOS/wasa",
+    "@wasmos/utils": "git:github.com/WebAssemblyOS/utils#v0.0.2",
     "acorn": "^6.0.0"
   }
 }
