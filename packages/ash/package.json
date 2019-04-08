@@ -22,8 +22,8 @@
   "author": "Willem Wyndham",
   "license": "MIT",
   "dependencies": {
-    "@wasmos/assemblyscript": "file:../assemblyscript",
-    "@wasmos/fs": "file:../kernel/packages/fs",
+    "@wasmos/assemblyscript": "^0.0.2",
+    "@wasmos/fs": "^0.0.2",
     "browserfs": "^1.4.3",
     "ts-node": "^8.0.3",
     "typescript": "^3.4.1",
@@ -39,5 +39,6 @@
     "webpack": "^4.29.5",
     "webpack-cli": "^3.2.3",
     "webpack-dev-server": "^3.2.0"
-  }
+  },
+  "gitHead": "feef85b557c8395979e6d5f67db35a488eea1f6d"
 }
