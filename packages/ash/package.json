@@ -22,8 +22,7 @@
   "author": "Willem Wyndham",
   "license": "MIT",
   "dependencies": {
-    "@wasmos/assemblyscript": "^0.0.2",
-    "@wasmos/fs": "^0.0.2",
+    "@wasmos/assemblyscript": "git:github.com/WebAssemblyOS/assemblyscript#v0.0.2",
     "browserfs": "^1.4.3",
     "ts-node": "^8.0.3",
     "typescript": "^3.4.1",

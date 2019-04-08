@@ -1,5 +1,5 @@
 // import {_process, Process} from "../preamble";
-import { log } from "../../lib/host/assembly";
+import { Console } from "@wasmos/wasa";
 import "allocator/arena";
 
 export const enum ExitStatus {
@@ -8,6 +8,6 @@ export const enum ExitStatus {
 }
 
 export function _main(argv: string[]): ExitStatus {
-  log<string>(argv.slice(1).join(" "));
+  Console.log(argv.slice(1).join(" "));
   return ExitStatus.EXIT_SUCCESS;
 }

@@ -29,6 +29,7 @@
     "typescript": "^3.4.1"
   },
   "dependencies": {
+    "@wasmos/wasa": "github:WebAssemblyOS/wasa",
     "acorn": "^6.0.0"
   }
 }
