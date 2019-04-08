@@ -1,5 +1,5 @@
 {
-  "extends": "../node_modules/assemblyscript/tsconfig-base.json",
+  "extends": "../node_modules/@wasmos/assemblyscript/tsconfig.json",
   "compilerOptions": {
     "module": "commonjs",
     "moduleResolution": "node",
