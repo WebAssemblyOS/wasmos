@@ -1,6 +1,6 @@
 {
   "name": "@wasmos/kernel",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Core OS kernel for assemblyscript and WebAssembly",
   "main": "dist/index.js",
   "scripts": {

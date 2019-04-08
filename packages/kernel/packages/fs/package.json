@@ -1,6 +1,6 @@
 {
   "name": "@wasmos/fs",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Core OS kernel for assemblyscript and WebAssembly",
   "types": "src/index.ts",
   "scripts": {

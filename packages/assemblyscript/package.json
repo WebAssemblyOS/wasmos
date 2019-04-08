@@ -1,6 +1,6 @@
 {
   "name": "@wasmos/assemblyscript",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Fork of AssemblyScript",
   "main": "dist/index.js",
   "types": "assembly/index.d.ts",

@@ -1,6 +1,6 @@
 {
   "name": "@wasmos/os",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "AssemeblyScript version of node's 'os' module",
   "main": "dist/index.js",
   "scripts": {

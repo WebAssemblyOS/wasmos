@@ -1,6 +1,6 @@
 {
   "name": "@wasmos/as-node",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Compiles and executes AssemblyScript files",
   "main": "dist/index.js",
   "scripts": {
@@ -20,8 +20,8 @@
   "author": "Willem Wyndham",
   "license": "MIT",
   "dependencies": {
-    "@wasmos/utils": "file:../utils",
     "@wasmos/assemblyscript": "file:../assemblyscript",
+    "@wasmos/utils": "file:../utils",
     "ts-node": "^8.0.3",
     "typescript": "^3.4.1"
   }
