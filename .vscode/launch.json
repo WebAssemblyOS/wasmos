@@ -28,6 +28,21 @@
       "request": "attach",
       "name": "Attach",
       "port": 9229
+    },
+    {
+      "name": "Jest AssemblyScript",
+      "type": "node",
+      "request": "launch",
+      "address": "localhost",
+      "protocol": "inspector",
+      "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/lerna",
+      "runtimeArgs": ["exec", "--scope", "assemblyscript", "--", "node"],
+      "args": [
+        "${workspaceRoot}/node_modules/jest/bin/jest.js",
+        "--runInBand",
+        "--no-cache",
+        "packages/assemblyscript"
+      ]
     }
   ]
 }

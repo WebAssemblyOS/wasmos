@@ -2,6 +2,7 @@ import * as fs from "fs";
 import * as asc from "assemblyscript/cli/asc";
 
 import * as path from "path";
+
 import { mkdirp, promisfy, assemblyFolders } from "@wasmos/utils";
 
 let stat = promisfy(fs.stat);
@@ -30,31 +31,23 @@ interface CompilerOptions {
   outDir: string;
   /** Base directory for assembly source */
   baseDir: string;
+  /** command line args passed to asc */
+  cmdline: string[];
 }
 
-export async function init(folder: string): Promise<string[]> {
-  let folders = await assemblyFolders(folder);
-  // let libFolder = join(folder, "node_modules", ".assembly");
-  // try {
-  //   await mkdir(libFolder);
-  // } catch (error) {}
-
-  // let res = await Promise.all(
-  //   folders.map(async folder => {
-  //     var target = join(libFolder, path.basename(path.dirname(folder)));
-  //     try {
-  //       await symlink(folder, target);
-  //     } catch (error) {}
-  //     return target;
-  //   })
-  // );
-  return folders;
+function isRoot(dir: string): boolean {
+  return path.basename(dir) !== "";
 }
 
 export class Compiler {
   static get opts(): CompilerOptions {
     return Compiler._opts;
   }
+  static mergeOpts(newOpts?: CompilerOptions): CompilerOptions {
+    if (newOpts) this._opts = { ...newOpts, ...this._opts };
+    return this._opts;
+  }
+
   private static _opts = {
     readFile: async (basename: string, baseDir: string) => {
       let base = baseDir ? baseDir : "";
@@ -95,32 +88,39 @@ export class Compiler {
     stdout: asc.createMemoryStream(),
     stderr: asc.createMemoryStream(),
     outDir: "../dist/bin",
-    baseDir: "./assembly"
+    baseDir: path.join(process.cwd(), "./assembly"),
+    cmdline: []
   };
 
   static async compileOne(bin: string, _opts?: CompilerOptions): Promise<void> {
-    let opts: CompilerOptions = { ..._opts, ...this.opts };
-    let libFolders = await init(join(opts.baseDir, ".."));
-    let folder = bin.split(".")[0];
+    let binPath = path.isAbsolute(bin) ? bin : path.join(process.cwd(), bin);
+
+    let opts = this.mergeOpts(_opts);
+    let folder = path.basename(bin).split(".")[0];
     var preamble: string[] = [];
     try {
       await stat(path.join(opts.baseDir, "preamble.ts"));
       preamble.push("preamble.ts");
     } catch (error) {}
 
-    // let outDir = join(opts.baseDir, "..", opts.outDir, folder);
+    let outDir = join(opts.outDir, folder);
+    let baseDir = this.findRoot(binPath);
+    let relativeBin = path.relative(baseDir, binPath);
+    let relativeDir = path.relative(process.cwd(), baseDir);
+    let libFolders = await assemblyFolders(join(baseDir, ".."));
+
     // await promisfy(fs.mkdir)(outDir, { recursive: true }); //Create parent folders
     debugger;
     let asc_opts = [
-      "bin/" + bin,
+      relativeBin,
       "--baseDir",
-      opts.baseDir,
+      relativeDir,
       "--binaryFile",
-      `${opts.outDir}/index.wasm`,
+      `${outDir}/index.wasm`,
       "--textFile",
-      `${opts.outDir}/index.wat`,
+      `${outDir}/index.wat`,
       "--tsdFile",
-      `${opts.outDir}/index.d.ts`,
+      `${outDir}/index.d.ts`,
       "--importMemory",
       "--measure",
       "--validate",
@@ -128,25 +128,37 @@ export class Compiler {
       "--lib",
       libFolders.join(",")
     ];
-    let mesg = `
-      -----------------------------------------------
-      compiling ${bin}
-      -----------------------------------------------
-      `;
-    opts.stdout.write(mesg);
-    (<any>asc).main(preamble.concat(asc_opts), { ...opts }, (x: Error) => {
-      if (x == null) {
-        console.log(opts.stdout.toString());
-        let err = opts.stderr.toString();
-        if (err) {
-          console.error(err);
+    return new Promise((resolve, reject) => {
+      (<any>asc).main(
+        preamble.concat(asc_opts).concat(opts.cmdline),
+        { ...opts },
+        (x: Error) => {
+          if (x == null) {
+            console.log(opts.stdout.toString());
+            let err = opts.stderr.toString();
+            if (err) {
+              console.log(err);
+            }
+            resolve();
+          } else {
+            // debugger;
+            console.log(opts.stdout.toString());
+            console.error(opts.stderr.toString());
+            console.error(x);
+            reject();
+          }
         }
-      } else {
-        // debugger;
-        console.log(opts.stdout.toString());
-        console.error(opts.stderr.toString());
-        console.error(x);
-      }
+      );
     });
+  }
+
+  static findRoot(baseDir: string): string {
+    while (isRoot(baseDir)) {
+      baseDir = path.dirname(baseDir);
+      if (baseDir === "assembly") {
+        return baseDir;
+      }
+    }
+    return this._opts.baseDir;
   }
 }
