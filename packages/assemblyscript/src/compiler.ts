@@ -108,19 +108,19 @@ export class Compiler {
       preamble.push("preamble.ts");
     } catch (error) {}
 
-    let outDir = join(opts.baseDir, "..", opts.outDir, folder);
-    await promisfy(fs.mkdir)(outDir, { recursive: true }); //Create parent folders
+    // let outDir = join(opts.baseDir, "..", opts.outDir, folder);
+    // await promisfy(fs.mkdir)(outDir, { recursive: true }); //Create parent folders
     debugger;
     let asc_opts = [
       "bin/" + bin,
       "--baseDir",
       opts.baseDir,
       "--binaryFile",
-      `${outDir}/index.wasm`,
+      `${opts.outDir}/index.wasm`,
       "--textFile",
-      `${outDir}/index.wat`,
+      `${opts.outDir}/index.wat`,
       "--tsdFile",
-      `${outDir}/index.d.ts`,
+      `${opts.outDir}/index.d.ts`,
       "--importMemory",
       "--measure",
       "--validate",
