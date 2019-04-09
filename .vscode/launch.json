@@ -6,6 +6,25 @@
   "configurations": [
     {
       "type": "node",
+      "request": "launch",
+      "name": "Launch via NPM",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run-script", "debug"],
+      "port": 9229
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "AssemblyScript",
+      "args": [
+        "${workspaceFolder}/packages/assemblyscript/bin/wasm-asc.ts",
+        "echo.ts"
+      ],
+      "runtimeArgs": ["-r", "ts-node/register", "--inspect-brk"],
+      "cwd": "${workspaceFolder}/packages/assemblyscript"
+    },
+    {
+      "type": "node",
       "request": "attach",
       "name": "Attach",
       "port": 9229

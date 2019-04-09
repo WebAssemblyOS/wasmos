@@ -2,7 +2,7 @@
   "name": "@wasmos/fs",
   "version": "0.0.2",
   "description": "Core OS kernel for assemblyscript and WebAssembly",
-  "types": "src/index.ts",
+  "types": "index.ts",
   "scripts": {
     "test": "jest"
   },
@@ -23,5 +23,8 @@
     "browserfs": "^1.4.3",
     "ts-node": "^8.0.3",
     "typescript": "^3.4.1"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^5.0.5"
   }
 }

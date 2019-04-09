@@ -1,7 +1,8 @@
 import * as fs from "fs";
 import * as asc from "assemblyscript/cli/asc";
+
 import * as path from "path";
-import { promisfy, assemblyFolders } from "@wasmos/utils";
+import { mkdirp, promisfy, assemblyFolders } from "@wasmos/utils";
 
 let stat = promisfy(fs.stat);
 let mkdir = promisfy(fs.mkdir);
@@ -9,6 +10,7 @@ let symlink = promisfy(fs.symlink);
 let join = path.join;
 let readdir = promisfy<string[]>(fs.readdir);
 let readlink = promisfy<string>(fs.readlink);
+
 interface CompilerOptions {
   /** Standard output stream to use. */
   stdout: asc.OutputStream;
@@ -72,7 +74,7 @@ export class Compiler {
       let base = baseDir ? baseDir : "";
       let file = path.join(base, basename);
       let folder = path.dirname(file);
-      promisfy(fs.mkdir)(folder, { recursive: true }); //Create parent folders
+      await mkdirp(folder); //Create parent folders
       await promisfy(fs.writeFile)(file, content, { flag: "w" });
     },
     listFiles: async (basename: string, baseDir: string): Promise<string[]> => {

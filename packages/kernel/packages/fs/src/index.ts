@@ -58,6 +58,3 @@ export async function initWorker(): Promise<void> {
     options: { worker: self }
   });
 }
-
-// import * as _fs from "fs";
-// export * from "fs-extra";

@@ -28,3 +28,5 @@ export async function assemblyFolders(startingDir: string): Promise<string[]> {
     v => !(v.endsWith("std/types/assembly") || v.endsWith("std/assembly"))
   );
 }
+
+export * from "./mkdirp";
