@@ -4,10 +4,9 @@
   "description": "A set of runtime tools for WebAssembly and AssemblyScript",
   "main": "dist/index.js",
   "scripts": {
-    "build:test": "tsc -p spec/tsconfig.json && cd spec && zip -r build.zip build/",
-    "test": "npm run build:test && jest",
-    "test:browsers": "npm run build && ts-node experiments/",
-    "bootstrap": "lerna bootstrap"
+    "test": "lerna run test",
+    "bootstrap": "lerna bootstrap",
+    "clean": "lerna clean"
   },
   "repository": {
     "type": "git",
