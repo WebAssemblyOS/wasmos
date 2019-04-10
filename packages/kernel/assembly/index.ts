@@ -1,5 +1,5 @@
 
-import * as fs from "./fs";
+// import * as fs from "./fs";
 import {Process} from "./process";
 import {ViewBuffer, CharBuffer} from "./screen";
 
@@ -24,7 +24,7 @@ class Kernel {
    * - waiting processes
    * - idle processes
    */
-   public fs:      FileSystem;
+   // public fs:      FileSystem;
    public running: Queue<Process>;
    public waiting: Queue<Process>;
    public idle:    Queue<Process>;
@@ -35,11 +35,11 @@ class Kernel {
    private init: Process;
 
    constructor() {
-     this.fs      = new FileSystem();
+     // this.fs      = new FileSystem();
      this.running = new Queue<Process>();
      this.waiting = new Queue<Process>();
      this.idle    = new Queue<Process>();
-     this.init    = new Process("/boot/init", process.cwd);
+     // this.init    = new Process("/boot/init", process.cwd);
    }
 
 

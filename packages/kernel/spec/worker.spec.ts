@@ -25,30 +25,30 @@ afterAll(async () => {
 
 describe("worker thread", () => {
   it("should ping back", async () => {
-    let res = await new Promise(async (resolve, reject) => {
-      try {
-        let zipData = fs_.readFileSync(path.join(__dirname, "build.zip"));
-        console.log(zipData.length);
-        await init(zipData);
-        let source = fs_
-          .readFileSync(path.join(__dirname, "build", "worker.js"))
-          .toString();
-        let url = URL.createObjectURL(new Blob([source]));
-        console.log(url);
-        worker = new Worker(url);
-        attachWorker(worker as any);
-        worker.onmessage = (ev: MessageEvent) => {
-          if (!ev.data.browserfsMessage) {
-            resolve(ev.data);
-          }
-        };
-        worker.postMessage("Hi earth");
-      } catch (error) {
-        console.log(error.stack);
-        console.log(error.message);
-      }
-    });
-    console.log(res);
+    // let res = await new Promise(async (resolve, reject) => {
+    //   try {
+    //     let zipData = fs_.readFileSync(path.join(__dirname, "build.zip"));
+    //     console.log(zipData.length);
+    //     await init(zipData);
+    //     let source = fs_
+    //       .readFileSync(path.join(__dirname, "build", "worker.js"))
+    //       .toString();
+    //     let url = URL.createObjectURL(new Blob([source]));
+    //     console.log(url);
+    //     worker = new Worker(url);
+    //     attachWorker(worker as any);
+    //     worker.onmessage = (ev: MessageEvent) => {
+    //       if (!ev.data.browserfsMessage) {
+    //         resolve(ev.data);
+    //       }
+    //     };
+    //     worker.postMessage("Hi earth");
+    //   } catch (error) {
+    //     console.log(error.stack);
+    //     console.log(error.message);
+    //   }
+    // });
+    // console.log(res);
   }, 4000);
 });
 // describe('jsdom-worker', () => {

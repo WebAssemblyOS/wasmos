@@ -1,6 +1,6 @@
-import * as loader from "@wasmos/assemblyscript";
-import { ASImport, Host, Env } from "assemblyscript/lib/host/lib";
-import { fs } from "./fs";
+import { loader, ASImport, Host, Env } from "@wasmos/assemblyscript";
+
+import { fs } from "@wasmos/fs";
 import * as path from "path";
 
 enum ExitStatus {
@@ -25,10 +25,7 @@ export class Process {
   binName: string;
   binpath: string;
 
-  constructor(
-    public args: string,
-    public env: EnvVariale = new EnvVariale({ initial: NUM_PAGES })
-  ) {
+  constructor(public args: string, public env: EnvVariale = new EnvVariale()) {
     this.binName = args.substring(0, args.indexOf(" "));
   }
 
@@ -36,7 +33,7 @@ export class Process {
     for (let _path of this.env.path) {
       let binary = path.join(_path.dir, _path.base, name, "index.wasm");
       let asc = path.join(_path.dir, _path.base, name, "index.ts");
-      if ((await fs.exists(binary)) || (await fs.exists(asc))) {
+      if ((await fs.pathExists(binary)) || (await fs.pathExists(asc))) {
         return binary;
       }
     }

@@ -1,13 +1,12 @@
-
 // import { attachWorker } from "./fs";
 
 export class Kernel {
-  worker: Worker
+  worker: Worker;
   constructor(path: string = "worker.js") {
     this.worker = new Worker(path);
     // attachWorker(this.worker);
     this.worker.postMessage({ init: path });
-    this.worker.onmessage = this.onmessage.bind(this)
+    this.worker.onmessage = this.onmessage.bind(this);
   }
 
   onmessage(event: MessageEvent) {
@@ -20,3 +19,4 @@ export class Kernel {
     return kernel;
   }
 }
+export * from "./process";
