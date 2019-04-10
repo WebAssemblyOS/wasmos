@@ -4,7 +4,8 @@
   "description": "A set of runtime tools for WebAssembly and AssemblyScript",
   "main": "dist/index.js",
   "scripts": {
-    "test": "lerna run test",
+    "test": "jest",
+    "test:as": "asp",
     "bootstrap": "lerna bootstrap",
     "clean": "lerna clean"
   },
@@ -34,6 +35,9 @@
     "jsdom-worker": "^0.1.0",
     "lerna": "^3.13.1",
     "node-fetch": "^2.3.0",
+    "ts-jest": "^24.0.2",
+    "ts-node": "^8.0.3",
+    "typescript": "^3.4.3",
     "webpack": "^4.29.5",
     "webpack-cli": "^3.2.3",
     "webpack-dev-server": "^3.2.0"

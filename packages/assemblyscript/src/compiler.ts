@@ -31,8 +31,10 @@ interface CompilerOptions {
   outDir: string;
   /** Base directory for assembly source */
   baseDir: string;
-  /** command line args passed to asc */
+  /** Command line args passed to asc */
   cmdline: string[];
+  /**  Whether to print mesaurements */
+  mesaure: boolean;
 }
 
 function isRoot(dir: string): boolean {
@@ -89,7 +91,8 @@ export class Compiler {
     stderr: asc.createMemoryStream(),
     outDir: "../dist/bin",
     baseDir: path.join(process.cwd(), "./assembly"),
-    cmdline: []
+    cmdline: [],
+    mesaure: false
   };
 
   static async compileOne(bin: string, _opts?: CompilerOptions): Promise<void> {
@@ -134,9 +137,8 @@ export class Compiler {
         { ...opts },
         (x: Error) => {
           if (x == null) {
-            console.log(opts.stdout.toString());
-            let err = opts.stderr.toString();
-            if (err) {
+            if (opts.mesaure) {
+              let err = opts.stderr.toString();
               console.log(err);
             }
             resolve();
@@ -155,7 +157,7 @@ export class Compiler {
   static findRoot(baseDir: string): string {
     while (isRoot(baseDir)) {
       baseDir = path.dirname(baseDir);
-      if (baseDir === "assembly") {
+      if (path.basename(baseDir) === "assembly") {
         return baseDir;
       }
     }
