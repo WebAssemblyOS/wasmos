@@ -14,27 +14,29 @@ let readlink = promisfy<string>(fs.readlink);
 
 interface CompilerOptions {
   /** Standard output stream to use. */
-  stdout: asc.OutputStream;
+  stdout?: asc.OutputStream;
   /** Standard error stream to use. */
-  stderr: asc.OutputStream;
+  stderr?: asc.OutputStream;
   /** Reads a file from disk (or memory). */
-  readFile: (filename: string, baseDir: string) => Promise<string | null>;
+  readFile?: (filename: string, baseDir: string) => Promise<string | null>;
   /** Writes a file to disk (or memory). */
-  writeFile: (
+  writeFile?: (
     filename: string,
     contents: Uint8Array,
     baseDir: string
   ) => Promise<void>;
   /** Lists all files within a directory. */
-  listFiles: (dirname: string, baseDir: string) => Promise<string[] | null>;
+  listFiles?: (dirname: string, baseDir: string) => Promise<string[] | null>;
   /** Output Directory */
-  outDir: string;
+  outDir?: string;
   /** Base directory for assembly source */
-  baseDir: string;
+  baseDir?: string;
   /** Command line args passed to asc */
-  cmdline: string[];
+  cmdline?: string[];
   /**  Whether to print mesaurements */
-  mesaure: boolean;
+  mesaure?: boolean;
+  /** Whether to include all assembly library folders */
+  lib?: boolean;
 }
 
 function isRoot(dir: string): boolean {
@@ -92,7 +94,8 @@ export class Compiler {
     outDir: "../dist/bin",
     baseDir: path.join(process.cwd(), "./assembly"),
     cmdline: [],
-    mesaure: false
+    mesaure: false,
+    lib: true
   };
 
   static async compileOne(bin: string, _opts?: CompilerOptions): Promise<void> {
@@ -104,13 +107,13 @@ export class Compiler {
     try {
       await stat(path.join(opts.baseDir, "preamble.ts"));
       preamble.push("preamble.ts");
-    } catch (error) {}
+    } catch (error) { }
 
     let outDir = join(opts.outDir, folder);
     let baseDir = this.findRoot(binPath);
     let relativeBin = path.relative(baseDir, binPath);
     let relativeDir = path.relative(process.cwd(), baseDir);
-    let libFolders = await assemblyFolders(join(baseDir, ".."));
+    let libFolders = opts.lib ? ["--lib", (await assemblyFolders(join(baseDir, ".."))).join(",")] : [];
 
     // await promisfy(fs.mkdir)(outDir, { recursive: true }); //Create parent folders
     debugger;
@@ -127,10 +130,8 @@ export class Compiler {
       "--importMemory",
       "--measure",
       "--validate",
-      "--debug",
-      "--lib",
-      libFolders.join(",")
-    ];
+      "--debug"].concat(libFolders.join(","));
+
     return new Promise((resolve, reject) => {
       (<any>asc).main(
         preamble.concat(asc_opts).concat(opts.cmdline),
