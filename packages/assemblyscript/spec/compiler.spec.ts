@@ -14,6 +14,7 @@ import { Compiler } from "../src";
 
 describe("echo", () => {
   it("should compile", async () => {
+    process.chdir(__dirname);
     await Compiler.compileOne(
       path.join(__dirname, "..", "assembly", "bin", "echo.ts")
     );

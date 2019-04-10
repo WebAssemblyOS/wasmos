@@ -7,7 +7,8 @@
     "test": "jest",
     "test:as": "asp",
     "bootstrap": "lerna bootstrap",
-    "clean": "lerna clean"
+    "clean": "lerna clean -y",
+    "linkDev": "lerna exec \"ldev\""
   },
   "repository": {
     "type": "git",
@@ -26,6 +27,7 @@
   },
   "homepage": "https://github.com/WebAssemblyOS/wasmos#readme",
   "devDependencies": {
+    "@types/fs-extra": "^5.0.5",
     "@types/jest": "^24.0.6",
     "@types/node": "^11.9.5",
     "@types/webassembly-js-api": "0.0.2",
@@ -36,10 +38,16 @@
     "lerna": "^3.13.1",
     "node-fetch": "^2.3.0",
     "ts-jest": "^24.0.2",
+    "ts-loader": "^5.3.3",
     "ts-node": "^8.0.3",
-    "typescript": "^3.4.3",
+    "typescript": "^3.4.2",
     "webpack": "^4.29.5",
     "webpack-cli": "^3.2.3",
     "webpack-dev-server": "^3.2.0"
+  },
+  "dependencies": {
+    "@wasmos/utils": "file:packages/utils",
+    "shelljs": "^0.8.3",
+    "shx": "^0.3.2"
   }
 }

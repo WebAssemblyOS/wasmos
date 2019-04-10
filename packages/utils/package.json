@@ -6,7 +6,10 @@
   "scripts": {
     "test": "jest"
   },
-  "bin": "bin/*",
+  "bin": {
+    "ldev": "./bin/ldev",
+    "asdb": "./bin/asdb"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/WebAssemblyOS/wasmos/tree/master/packages/utils"
@@ -28,7 +31,6 @@
   },
   "devDependencies": {
     "ts-node": "^8.0.3",
-    "typescript": "^3.4.1",
-    "@wasmos/fs": "git:github.com/WebAssemblyOS/fs#v0.0.2"
+    "typescript": "^3.4.1"
   }
 }
