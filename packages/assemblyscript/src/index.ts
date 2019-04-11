@@ -5,5 +5,5 @@ export * from "assemblyscript/lib/host/lib";
 
 
 export async function main() {
-  
+
 }

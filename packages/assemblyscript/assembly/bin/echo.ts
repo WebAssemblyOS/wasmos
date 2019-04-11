@@ -1,6 +1,8 @@
 // import {_process, Process} from "../preamble";
 // import { Console } from "@wasmos/wasa";
-import "allocator/arena";
+// import "allocator/arena";
+
+import {log} from "host";
 
 export const enum ExitStatus {
   EXIT_FAILURE = -1,
@@ -8,6 +10,6 @@ export const enum ExitStatus {
 }
 
 export function _main(argv: string[]): ExitStatus {
-  // Console.log(argv.slice(1).join(" "));
+  log(argv.slice(1).join(" "));
   return ExitStatus.EXIT_SUCCESS;
 }

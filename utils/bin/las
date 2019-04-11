@@ -1,0 +1,16 @@
+#!/usr/bin/env node
+
+let shell = require("shelljs");
+let path = require("path")
+
+if (!exists("./node_modules")){
+  console.log(path.basename(shell.pwd().stdout) + " has no installed dependencies.  Try running `npm run bootstrap` if it should.")
+  process.exit(0)
+}
+
+shell.cd("./node_modules")
+
+if (!exists(".assembly")){
+  shell.mkdir(".assembly")
+}
+shell.cd(".assembly")

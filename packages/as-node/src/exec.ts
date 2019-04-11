@@ -13,6 +13,7 @@ export async function exec(filename: string, args?: string) {
   if (!(await fs.pathExists(wasmPath))) {
     await Compiler.compileOne(path.resolve(filename), { lib: false });
   }
-  let _process = ASProcess.exec([filename, args].join(" "));
-  console.log(_process.stdout.join("\n"));
+  expect(await fs.pathExists(wasmPath)).toBe(true)
+  // let _process = ASProcess.exec([filename, args].join(" "));
+  // console.log(_process.stdout.join("\n"));
 }

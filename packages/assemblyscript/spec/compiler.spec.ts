@@ -1,16 +1,19 @@
 //
-import * as fs from "fs";
+import * as fs from "fs-extra";
+import * as shell from "shelljs";
 import * as path from "path";
-// beforeAll(async () => {
-//
 
-//
-// }, 10000);
-import { Compiler } from "../src";
+import { Compiler, linkLibrary } from "../src";
 
-// afterAll(async () => {
-//   // worker.terminate();
-// });
+
+const ROOT = path.join(__dirname, "..")
+
+describe("Link Library", () => {
+  it("should find all the assembly files", async () => {
+    await linkLibrary(ROOT);
+    expect(shell.test("-e",ROOT+"/node_modules/.assembly")).toBe(true)
+  }, 4000);
+});
 
 describe("echo", () => {
   it("should compile", async () => {

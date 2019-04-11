@@ -1,16 +1,11 @@
-import * as fs from "fs";
+import {fs, mkdirp, promisfy, assemblyFolders} from "@wasmos/fs";
 import * as asc from "assemblyscript/cli/asc";
 
 import * as path from "path";
 
-import { mkdirp, promisfy, assemblyFolders } from "@wasmos/utils";
 
-let stat = promisfy(fs.stat);
-let mkdir = promisfy(fs.mkdir);
-let symlink = promisfy(fs.symlink);
 let join = path.join;
-let readdir = promisfy<string[]>(fs.readdir);
-let readlink = promisfy<string>(fs.readlink);
+
 
 interface CompilerOptions {
   /** Standard output stream to use. */
@@ -41,6 +36,26 @@ interface CompilerOptions {
 
 function isRoot(dir: string): boolean {
   return path.basename(dir) !== "";
+}
+
+export async function linkLibrary(rootPath: string): Promise<string> {
+   let folders = await assemblyFolders(rootPath);
+   console.log(folders);
+   let assemblyFolder = path.join(rootPath, "node_modules", ".assembly");
+   mkdirp(assemblyFolder);
+   let pwd = process.cwd();
+   process.chdir(assemblyFolder);
+   await Promise.all(folders.map(async (v: string)=> {
+     let folder = path.basename(path.dirname(v))
+     if (!( await fs.pathExists(folder))){
+       let relativeFolder = path.relative(process.cwd(), v);
+       console.log("link "+ folder + " to " + relativeFolder);
+       await fs.symlink(relativeFolder, folder);
+     }
+   }))
+   process.chdir(pwd);
+
+   return assemblyFolder;
 }
 
 export class Compiler {
@@ -79,10 +94,10 @@ export class Compiler {
       let dir = path.join(base, basename);
       var files: string[] = [];
       try {
-        files = await readdir(dir);
+        files = await fs.readdir(dir);
       } catch (error) {
         try {
-          files = await readdir(await readlink(dir));
+          files = await fs.readdir(await fs.readlink(dir));
         } catch (error) {
           throw error;
         }
@@ -105,15 +120,16 @@ export class Compiler {
     let folder = path.basename(bin).split(".")[0];
     var preamble: string[] = [];
     try {
-      await stat(path.join(opts.baseDir, "preamble.ts"));
+      await fs.stat(path.join(opts.baseDir!, "preamble.ts"));
       preamble.push("preamble.ts");
     } catch (error) { }
 
-    let outDir = join(opts.outDir, folder);
+    let outDir = join(opts.outDir!, folder);
     let baseDir = this.findRoot(binPath);
     let relativeBin = path.relative(baseDir, binPath);
     let relativeDir = path.relative(process.cwd(), baseDir);
-    let libFolders = opts.lib ? ["--lib", (await assemblyFolders(join(baseDir, ".."))).join(",")] : [];
+    let libraryPath = await linkLibrary(path.join(baseDir, ".."));
+    let libFolders = opts.lib ? ["--lib", libraryPath] : [];
 
     // await promisfy(fs.mkdir)(outDir, { recursive: true }); //Create parent folders
     debugger;
@@ -130,23 +146,23 @@ export class Compiler {
       "--importMemory",
       "--measure",
       "--validate",
-      "--debug"].concat(libFolders.join(","));
+      "--debug"].concat(libFolders);
 
     return new Promise((resolve, reject) => {
       (<any>asc).main(
-        preamble.concat(asc_opts).concat(opts.cmdline),
+        preamble.concat(asc_opts).concat(opts.cmdline!),
         { ...opts },
         (x: Error) => {
           if (x == null) {
             if (opts.mesaure) {
-              let err = opts.stderr.toString();
+              let err = opts.stderr!.toString();
               console.log(err);
             }
             resolve();
           } else {
             // debugger;
-            console.log(opts.stdout.toString());
-            console.error(opts.stderr.toString());
+            console.log(opts.stdout!.toString());
+            console.error(opts.stderr!.toString());
             console.error(x);
             reject();
           }

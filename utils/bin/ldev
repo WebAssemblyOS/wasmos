@@ -3,10 +3,13 @@
 let shell = require("shelljs");
 let path = require("path")
 
+function exists(name) {
+  return shell.test("-e", name)
+}
 //Get the root Binaries
-let rootBin =  path.resolve(path.dirname( __dirname)+"/../../node_modules/.bin/");
-if (shell.ls("./node_modules/.bin").stderr){
-  console.log(shell.pwd().stdout)
+let rootBin =  path.resolve(path.dirname( __dirname)+"/../node_modules/.bin/");
+if (!exists("./node_modules/.bin")){
+  console.log(path.basename(shell.pwd().stdout) + " has no installed dependencies.  Try running `npm run bootstrap` if it should.")
   process.exit(0)
 }
 
@@ -16,8 +19,9 @@ shell.ls(rootBin).forEach(bin => {
   let binName = path.basename(bin)
   let dirName = path.join(rootBin, bin);
   let relativeBinary = path.join(path.relative(shell.pwd().stdout, rootBin), binName)
-  if (shell.ls(binName).stderr){
-    shell.ln("-s", relativeBinary, binName)
+  if (!exists(binName)){
+    console.log(relativeBinary, path.resolve(binName))
+    shell.ln("-s", relativeBinary, path.resolve(binName))
   }
 })
 shell.cd("../..")

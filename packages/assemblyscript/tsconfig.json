@@ -1,9 +1,9 @@
 {
   "extends": "./tsconfig-base.json",
   "compilerOptions": {
-    "outDir": "dist/",
     "declaration": true,
-    "module": "commonjs"
+    "module": "commonjs",
+    "lib": "es2015"
   },
   "include": ["src/"]
 }

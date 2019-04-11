@@ -1,5 +1,5 @@
 import * as BrowserFS from "browserfs";
-import { promisfy } from "@wasmos/utils";
+import { promisfy } from "./glob";
 
 export async function init(
   root: string | ArrayBuffer = "assembly.zip"
@@ -46,15 +46,16 @@ export async function init(
   });
 }
 
-export function attachWorker(worker: Worker) {
-  BrowserFS.FileSystem.WorkerFS.attachRemoteListener(worker);
-}
-import * as fs from "fs-extra";
-export { fs };
-
 export async function initWorker(): Promise<void> {
   await promisfy(BrowserFS.configure)({
     fs: "WorkerFS",
     options: { worker: self }
   });
 }
+export function attachWorker(worker: Worker) {
+  BrowserFS.FileSystem.WorkerFS.attachRemoteListener(worker);
+}
+import * as fs from "fs-extra";
+export { fs };
+export * from "./mkdirp";
+export * from "./glob";
