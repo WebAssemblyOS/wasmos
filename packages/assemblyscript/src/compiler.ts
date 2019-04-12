@@ -40,7 +40,6 @@ function isRoot(dir: string): boolean {
 export async function linkLibrary(rootPath: string): Promise<string> {
   let folders = await assemblyFolders(rootPath);
   let assemblyFolder = path.join(rootPath, "node_modules", ".assembly");
-  console.log(folders)
   await mkdirp(assemblyFolder);
   let pwd = process.cwd();
   process.chdir(assemblyFolder);
