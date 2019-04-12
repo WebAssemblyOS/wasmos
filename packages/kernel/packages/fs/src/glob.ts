@@ -25,6 +25,7 @@ export async function assemblyFolders(startingDir: string): Promise<string[]> {
   let dir = startingDir + "/node_modules/**/**/assembly";
   let res = await Glob(dir);
   return res.filter(
-    v => !(v.endsWith("std/types/assembly") || v.endsWith("std/assembly"))
+    v => !(v.endsWith("std/types/assembly") || v.endsWith("std/assembly") ||
+      v.split("node_modules").length != 2 || v.match(/node_modules.*packages.*/) != null)
   );
 }

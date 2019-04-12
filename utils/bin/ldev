@@ -14,13 +14,11 @@ if (!exists("./node_modules/.bin")){
 }
 
 shell.cd("./node_modules/.bin")
-// console.log(shell.ls(".").stdout)
 shell.ls(rootBin).forEach(bin => {
   let binName = path.basename(bin)
   let dirName = path.join(rootBin, bin);
   let relativeBinary = path.join(path.relative(shell.pwd().stdout, rootBin), binName)
   if (!exists(binName)){
-    console.log(relativeBinary, path.resolve(binName))
     shell.ln("-s", relativeBinary, path.resolve(binName))
   }
 })

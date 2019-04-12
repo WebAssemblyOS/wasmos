@@ -3,7 +3,7 @@
   "version": "0.0.2",
   "description": "Fork of AssemblyScript",
   "main": "dist/index.js",
-  "types": "src/index.ts",
+  "types": "assembly/index.ts",
   "scripts": {
     "test": "jest"
   },

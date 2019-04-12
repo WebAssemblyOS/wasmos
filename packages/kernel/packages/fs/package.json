@@ -2,7 +2,7 @@
   "name": "@wasmos/fs",
   "version": "0.0.2",
   "description": "Core OS kernel for assemblyscript and WebAssembly",
-  "types": "index.ts",
+  "types": "assembly/index.ts",
   "scripts": {
     "test": "jest"
   },

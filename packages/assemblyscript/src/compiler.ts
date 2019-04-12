@@ -1,11 +1,10 @@
-import {fs, mkdirp, promisfy, assemblyFolders} from "@wasmos/fs";
+import { fs, mkdirp, promisfy, assemblyFolders } from "@wasmos/fs/src";
 import * as asc from "assemblyscript/cli/asc";
-
+import * as shell from "shelljs";
 import * as path from "path";
-
+import assert = require("assert");
 
 let join = path.join;
-
 
 interface CompilerOptions {
   /** Standard output stream to use. */
@@ -39,23 +38,34 @@ function isRoot(dir: string): boolean {
 }
 
 export async function linkLibrary(rootPath: string): Promise<string> {
-   let folders = await assemblyFolders(rootPath);
-   console.log(folders);
-   let assemblyFolder = path.join(rootPath, "node_modules", ".assembly");
-   mkdirp(assemblyFolder);
-   let pwd = process.cwd();
-   process.chdir(assemblyFolder);
-   await Promise.all(folders.map(async (v: string)=> {
-     let folder = path.basename(path.dirname(v))
-     if (!( await fs.pathExists(folder))){
-       let relativeFolder = path.relative(process.cwd(), v);
-       console.log("link "+ folder + " to " + relativeFolder);
-       await fs.symlink(relativeFolder, folder);
-     }
-   }))
-   process.chdir(pwd);
+  let folders = await assemblyFolders(rootPath);
+  let assemblyFolder = path.join(rootPath, "node_modules", ".assembly");
+  console.log(folders)
+  await mkdirp(assemblyFolder);
+  let pwd = process.cwd();
+  process.chdir(assemblyFolder);
+  await Promise.all(
+    folders.map(async (v: string) => {
+      let folder = path.dirname(v);
+      let grandFolder = path.dirname(folder);
+      folder = path.basename(folder);
+      while (path.basename(grandFolder) != "node_modules") {
+        folder = path.join(path.basename(grandFolder), folder);
+        grandFolder = path.dirname(grandFolder);
+      }
+      if (path.basename(path.dirname(folder)) != "node_modules"){
+        await mkdirp(path.dirname(folder));
+      }
+      let folderExists = await fs.pathExists(folder);
+      if (!folderExists) {
+        let realPath = await fs.realpath(v);
+        await fs.symlink(realPath, folder, "dir");
+      }
+    })
+  );
+  process.chdir(pwd);
 
-   return assemblyFolder;
+  return assemblyFolder;
 }
 
 export class Compiler {
@@ -70,8 +80,8 @@ export class Compiler {
   private static _opts = {
     readFile: async (basename: string, baseDir: string) => {
       let base = baseDir ? baseDir : "";
-      let file = path.join(base, basename);
       try {
+        let file = await fs.realpath(path.join(base, basename));
         let source = await promisfy(fs.readFile)(file);
         return source.toString();
       } catch (e) {
@@ -84,7 +94,7 @@ export class Compiler {
       baseDir: string
     ) => {
       let base = baseDir ? baseDir : "";
-      let file = path.join(base, basename);
+      let file = await fs.realpath(path.join(base, basename));
       let folder = path.dirname(file);
       await mkdirp(folder); //Create parent folders
       await promisfy(fs.writeFile)(file, content, { flag: "w" });
@@ -92,12 +102,12 @@ export class Compiler {
     listFiles: async (basename: string, baseDir: string): Promise<string[]> => {
       let base = baseDir ? baseDir : "";
       let dir = path.join(base, basename);
-      var files: string[] = [];
       try {
+        var files: string[] = [];
         files = await fs.readdir(dir);
       } catch (error) {
         try {
-          files = await fs.readdir(await fs.readlink(dir));
+          files = await fs.readdir(await fs.realpath(dir));
         } catch (error) {
           throw error;
         }
@@ -122,7 +132,7 @@ export class Compiler {
     try {
       await fs.stat(path.join(opts.baseDir!, "preamble.ts"));
       preamble.push("preamble.ts");
-    } catch (error) { }
+    } catch (error) {}
 
     let outDir = join(opts.outDir!, folder);
     let baseDir = this.findRoot(binPath);
@@ -146,7 +156,8 @@ export class Compiler {
       "--importMemory",
       "--measure",
       "--validate",
-      "--debug"].concat(libFolders);
+      "--debug"
+    ].concat(libFolders);
 
     return new Promise((resolve, reject) => {
       (<any>asc).main(

@@ -2,7 +2,7 @@
 // import { Console } from "@wasmos/wasa";
 // import "allocator/arena";
 
-import {log} from "host";
+import {log} from "assemblyscript/lib/host";
 
 export const enum ExitStatus {
   EXIT_FAILURE = -1,
