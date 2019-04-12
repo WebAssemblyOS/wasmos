@@ -1,6 +1,6 @@
 
 import { exec } from "..";
-import { fs } from "@wasmos/fs";
+import { fs } from "@wasmos/fs/src";
 
 beforeAll(() => {
   process.chdir(__dirname + "/..");
