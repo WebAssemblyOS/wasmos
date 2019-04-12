@@ -1,4 +1,4 @@
-import { fs, mkdirp, promisfy, assemblyFolders } from "@wasmos/fs/src";
+import { fs, mkdirp, assemblyFolders } from "@wasmos/fs/src";
 import * as asc from "assemblyscript/cli/asc";
 import * as shell from "shelljs";
 import * as path from "path";
@@ -81,8 +81,8 @@ export class Compiler {
     readFile: async (basename: string, baseDir: string) => {
       let base = baseDir ? baseDir : "";
       try {
-        let file = await fs.realpath(path.join(base, basename));
-        let source = await promisfy(fs.readFile)(file);
+        let file = path.join(base, basename);
+        let source = await fs.readFile(file);
         return source.toString();
       } catch (e) {
         return null;
@@ -94,10 +94,10 @@ export class Compiler {
       baseDir: string
     ) => {
       let base = baseDir ? baseDir : "";
-      let file = await fs.realpath(path.join(base, basename));
+      let file = path.join(base, basename);
       let folder = path.dirname(file);
       await mkdirp(folder); //Create parent folders
-      await promisfy(fs.writeFile)(file, content, { flag: "w" });
+      await fs.writeFile(file, content, { flag: "w" });
     },
     listFiles: async (basename: string, baseDir: string): Promise<string[]> => {
       let base = baseDir ? baseDir : "";
@@ -141,8 +141,7 @@ export class Compiler {
     let libraryPath = await linkLibrary(path.join(baseDir, ".."));
     let libFolders = opts.lib ? ["--lib", libraryPath] : [];
 
-    // await promisfy(fs.mkdir)(outDir, { recursive: true }); //Create parent folders
-    debugger;
+
     let asc_opts = [
       relativeBin,
       "--baseDir",
