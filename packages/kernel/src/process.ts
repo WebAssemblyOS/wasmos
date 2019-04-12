@@ -1,6 +1,6 @@
-import { loader, ASImport, Host, Env } from "@wasmos/assemblyscript";
+import { loader, ASImport, Host, Env } from "@wasmos/assemblyscript/src";
 
-import { fs } from "@wasmos/fs";
+import { fs } from "@wasmos/fs/src";
 import * as path from "path";
 
 enum ExitStatus {

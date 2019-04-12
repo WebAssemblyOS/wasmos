@@ -1,7 +1,7 @@
 import { ASProcess } from "@wasmos/kernel";
 import { Compiler } from "@wasmos/assemblyscript/src";
 
-import { fs } from "@wasmos/fs";
+import { fs } from "@wasmos/fs/src";
 import * as path from "path";
 
 export async function exec(filename: string, args?: string) {
