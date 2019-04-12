@@ -1,17 +1,11 @@
 {
   "compilerOptions": {
-    "lib": ["webworker", "es6", "scripthost"],
+    "lib": ["webworker", "es6", "scripthost", "es2015", "es2017"],
     "module": "commonjs",
     "moduleResolution": "node",
     "esModuleInterop": true,
     "target": "es6",
     "allowJs": true,
     "strict": false
-  },
-  "include": [
-    "src/**/*.ts",
-    "./build.ts",
-    "packages/kernel/src/threading/worker.ts",
-    "packages/kernel/src/threading/actor.ts"
-  ]
+  }
 }

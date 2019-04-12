@@ -3,7 +3,7 @@
   "version": "0.0.2",
   "description": "Fork of AssemblyScript",
   "main": "dist/index.js",
-  "types": "src/index.ts",
+  "types": "assembly/index.ts",
   "scripts": {
     "test": "jest"
   },
@@ -25,16 +25,8 @@
   ],
   "author": "Willem Wyndham",
   "license": "MIT",
-  "devDependencies": {
-    "ts-node": "^8.0.3",
-    "typescript": "^3.4.1"
-  },
   "dependencies": {
-    "@types/fs-extra": "^5.0.5",
     "@wasmos/fs": "git:github.com/WebAssemblyOS/fs#v0.0.2",
-    "@wasmos/utils": "git:github.com/WebAssemblyOS/utils#v0.0.2",
-    "acorn": "^6.0.0",
-    "assemblyscript": "github:willemneal/assemblyscript#b7d8e1300a578fb76ff25f9dfab9de8c5a1cde94",
-    "fs-extra": "^7.0.1"
+    "assemblyscript": "github:willemneal/assemblyscript#b7d8e1300a578fb76ff25f9dfab9de8c5a1cde94"
   }
 }

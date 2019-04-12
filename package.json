@@ -6,7 +6,7 @@
   "scripts": {
     "test": "jest",
     "test:as": "asp",
-    "bootstrap": "lerna bootstrap",
+    "bootstrap": "lerna bootstrap && npm run linkDev",
     "clean": "lerna clean -y",
     "linkDev": "lerna exec \"ldev\""
   },
@@ -35,7 +35,6 @@
     "browserfs": "^1.4.3",
     "jest": "^24.1.0",
     "jsdom-worker": "^0.1.0",
-    "lerna": "^3.13.1",
     "node-fetch": "^2.3.0",
     "ts-jest": "^24.0.2",
     "ts-loader": "^5.3.3",
@@ -46,7 +45,9 @@
     "webpack-dev-server": "^3.2.0"
   },
   "dependencies": {
-    "@wasmos/utils": "file:packages/utils",
+    "@types/shelljs": "^0.8.4",
+    "@wasmos/utils": "file:./utils",
+    "lerna": "^3.13.0",
     "shelljs": "^0.8.3",
     "shx": "^0.3.2"
   }

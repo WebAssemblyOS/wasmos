@@ -23,21 +23,7 @@
   "license": "MIT",
   "dependencies": {
     "@wasmos/assemblyscript": "git:github.com/WebAssemblyOS/assemblyscript#v0.0.2",
-    "browserfs": "^1.4.3",
-    "ts-node": "^8.0.3",
-    "typescript": "^3.4.1",
     "xterm": "^3.12.0"
-  },
-  "devDependencies": {
-    "@types/webassembly-js-api": "0.0.2",
-    "as-pect": "github:jtenner/as-pect",
-    "jest": "^24.1.0",
-    "jsdom-worker": "^0.1.0",
-    "node-fetch": "^2.3.0",
-    "ts-loader": "^5.3.3",
-    "webpack": "^4.29.5",
-    "webpack-cli": "^3.2.3",
-    "webpack-dev-server": "^3.2.0"
   },
   "gitHead": "feef85b557c8395979e6d5f67db35a488eea1f6d"
 }

@@ -26,7 +26,9 @@ import * as path from "path";
 import * as fs from "fs-extra";
 
 var _0777 = parseInt("0777", 8);
-
+/**
+ * Creates a directory including the parents if they don't exist.
+ */
 export async function mkdirp(
   p: string,
   opts: any | null = null,

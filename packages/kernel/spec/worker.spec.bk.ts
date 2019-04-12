@@ -2,7 +2,7 @@
 // import 'jsdom-worker';
 
 import * as fs_ from "fs";
-import { init, attachWorker } from "../packages/fs";
+import { init, attachWorker } from "../packages/fs/src";
 import * as path from "path";
 const sleep = t =>
   new Promise(r => {

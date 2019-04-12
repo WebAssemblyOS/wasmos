@@ -4,7 +4,7 @@
   "description": "Compiles and executes AssemblyScript files",
   "main": "dist/index.js",
   "scripts": {
-    "test": "ts-node bin/as-node.ts echo"
+    "test": "echo test top level"
   },
   "repository": {
     "type": "git",
@@ -21,8 +21,7 @@
   "license": "MIT",
   "dependencies": {
     "@wasmos/assemblyscript": "git:github.com/WebAssemblyOS/assemblyscript#v0.0.2",
-    "@wasmos/utils": "git:github.com/WebAssemblyOS/utils#v0.0.2",
-    "ts-node": "^8.0.3",
-    "typescript": "^3.4.1"
+    "@wasmos/kernel": "git:github.com/WebAssemblyOS/kernel#v0.0.2",
+    "@wasmos/fs": "git:github.com/WebAssemblyOS/fs#v0.0.2"
   }
 }
