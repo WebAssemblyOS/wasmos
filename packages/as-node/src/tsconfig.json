@@ -4,7 +4,6 @@
     "module": "commonjs",
     "moduleResolution": "node",
     "esModuleInterop": true,
-    "target": "es6",
-    "allowJs": true
+    "target": "es6"
   }
 }

@@ -22,6 +22,6 @@
   "dependencies": {
     "@wasmos/assemblyscript": "git:github.com/WebAssemblyOS/assemblyscript#v0.0.2",
     "@wasmos/fs": "git:github.com/WebAssemblyOS/fs#v0.0.2",
-    "@wasmos/wasa": "git:github.com/WebAssemblyOS/wasa#dd4918ae361bb778ddffa808cb29f32d6babf24c"
+    "@wasmos/wasa": "git:github.com/WebAssemblyOS/wasa#c5c7b85e16aa659b9913cc9e5fef62598c4012b7"
   }
 }

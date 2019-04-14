@@ -6,10 +6,22 @@
   "configurations": [
     {
       "type": "node",
+      "request": "attach",
+      "name": "Attach to Remote",
+      "address": "127.0.0.1",
+      "port": 9229,
+      "localRoot": "${workspaceFolder}",
+      "remoteRoot": "Absolute path to the remote directory containing the program"
+    },
+    {
+      "type": "node",
       "request": "launch",
       "name": "Launch via NPM",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run-script", "debug"],
+      "runtimeArgs": [
+        "run-script",
+        "debug"
+      ],
       "port": 9229
     },
     {
@@ -20,7 +32,11 @@
         "${workspaceFolder}/packages/assemblyscript/bin/wasm-asc.ts",
         "echo.ts"
       ],
-      "runtimeArgs": ["-r", "ts-node/register", "--inspect-brk"],
+      "runtimeArgs": [
+        "-r",
+        "ts-node/register",
+        "--inspect-brk"
+      ],
       "cwd": "${workspaceFolder}/packages/assemblyscript"
     },
     {
@@ -30,19 +46,38 @@
       "port": 9229
     },
     {
-      "name": "Jest AssemblyScript",
+      "name": "Jest debug AssemblyScript",
       "type": "node",
       "request": "launch",
       "address": "localhost",
       "protocol": "inspector",
       "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/lerna",
-      "runtimeArgs": ["exec", "--scope", "assemblyscript", "--", "node"],
+      "runtimeArgs": [
+        "exec",
+        "--scope",
+        "assemblyscript",
+        "--",
+        "node"
+      ],
       "args": [
         "${workspaceRoot}/node_modules/jest/bin/jest.js",
         "--runInBand",
         "--no-cache",
         "packages/assemblyscript"
       ]
-    }
+    },
+    {
+      "name": "Jest",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "node",
+      "args": [
+        "${workspaceRoot}/node_modules/jest/bin/jest.js",
+        "--",
+        "--runInBand",
+        "--no-cache",
+        "${fileDirname}"
+      ]
+    },
   ]
 }
