@@ -70,7 +70,7 @@ export class ASProcess extends Process implements Wasi.Wasi {
 
   constructor(public args: string[], env?: Env) {
     super(args, env);
-    args.forEach(this.UT8Args.push);
+    args.forEach(arg => this.UT8Args.push(arg));
   }
 
   readStdout(s: string | number): void {
