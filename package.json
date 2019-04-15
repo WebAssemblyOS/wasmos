@@ -8,7 +8,9 @@
     "test:as": "asp",
     "bootstrap": "lerna bootstrap && npm run linkDev",
     "clean": "lerna clean -y",
-    "linkDev": "lerna exec \"ldev\""
+    "linkDev": "lerna exec \"ldev\"",
+    "ci": "npm-run-all clean bootstrap ci:test",
+    "ci:test": "npm run test -- -i"
   },
   "repository": {
     "type": "git",
@@ -36,6 +38,7 @@
     "jest": "^24.1.0",
     "jsdom-worker": "^0.1.0",
     "node-fetch": "^2.3.0",
+    "npm-run-all": "^4.1.5",
     "ts-jest": "^24.0.2",
     "ts-loader": "^5.3.3",
     "ts-node": "^8.0.3",

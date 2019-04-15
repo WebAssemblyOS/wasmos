@@ -1,6 +1,6 @@
 
 import { ASProcess, Args, Arg } from "../src/process/wasm";
-import { stringToUTF8Array, fromUTF8Array } from "@wasmos/wasa/src"
+import { stringToUTF8Array, fromUTF8Array } from "@wasmos/utils"
 
 var args: Args;
 const Hello = "Hello";

@@ -1,6 +1,6 @@
 import { Process, Env } from "./process";
-import * as Wasi from "@wasmos/wasa/src/wasi";
-import { toUint8Array, fromUTF8Array } from "@wasmos/wasa/src";
+import { Wasi } from "../wasi";
+import { toUint8Array, fromUTF8Array } from "@wasmos/utils";
 import { loader, ASImport } from "@wasmos/assemblyscript/src";
 
 export class Arg {
