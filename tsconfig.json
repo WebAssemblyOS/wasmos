@@ -1,6 +1,12 @@
 {
   "compilerOptions": {
-    "lib": ["webworker", "es6", "scripthost", "es2015", "es2017"],
+    "lib": [
+      "webworker",
+      "es6",
+      "scripthost",
+      "es2015",
+      "es2017"
+    ],
     "module": "commonjs",
     "moduleResolution": "node",
     "esModuleInterop": true,
