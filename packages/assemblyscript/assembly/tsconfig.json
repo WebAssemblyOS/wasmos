@@ -3,6 +3,7 @@
   "include": ["**/*.ts"],
   "compilerOptions": {
     "typeRoots": [
+      "./types",
       "../node_modules/.assembly/",
       "../node_modules/assemblyscript/std/types"
     ]

@@ -30,7 +30,7 @@
   "homepage": "https://github.com/WebAssemblyOS/wasmos#readme",
   "devDependencies": {
     "@types/fs-extra": "^5.0.5",
-    "@types/jest": "^24.0.6",
+    "@types/jest": "^24.0.11",
     "@types/node": "^11.9.5",
     "@types/webassembly-js-api": "0.0.2",
     "as-pect": "github:jtenner/as-pect",

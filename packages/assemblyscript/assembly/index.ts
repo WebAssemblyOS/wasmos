@@ -1,1 +1,1 @@
-export * from "./testclass";
+export * from "@wasmos/wasa";

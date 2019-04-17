@@ -1,6 +1,6 @@
-import { fs, mkdirp, assemblyFolders } from "@wasmos/fs/src";
+import { glob, fs, mkdirp, assemblyFolders } from "@wasmos/fs/src";
 import * as asc from "assemblyscript/cli/asc";
-import * as shell from "shelljs";
+
 import * as path from "path";
 import assert = require("assert");
 
@@ -52,7 +52,7 @@ export async function linkLibrary(rootPath: string): Promise<string> {
         folder = path.join(path.basename(grandFolder), folder);
         grandFolder = path.dirname(grandFolder);
       }
-      if (path.basename(path.dirname(folder)) != "node_modules"){
+      if (path.basename(path.dirname(folder)) != "node_modules") {
         await mkdirp(path.dirname(folder));
       }
       let folderExists = await fs.pathExists(folder);
@@ -79,9 +79,19 @@ export class Compiler {
   private static _opts = {
     readFile: async (basename: string, baseDir: string) => {
       let base = baseDir ? baseDir : "";
+      console.log(basename);
       try {
         let file = path.join(base, basename);
+        let libPath = path.join("../node_modules/.assembly", basename);
+        if (await fs.pathExists(basename)) {
+          console.log("using basename " + basename);
+          file = basename;
+        } else if (await fs.pathExists(libPath)) {
+          file = libPath;
+        }
         let source = await fs.readFile(file);
+        console.log(`FILE: ${file} ${source.toString().substring(0, 40)}`);
+        debugger;
         return source.toString();
       } catch (e) {
         return null;
@@ -101,6 +111,7 @@ export class Compiler {
     listFiles: async (basename: string, baseDir: string): Promise<string[]> => {
       let base = baseDir ? baseDir : "";
       let dir = path.join(base, basename);
+      console.log(dir);
       try {
         var files: string[] = [];
         files = await fs.readdir(dir);
@@ -116,30 +127,37 @@ export class Compiler {
     stdout: asc.createMemoryStream(),
     stderr: asc.createMemoryStream(),
     outDir: "../dist/bin",
-    baseDir: path.join(process.cwd(), "./assembly"),
+    baseDir: "./assembly",
     cmdline: [],
     mesaure: false,
     lib: true
   };
 
   static async compileOne(bin: string, _opts?: CompilerOptions): Promise<void> {
+    console.log(process.cwd());
     let binPath = path.isAbsolute(bin) ? bin : path.join(process.cwd(), bin);
 
     let opts = this.mergeOpts(_opts);
     let folder = path.basename(bin).split(".")[0];
-    var preamble: string[] = [];
-    try {
-      await fs.stat(path.join(opts.baseDir!, "preamble.ts"));
-      preamble.push("preamble.ts");
-    } catch (error) {}
 
     let outDir = join(opts.outDir!, folder);
     let baseDir = this.findRoot(binPath);
     let relativeBin = path.relative(baseDir, binPath);
     let relativeDir = path.relative(process.cwd(), baseDir);
     let libraryPath = await linkLibrary(path.join(baseDir, ".."));
-    let libFolders = opts.lib ? ["--lib", libraryPath] : [];
+    let allPaths = await glob(libraryPath + "/**/*.ts");
 
+    console.log(allPaths);
+    let libFolders: string[] = opts.lib ? ["--lib", libraryPath] : [];
+
+    var preamble: string[] = [];
+    let preamblePath = path.join(baseDir, "preamble.ts");
+    if (await fs.pathExists(preamblePath)) {
+      preamble.push("preamble.ts");
+    }
+    preamble = preamble.concat(allPaths.filter(x => x.endsWith("preamble.ts")));
+    console.log(`Preamble: ${preamble}`);
+    console.log(`libfolders: ${allPaths}`);
 
     let asc_opts = [
       relativeBin,
@@ -170,7 +188,7 @@ export class Compiler {
             resolve();
           } else {
             // debugger;
-            console.log(opts.stdout!.toString());
+            // console.log(opts.stdout!.toString());
             console.error(opts.stderr!.toString());
             console.error(x);
             reject();
