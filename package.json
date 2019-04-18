@@ -46,13 +46,13 @@
     "typescript": "^3.4.2",
     "webpack": "^4.29.5",
     "webpack-cli": "^3.2.3",
-    "webpack-dev-server": "^3.2.0"
+    "webpack-dev-server": "^3.2.0",
+    "@wasmos/utils": "file:./utils"
   },
   "dependencies": {
     "@types/filesystem": "0.0.28",
     "@types/jest": "^24.0.11",
     "@types/shelljs": "^0.8.4",
-    "@wasmos/utils": "file:./utils",
     "lerna": "^3.13.0",
     "shelljs": "^0.8.3",
     "shx": "^0.3.2"
