@@ -2,7 +2,7 @@
 // import { process } from "../process";
 
 import { File } from "@wasmos/fs";
-import {Console, CommandLine} from "@wasmos/assemblyscript";
+import { Console, CommandLine } from "@wasmos/wasa/wasa";
 
 export const enum ExitStatus {
   EXIT_FAILURE = -1,
@@ -15,9 +15,10 @@ function _main(argv: String[]): ExitStatus {
   return ExitStatus.EXIT_SUCCESS;
 }
 
-_main((new CommandLine()).all())
+let commandLine = new CommandLine();
+_main(commandLine.all());
 
-let f = new File()
+let f = new File();
 // log(process.uid)
 // log(process);
 // log(process.argv[0]);

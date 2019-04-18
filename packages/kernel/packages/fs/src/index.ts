@@ -1,21 +1,21 @@
-import * as BrowserFS from "browserfs";
+import * as BrowserFS from "browserfs/dist/browserfs";
 import { glob, promisfy } from "./glob";
-
 
 export async function assemblyFolders(startingDir: string): Promise<string[]> {
   let dir = startingDir + "/node_modules/**/**/assembly";
   let res = new Set();
   return (await glob(dir))
-  .filter(v =>!(v.endsWith("std/types/assembly") || v.endsWith("std/assembly")))
-  .reduce( (acc: string[], v: string) => {
-      let endName = v.substring(v.lastIndexOf("node_modules"))
-      if (!res.has(endName)){
+    .filter(
+      v => !(v.endsWith("std/types/assembly") || v.endsWith("std/assembly"))
+    )
+    .reduce((acc: string[], v: string) => {
+      let endName = v.substring(v.lastIndexOf("node_modules"));
+      if (!res.has(endName)) {
         acc.push(v);
         res.add(endName);
       }
       return acc;
-  }, []);
-
+    }, []);
 }
 export async function init(
   root: string | ArrayBuffer = "assembly.zip"

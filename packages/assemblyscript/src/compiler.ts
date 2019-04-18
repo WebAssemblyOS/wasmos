@@ -79,28 +79,17 @@ export class Compiler {
   private static _opts = {
     readFile: async (basename: string, baseDir: string) => {
       let base = baseDir ? baseDir : ".";
-      console.log(basename);
       try {
         let file = path.join(base, basename);
         // let libPath = path.join("../node_modules/.assembly", basename);
-        console.log(path.resolve(file));
         if (await fs.pathExists(basename)) {
-          console.log("using basename " + basename);
           file = basename;
         }
         let source = await fs.readFile(file);
-        if (file.endsWith("wasa.ts")) {
-          var stack = new Error().stack;
-          console.log(Object.keys(asc.libraryFiles));
-          console.log(stack);
-        }
-        console.log(`FILE: ${file} ${source.toString().substring(0, 40)}`);
-        debugger;
         let sourceStr = source.toString();
         if (basename.startsWith("node_modules")) {
           let libname = basename.replace(/.*\.assembly\/(.*)\.ts/, "$1");
-          // libname = libname.replace(/(.*)\/index/, "$1");
-          console.log("------------------- " + libname);
+          libname = libname.replace(/(.*)\/index/, "$1");
           if (!asc.libraryFiles[libname]) asc.libraryFiles[libname] = sourceStr;
         }
         return sourceStr;
@@ -122,7 +111,6 @@ export class Compiler {
     listFiles: async (basename: string, baseDir: string): Promise<string[]> => {
       let base = baseDir ? baseDir : "";
       let dir = path.join(base, basename);
-      console.log(dir);
       try {
         var files: string[] = [];
         files = await fs.readdir(dir);
@@ -145,7 +133,6 @@ export class Compiler {
   };
 
   static async compileOne(bin: string, _opts?: CompilerOptions): Promise<void> {
-    console.log(process.cwd());
     let binPath = path.isAbsolute(bin) ? bin : path.join(process.cwd(), bin);
 
     let opts = this.mergeOpts(_opts);
@@ -160,14 +147,14 @@ export class Compiler {
       await linkLibrary(path.join(baseDir, ".."))
     );
     let allPaths = await glob(libraryPath + "/**/*.ts");
-    await Promise.all(
-      allPaths.map(async file => {
-        let libname = file.replace(/.*\.assembly\/(.*)\.ts/, "$1");
-        // libname = libname.replace(/(.*)\/index/, "$1");
-        console.log("------------------- " + libname);
-        asc.libraryFiles[libname] = (await opts.readFile!(file, "")) || "";
-      })
-    );
+    // await Promise.all(
+    //   allPaths.map(async file => {
+    //     let libname = file.replace(/.*\.assembly\/(.*)\.ts/, "$1");
+    //     // libname = libname.replace(/(.*)\/index/, "$1");
+    //     console.log("------------------- " + libname);
+    //     asc.libraryFiles[libname] = (await opts.readFile!(file, "")) || "";
+    //   })
+    // );
 
     let libFolders: string[] = opts.lib ? ["--lib", libraryPath] : [];
 
@@ -176,10 +163,12 @@ export class Compiler {
     if (await fs.pathExists(preamblePath)) {
       preamble.push("preamble.ts");
     }
-    preamble = preamble.concat(allPaths.filter(x => x.endsWith("preamble.ts")));
-    console.log(`Preamble: ${preamble}`);
-    console.log(`libfolders: ${libFolders}`);
-    console.log(`all Paths: ${allPaths}`);
+    preamble = preamble.concat(
+      allPaths.filter((x: string) => x.endsWith("preamble.ts"))
+    );
+    // console.log(`Preamble: ${preamble}`);
+    // console.log(`libfolders: ${libFolders}`);
+    // console.log(`all Paths: ${allPaths}`);
 
     let asc_opts = [
       relativeBin,

@@ -6,10 +6,11 @@
   "scripts": {
     "test": "jest",
     "test:as": "asp",
+    "check": "tsc --noEmit",
     "bootstrap": "lerna bootstrap && npm run linkDev",
     "clean": "lerna clean -y",
     "linkDev": "lerna exec \"ldev\"",
-    "ci": "npm-run-all clean bootstrap ci:test",
+    "ci": "npm-run-all check clean bootstrap ci:test",
     "ci:test": "npm run test -- -i"
   },
   "repository": {
@@ -33,7 +34,8 @@
     "@types/node": "^11.9.5",
     "@types/webassembly-js-api": "0.0.2",
     "as-pect": "github:jtenner/as-pect",
-    "browserfs": "^1.4.3",
+    "browserfs": "git:github.com/jvilk/browserfs",
+    "dropbox": "~4.0.9",
     "jest": "^24.1.0",
     "jsdom-worker": "^0.1.0",
     "node-fetch": "^2.3.0",
@@ -47,6 +49,7 @@
     "webpack-dev-server": "^3.2.0"
   },
   "dependencies": {
+    "@types/filesystem": "0.0.28",
     "@types/jest": "^24.0.11",
     "@types/shelljs": "^0.8.4",
     "@wasmos/utils": "file:./utils",
