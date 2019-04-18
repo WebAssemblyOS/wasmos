@@ -10,7 +10,7 @@
     "bootstrap": "lerna bootstrap && npm run linkDev",
     "clean": "lerna clean -y",
     "linkDev": "lerna exec \"ldev\"",
-    "ci": "npm-run-all check clean bootstrap ci:test",
+    "ci": "npm-run-all clean bootstrap check ci:test",
     "ci:test": "npm run test -- -i"
   },
   "repository": {
