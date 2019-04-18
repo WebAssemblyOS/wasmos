@@ -1,6 +1,6 @@
 var FontFaceObserver = require("fontfaceobserver");
 // import { EventManager, Terminal } from "./terminal";
-import { Terminal } from "xterm/lib/public/terminal";
+import { Terminal } from "xterm";
 import * as fullscreen from "xterm/lib/addons/fullscreen/fullscreen";
 import { Process } from "@wasmos/kernel/src";
 import * as BrowserFS from "browserfs";
