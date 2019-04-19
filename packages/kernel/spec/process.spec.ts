@@ -1,12 +1,13 @@
-import { ASProcess, Args, Arg } from "../src/process/wasm";
+import { UTF8 } from "../src/process/utf8";
+import { ASProcess} from "../src/process/wasm";
 import { stringToUTF8Array, fromUTF8Array } from "@wasmos/utils";
-import { loader } from "@wasmos/assemblyscript/src";
+import { loader } from "@wasmos/assemblyscript/src/index";
 
-var args: Args;
+var args: UTF8Array;
 const Hello = "Hello";
 const world = "world";
 beforeEach(() => {
-  args = new Args();
+  args = new UTF8Array([]);
 });
 
 describe("Args", () => {
@@ -27,8 +28,9 @@ describe("Process", () => {
       args.push(world);
       let _args = [Hello, world];
       let asp = new ASProcess(_args);
-      expect(asp.UT8Args.length).toBe(2);
-      expect(fromUTF8Array(asp.UT8Args.args[0].data)).toEqual(Hello);
+      expect(asp.args.length).toBe(2);
+      expect(fromUTF8Array(asp.utf8Args.args[0].data)).toEqual(Hello);
+      asp.
     });
   });
 });

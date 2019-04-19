@@ -1,7 +1,7 @@
 /// reference
 
 // import * as asc from "assemblyscript/dist/asc";
-import { loader } from "@wasmos/assemblyscript/src";
+import { loader } from "@wasmos/assemblyscript/src/index";
 // import * as vue from 'vue-compiler';
 import * as BrowserFS from "browserfs";
 // import { promisfy } from "../util";

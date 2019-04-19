@@ -7,8 +7,12 @@
     "target": "es6",
     "allowJs": true,
     "strict": false,
-    "typeRoots": ["node_modules/@types", "node_modules/dropbox/src"]
+    "typeRoots": [
+      "node_modules/@types",
+      "**/node_modules/@types",
+      "node_modules/dropbox/src"
+    ]
   },
-  "exclude": ["node_modules/**/*", "packages/**/node_modules/**/*"],
+  "exclude": ["node_modules/**/*", "packages/**/node_modules/"],
   "include": ["src/**/*", "packages/*/src/**/*", "packages/kernel/*/src/**/*"]
 }
