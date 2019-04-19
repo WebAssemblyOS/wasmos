@@ -1,7 +1,4 @@
-// import { attachWorker } from "./fs";
-import { Wasi } from "@wasmos/wasa/src"
-
-export class Kernel implements Wasi.Wasi {
+export class Kernel {
   worker: Worker;
   constructor(path: string = "worker.js") {
     this.worker = new Worker(path);
@@ -19,6 +16,5 @@ export class Kernel implements Wasi.Wasi {
 
     return kernel;
   }
-
 }
 export * from "./process";

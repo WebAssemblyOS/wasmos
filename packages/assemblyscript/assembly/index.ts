@@ -1,1 +1,1 @@
-export * from "./testclass";
+export * from "./wasa";

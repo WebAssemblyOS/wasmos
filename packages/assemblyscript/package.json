@@ -3,7 +3,7 @@
   "version": "0.0.2",
   "description": "Fork of AssemblyScript",
   "main": "dist/index.js",
-  "types": "assembly/index.ts",
+  "types": "assembly/types/index.d.ts",
   "scripts": {
     "test": "jest"
   },
@@ -13,7 +13,9 @@
     "tsconfig-base.json",
     "bin/"
   ],
-  "bin": "bin/wasm-asc",
+  "bin": {
+    "wasmos-asc": "./bin/wasmos-asc.ts"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/WebAssemblyOS/wasmos/tree/master/packages/assemblyscript"
@@ -27,6 +29,7 @@
   "license": "MIT",
   "dependencies": {
     "@wasmos/fs": "git:github.com/WebAssemblyOS/fs#v0.0.2",
-    "assemblyscript": "github:willemneal/assemblyscript#b7d8e1300a578fb76ff25f9dfab9de8c5a1cde94"
+    "assemblyscript": "github:willemneal/assemblyscript#fa7c0fa7ec4d0e623731efbbb01547921e2f8b1f",
+    "@wasmos/wasa": "git:github.com/WebAssemblyOS/wasa"
   }
 }
