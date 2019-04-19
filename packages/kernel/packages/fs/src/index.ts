@@ -1,10 +1,26 @@
-import * as BrowserFS from "browserfs";
-import { promisfy } from "./util";
+import * as BrowserFS from "browserfs/dist/browserfs";
+import { glob, promisfy } from "./glob";
 
-
-
-export async function init(root: string | ArrayBuffer = "assembly.zip"): Promise<void> {
-  BrowserFS.install(global || window)
+export async function assemblyFolders(startingDir: string): Promise<string[]> {
+  let dir = startingDir + "/node_modules/**/**/assembly";
+  let res = new Set();
+  return (await glob(dir))
+    .filter(
+      v => !(v.endsWith("std/types/assembly") || v.endsWith("std/assembly"))
+    )
+    .reduce((acc: string[], v: string) => {
+      let endName = v.substring(v.lastIndexOf("node_modules"));
+      if (!res.has(endName)) {
+        acc.push(v);
+        res.add(endName);
+      }
+      return acc;
+    }, []);
+}
+export async function init(
+  root: string | ArrayBuffer = "assembly.zip"
+): Promise<void> {
+  BrowserFS.install(global || window);
   return new Promise(async (resolve, reject) => {
     let zipData;
     if (typeof root === "string") {
@@ -13,45 +29,49 @@ export async function init(root: string | ArrayBuffer = "assembly.zip"): Promise
     } else {
       zipData = root;
     }
-    BrowserFS.configure({
-      fs: "MountableFileSystem",
-      options: {
-        "/": {
-          fs: "OverlayFS",
-          options: {
-            readable: {
-              fs: "ZipFS",
-              options: {
-                // Wrap as Buffer object.
-                zipData: Buffer.from(zipData)
+    BrowserFS.configure(
+      {
+        fs: "MountableFileSystem",
+        options: {
+          "/": {
+            fs: "OverlayFS",
+            options: {
+              readable: {
+                fs: "ZipFS",
+                options: {
+                  // Wrap as Buffer object.
+                  zipData: Buffer.from(zipData)
+                }
+              },
+              writable: {
+                fs: "LocalStorage",
+                options: {}
               }
-            },
-            writable: {
-              fs: "LocalStorage",
-              options: {}
             }
           }
-        },
+        }
+      },
+      function(e) {
+        if (e) {
+          // An error occurred.
+          reject(e);
+        }
+        resolve();
       }
-    }, function(e) {
-      if (e) {
-        // An error occurred.
-        reject(e)
-      }
-      resolve();
-    });
+    );
   });
 }
 
+export async function initWorker(): Promise<void> {
+  await promisfy(BrowserFS.configure)({
+    fs: "WorkerFS",
+    options: { worker: self }
+  });
+}
 export function attachWorker(worker: Worker) {
   BrowserFS.FileSystem.WorkerFS.attachRemoteListener(worker);
 }
 import * as fs from "fs-extra";
-export { fs }
-
-export async function initWorker(): Promise<void> {
-  await promisfy(BrowserFS.configure)({ fs: "WorkerFS", options: { worker: self } });
-}
-
-// import * as _fs from "fs";
-// export * from "fs-extra";
+export { fs };
+export * from "./mkdirp";
+export * from "./glob";

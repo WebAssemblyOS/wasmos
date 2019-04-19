@@ -1,0 +1,26 @@
+{
+  "name": "@wasmos/utils",
+  "version": "0.0.2",
+  "description": "Core OS kernel for assemblyscript and WebAssembly",
+  "types": "src/index.ts",
+  "scripts": {
+    "test": "jest"
+  },
+  "bin": {
+    "ldev": "./bin/ldev",
+    "asdb": "./bin/asdb"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/WebAssemblyOS/wasmos/tree/master/utils"
+  },
+  "keywords": [
+    "AssemblyScript",
+    "Kernel",
+    "OS",
+    "WebAssembly",
+    "WebAssemblyOS"
+  ],
+  "author": "Willem Wyndham",
+  "license": "MIT"
+}

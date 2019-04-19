@@ -1,11 +1,4 @@
 {
-  "extends": "../node_modules/assemblyscript/std/assembly.json",
-  "include": [
-    "./**/*.ts"
-  ],
-  "types": [ "../node_modules/assemblyscript/std/assembly",
-    "./kernel",
-    "./node_modules/*/**/assembly" ]
-
-
+  "extends": "../node_modules/@wasmos/assemblyscript/std/assembly.json",
+  "include": ["./**/*.ts"]
 }
