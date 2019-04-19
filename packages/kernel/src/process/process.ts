@@ -1,4 +1,9 @@
-import { loader, ASImport, Host, Env as _Env } from "@wasmos/assemblyscript/src";
+import {
+  loader,
+  ASImport,
+  Host,
+  Env as _Env
+} from "@wasmos/assemblyscript/src/index";
 
 import { fs } from "@wasmos/fs/src";
 import * as path from "path";
@@ -10,21 +15,28 @@ enum ExitStatus {
 
 export class Env extends _Env {
   PATH: string[] = ["/bin"];
+  map: Map<string, string> = new Map<string, string>();
+  static default: Env = Env.fromMap([["PATH", "/usr/bin"]]);
 
-  add(_path: string): Env {
-    this.PATH.push(_path);
+  set(name: string, value: string): Env {
+    this.map.set(name, value);
     return this;
   }
 
   async search(arg: string): Promise<string | null> {
-    for(let p of this.PATH){
+    for (let p of this.PATH) {
       let bin = path.join(p, arg);
-      if (await fs.pathExists(bin)){
+      if (await fs.pathExists(bin)) {
         return bin;
       }
     }
     return null;
+  }
 
+  static fromMap(map: Map<string, string> | Iterable<readonly [string, string]>): Env {
+    let env = new Env();
+    env.map = (map instanceof Map) ? map : new Map(map);
+    return env;
   }
 }
 
@@ -44,13 +56,11 @@ export class Process {
     let asc = path.join(name, "index.ts");
     if (await this.env.search(binary)) {
       return binary;
-    }else if (await fs.pathExists(asc)) {
+    } else if (await fs.pathExists(asc)) {
       return asc;
     }
     return null;
   }
 
-  static async spawn(args: string[], env: Env) {
-
-  }
+  static async spawn(args: string[], env: Env) {}
 }

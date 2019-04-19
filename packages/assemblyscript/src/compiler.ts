@@ -1,4 +1,4 @@
-import { glob, fs, mkdirp, assemblyFolders } from "@wasmos/fs/src";
+import { glob, fs, mkdirp, assemblyFolders } from "@wasmos/fs/src/index";
 import * as asc from "assemblyscript/cli/asc";
 
 import * as path from "path";

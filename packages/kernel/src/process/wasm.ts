@@ -1,62 +1,7 @@
 import { Process, Env } from "./process";
 import { Wasi } from "../wasi";
-import { toUint8Array, fromUTF8Array } from "@wasmos/utils";
-import { loader, ASImport } from "@wasmos/assemblyscript/src";
-
-export class Arg {
-  data: Uint8Array;
-
-  constructor(str: string) {
-    this.data = toUint8Array(str);
-  }
-
-  get size(): number {
-    return this.data.length + 1
-  }
-
-  get str(): string {
-    return fromUTF8Array(this.data);
-  }
-}
-
-export class Args {
-  args: Arg[] = new Array();
-
-
-  push(arg: string): void {
-    this.args.push(new Arg(arg));
-  }
-  /**
-   * Sums the sizes of each argument
-   */
-  get size(): number {
-    return this.args.reduce((acc, curr) => {
-      return acc + curr.size;
-    }, 0);
-  }
-
-  get length(): number {
-    return this.args.length;
-  }
-
-  get bytes(): Uint8Array {
-    // TODO: Find the right type
-    let array = new Uint8Array(this.size)
-    this.ptrs.forEach((ptr, idx, ptrs) => {
-      array.set(this.args[idx].data, ptr)
-    });
-    return array;
-  }
-
-  get ptrs(): Uint32Array {
-    let ptrs = new Uint32Array(this.length);
-    this.args.reduce((acc, cur, idx) => {
-      ptrs[idx] = acc;
-      return acc + cur.size
-    }, 0);
-    return ptrs;
-  }
-}
+import { loader, ASImport } from "@wasmos/assemblyscript/src/index";
+import { UTF8 } from "./utf8";
 
 export class ASProcess extends Process implements Wasi.Wasi {
   instance: loader.ASInstance;
@@ -65,12 +10,14 @@ export class ASProcess extends Process implements Wasi.Wasi {
   status: number;
   binName: string;
   binpath: string;
-  UT8Args: Args = new Args();
+  utf8Args: UTF8.Array;
   _memory: Uint8Array;
+  utf8env: UTF8.Array;
 
-  constructor(public args: string[], env?: Env) {
+  constructor(public args: string[], env: Env = Env.default) {
     super(args, env);
-    args.forEach(arg => this.UT8Args.push(arg));
+    this.utf8Args = new UTF8.Array(args);
+    this.utf8env = UTF8.Map.fromMap(env.map);
   }
 
   readStdout(s: string | number): void {
@@ -86,13 +33,13 @@ export class ASProcess extends Process implements Wasi.Wasi {
   }
 
   get U32(): Uint32Array {
-    return this.instance ? this.instance.memory.U32 : Uint32Array.from(this._memory);
+    return this.instance
+      ? this.instance.memory.U32
+      : Uint32Array.from(this._memory);
   }
 
-
-
   start(): Process {
-    var res;
+    var res: number;
     try {
       let imports = ASImport.createImport(this.env);
       this.instance = loader.instantiate(this.module, imports);
@@ -108,37 +55,65 @@ export class ASProcess extends Process implements Wasi.Wasi {
     this.U32[idx >> 2] = value;
   }
 
-  set32(idx: number, array: Uint8Array) {
-    this.U8.set(array, idx >> 2)
+  set32(idx: number, array: Uint32Array) {
+    this.U32.set(array, idx >> 2);
   }
 
+  set8(idx: number, array: Uint8Array) {
+    this.U8.set(array, idx);
+  }
 
+  load8(idx: number, length: number): Uint8Array {
+    return this.U8.slice(idx, length);
+  }
+
+  loadUTFString(idx: number, length: number): UTF8.String {
+    return new UTF8.String(this.load8(idx, length));
+  }
 
   args_get(argv: number, argv_buf: number): Wasi.errno {
-    // this.set32(argv, this)
-
+    this.set32(argv, this.utf8Args.ptrs);
+    this.set8(argv_buf, this.utf8Args.bytes);
     return Wasi.errno.SUCCESS;
   }
 
   args_sizes_get(argc: number, argv_buf_size: number): Wasi.errno {
-    this.store32(argc, this.UT8Args.length);
-    this.store32(argv_buf_size, this.UT8Args.size);
+    this.store32(argc, this.utf8Args.length);
+    this.store32(argv_buf_size, this.utf8Args.size);
     return Wasi.errno.SUCCESS;
   }
 
   clock_res_get(clock: Wasi.clockid, resolution: number): Wasi.errno {
     return Wasi.errno.SUCCESS;
   }
-  clock_time_get(clock: Wasi.clockid, precision: number, time: number): Wasi.errno {
+  clock_time_get(
+    clock: Wasi.clockid,
+    precision: number,
+    time: number
+  ): Wasi.errno {
     return Wasi.errno.SUCCESS;
   }
+
   environ_get(environ: number, environ_buf: number): Wasi.errno {
+    this.set32(environ, this.utf8env.ptrs);
+    this.set8(environ_buf, this.utf8env.bytes);
     return Wasi.errno.SUCCESS;
   }
-  environ_sizes_get(environ_count: number, environ_buf_size: number): Wasi.errno {
+
+  environ_sizes_get(
+    environ_count: number,
+    environ_buf_size: number
+  ): Wasi.errno {
+    this.store32(environ_count, this.utf8env.length);
+    this.store32(environ_buf_size, this.utf8env.size);
     return Wasi.errno.SUCCESS;
   }
-  fd_advise(fd: number, offset: number, len: number, advice: Wasi.advice): Wasi.errno {
+  fd_advise(
+    fd: number,
+    offset: number,
+    len: number,
+    advice: Wasi.advice
+  ): Wasi.errno {
     return Wasi.errno.SUCCESS;
   }
   fd_allocate(fd: number, offset: number, len: number): Wasi.errno {
@@ -156,7 +131,11 @@ export class ASProcess extends Process implements Wasi.Wasi {
   fd_fdstat_set_flags(fd: number, flags: Wasi.fdflags): Wasi.errno {
     return Wasi.errno.SUCCESS;
   }
-  fd_fdstat_set_rights(fd: number, fs_rights_base: Wasi.rights, fs_rights_inheriting: Wasi.rights): Wasi.errno {
+  fd_fdstat_set_rights(
+    fd: number,
+    fs_rights_base: Wasi.rights,
+    fs_rights_inheriting: Wasi.rights
+  ): Wasi.errno {
     return Wasi.errno.SUCCESS;
   }
   fd_filestat_get(fd: number, buf: Wasi.filestat): Wasi.errno {
@@ -165,10 +144,21 @@ export class ASProcess extends Process implements Wasi.Wasi {
   fd_filestat_set_size(fd: number, size: number): Wasi.errno {
     return Wasi.errno.SUCCESS;
   }
-  fd_filestat_set_times(fd: number, st_atim: number, st_mtim: number, fstflags: Wasi.fstflags): Wasi.errno {
+  fd_filestat_set_times(
+    fd: number,
+    st_atim: number,
+    st_mtim: number,
+    fstflags: Wasi.fstflags
+  ): Wasi.errno {
     return Wasi.errno.SUCCESS;
   }
-  fd_pread(fd: number, iovs: number, iovs_len: number, offset: number, nread: number): Wasi.errno {
+  fd_pread(
+    fd: number,
+    iovs: number,
+    iovs_len: number,
+    offset: number,
+    nread: number
+  ): Wasi.errno {
     return Wasi.errno.SUCCESS;
   }
   fd_prestat_get(fd: number, buf: Wasi.prestat): Wasi.errno {
@@ -177,19 +167,47 @@ export class ASProcess extends Process implements Wasi.Wasi {
   fd_prestat_dir_name(fd: number, path: number, path_len: number): Wasi.errno {
     return Wasi.errno.SUCCESS;
   }
-  fd_pwrite(fd: number, iovs: number, iovs_len: number, offset: number, nwritten: number): Wasi.errno {
+  fd_pwrite(
+    fd: number,
+    iovs: number,
+    iovs_len: number,
+    offset: number,
+    nwritten: number
+  ): Wasi.errno {
     return Wasi.errno.SUCCESS;
   }
-  fd_read(fd: number, iovs: number, iovs_len: number, nread: number): Wasi.errno {
+  fd_read(
+    fd: number,
+    iovs: number,
+    iovs_len: number,
+    nread: number
+  ): Wasi.errno {
     return Wasi.errno.SUCCESS;
   }
-  fd_readdir(fd: number, buf: number, buf_len: number, cookie: number, buf_used: number): Wasi.errno {
+  fd_readdir(
+    fd: number,
+    buf: number,
+    buf_len: number,
+    cookie: number,
+    buf_used: number
+  ): Wasi.errno {
     return Wasi.errno.SUCCESS;
   }
-  sock_send(sock: number, si_data: number, si_data_len: number, si_flags: Wasi.siflags, so_datalen: number): Wasi.errno {
+  sock_send(
+    sock: number,
+    si_data: number,
+    si_data_len: number,
+    si_flags: Wasi.siflags,
+    so_datalen: number
+  ): Wasi.errno {
     return Wasi.errno.SUCCESS;
   }
-  fd_seek(fd: number, offset: number, whence: Wasi.whence, newoffset: number): Wasi.errno {
+  fd_seek(
+    fd: number,
+    offset: number,
+    whence: Wasi.whence,
+    newoffset: number
+  ): Wasi.errno {
     return Wasi.errno.SUCCESS;
   }
   fd_sync(fd: number): Wasi.errno {
@@ -198,44 +216,125 @@ export class ASProcess extends Process implements Wasi.Wasi {
   fd_tell(fd: number, newoffset: number): Wasi.errno {
     return Wasi.errno.SUCCESS;
   }
-  fd_write(fd: number, iovs: number, iovs_len: number, nwritten: number): Wasi.errno {
+
+  //  /** Input: The file descriptor to which to write data. */
+  //           fd: fd,
+  //           /** Input: List of scatter/gather vectors from which to retrieve data. */
+  //           iovs: ptr<struct<iovec>>,
+  //           /** Input: List of scatter/gather vectors from which to retrieve data. */
+  //           iovs_len: usize,
+  //           /** Output: The number of bytes written. */
+  //           nwritten: ptr<usize>
+
+  fd_write(
+    fd: number,
+    iovs: number,
+    iovs_len: number,
+    nwritten: number
+  ): Wasi.errno {
+    if (fd === 1) {
+    }
     return Wasi.errno.SUCCESS;
   }
-  path_create_directory(fd: number, path: number, path_len: number): Wasi.errno {
+  path_create_directory(
+    fd: number,
+    path: number,
+    path_len: number
+  ): Wasi.errno {
     return Wasi.errno.SUCCESS;
   }
-  path_filestat_get(fd: number, flags: Wasi.lookupflags, path: number, path_len: number, buf: Wasi.filestat): Wasi.errno {
+  path_filestat_get(
+    fd: number,
+    flags: Wasi.lookupflags,
+    path: number,
+    path_len: number,
+    buf: Wasi.filestat
+  ): Wasi.errno {
     return Wasi.errno.SUCCESS;
   }
-  path_filestat_set_times(fd: number, flags: Wasi.lookupflags, path: number, path_len: number, st_atim: number, st_mtim: number, fstflags: Wasi.fstflags): Wasi.errno {
+  path_filestat_set_times(
+    fd: number,
+    flags: Wasi.lookupflags,
+    path: number,
+    path_len: number,
+    st_atim: number,
+    st_mtim: number,
+    fstflags: Wasi.fstflags
+  ): Wasi.errno {
     return Wasi.errno.SUCCESS;
   }
-  path_link(old_fd: number, old_flags: Wasi.lookupflags, old_path: number, old_path_len: number, new_fd: number, new_path: number, new_path_len: number): Wasi.errno {
+  path_link(
+    old_fd: number,
+    old_flags: Wasi.lookupflags,
+    old_path: number,
+    old_path_len: number,
+    new_fd: number,
+    new_path: number,
+    new_path_len: number
+  ): Wasi.errno {
     return Wasi.errno.SUCCESS;
   }
-  path_open(dirfd: number, dirflags: Wasi.lookupflags, path: number, path_len: number, oflags: Wasi.oflags, fs_rights_base: Wasi.rights, fs_rights_inheriting: Wasi.rights, fs_flags: Wasi.fdflags, fd: number): Wasi.errno {
+  path_open(
+    dirfd: number,
+    dirflags: Wasi.lookupflags,
+    path: number,
+    path_len: number,
+    oflags: Wasi.oflags,
+    fs_rights_base: Wasi.rights,
+    fs_rights_inheriting: Wasi.rights,
+    fs_flags: Wasi.fdflags,
+    fd: number
+  ): Wasi.errno {
     return Wasi.errno.SUCCESS;
   }
-  path_readlink(fd: number, path: number, path_len: number, buf: number, buf_len: number, buf_used: number): Wasi.errno {
+  path_readlink(
+    fd: number,
+    path: number,
+    path_len: number,
+    buf: number,
+    buf_len: number,
+    buf_used: number
+  ): Wasi.errno {
     return Wasi.errno.SUCCESS;
   }
-  path_remove_directory(fd: number, path: number, path_len: number): Wasi.errno {
+  path_remove_directory(
+    fd: number,
+    path: number,
+    path_len: number
+  ): Wasi.errno {
     return Wasi.errno.SUCCESS;
   }
-  path_rename(old_fd: number, old_path: number, old_path_len: number, new_fd: number, new_path: number, new_path_len: number): Wasi.errno {
+  path_rename(
+    old_fd: number,
+    old_path: number,
+    old_path_len: number,
+    new_fd: number,
+    new_path: number,
+    new_path_len: number
+  ): Wasi.errno {
     return Wasi.errno.SUCCESS;
   }
-  path_symlink(old_path: number, old_path_len: number, fd: number, new_path: number, new_path_len: number): Wasi.errno {
+  path_symlink(
+    old_path: number,
+    old_path_len: number,
+    fd: number,
+    new_path: number,
+    new_path_len: number
+  ): Wasi.errno {
     return Wasi.errno.SUCCESS;
   }
   path_unlink_file(fd: number, path: number, path_len: number): Wasi.errno {
     return Wasi.errno.SUCCESS;
   }
-  poll_oneoff(in_: number, out: number, nsubscriptions: number, nevents: number): Wasi.errno {
+  poll_oneoff(
+    in_: number,
+    out: number,
+    nsubscriptions: number,
+    nevents: number
+  ): Wasi.errno {
     return Wasi.errno.SUCCESS;
   }
-  proc_exit(rval: number): void {
-  }
+  proc_exit(rval: number): void {}
   proc_raise(sig: Wasi.signal): Wasi.errno {
     return Wasi.errno.SUCCESS;
   }
@@ -245,7 +344,14 @@ export class ASProcess extends Process implements Wasi.Wasi {
   sched_yield(): Wasi.errno {
     return Wasi.errno.SUCCESS;
   }
-  sock_recv(sock: number, ri_data: number, ri_data_len: number, ri_flags: Wasi.riflags, ro_datalen: number, ro_flags: number): Wasi.errno {
+  sock_recv(
+    sock: number,
+    ri_data: number,
+    ri_data_len: number,
+    ri_flags: Wasi.riflags,
+    ro_datalen: number,
+    ro_flags: number
+  ): Wasi.errno {
     return Wasi.errno.SUCCESS;
   }
   sock_shutdown(sock: number, how: Wasi.sdflags): Wasi.errno {
@@ -254,5 +360,4 @@ export class ASProcess extends Process implements Wasi.Wasi {
   fd_renumber(from: number, to: number): Wasi.errno {
     return Wasi.errno.SUCCESS;
   }
-
 }
