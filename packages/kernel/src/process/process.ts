@@ -16,6 +16,7 @@ enum ExitStatus {
 export class Env extends _Env {
   PATH: string[] = ["/bin"];
   map: Map<string, string> = new Map<string, string>();
+  static default: Env = Env.fromMap([["PATH", "/usr/bin"]]);
 
   set(name: string, value: string): Env {
     this.map.set(name, value);
@@ -30,6 +31,12 @@ export class Env extends _Env {
       }
     }
     return null;
+  }
+
+  static fromMap(map: Map<string, string> | Iterable<readonly [string, string]>): Env {
+    let env = new Env();
+    env.map = (map instanceof Map) ? map : new Map(map);
+    return env;
   }
 }
 

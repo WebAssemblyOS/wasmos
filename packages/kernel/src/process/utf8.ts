@@ -37,14 +37,16 @@ export namespace UTF8 {
       this.args.push(new UTF8.String(arg));
     }
     /**
-     * Sums the sizes of each argument
+     * number of bytes
      */
     get size(): number {
       return this.args.reduce((acc, curr) => {
         return acc + curr.size;
       }, 0);
     }
-
+    /**
+     * number of elements
+     */
     get length(): number {
       return this.args.length;
     }
@@ -75,7 +77,8 @@ export namespace UTF8 {
     static fromMap(map: _Map<string, string>): UTF8.Array {
       let res = new Map();
       map.forEach((value, key) => {
-        res.push(`${key}=${value}`);
+        let str = `${key}=${value}`;
+        res.push(str);
       });
       return res;
     }

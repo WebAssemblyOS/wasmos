@@ -14,7 +14,7 @@ export class ASProcess extends Process implements Wasi.Wasi {
   _memory: Uint8Array;
   utf8env: UTF8.Array;
 
-  constructor(public args: string[], env?: Env) {
+  constructor(public args: string[], env: Env = Env.default) {
     super(args, env);
     this.utf8Args = new UTF8.Array(args);
     this.utf8env = UTF8.Map.fromMap(env.map);
