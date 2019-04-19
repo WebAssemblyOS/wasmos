@@ -1,17 +1,12 @@
-
-
 type EnvVar = Map<string, string>;
 
-
-
 export class InputStream {
-  constructor(){}
+  constructor() {}
 }
 
 export class OutputStream {
-  constructor(){}
+  constructor() {}
 }
-
 
 export class Process {
   private _uid: i32;
@@ -23,13 +18,10 @@ export class Process {
   public stdin: InputStream;
   public exitCode: i32;
 
-  constructor(
-    cmdline: string,
-    currentDir: string
-  ) {
+  constructor(cmdline: string, currentDir: string) {
     this.cmd = cmdline;
     this.argv = cmdline.split(" ");
-    this.argv0 = this.argv[0]
+    this.argv0 = this.argv[0];
     this._cwd = currentDir;
     this.stdin = new InputStream();
     this.stdout = new OutputStream();
@@ -40,12 +32,10 @@ export class Process {
   }
 
   get cwd(): string {
-    return this._cwd
+    return this._cwd;
   }
 
   get uid(): i32 {
     return this._uid;
   }
-
-
 }

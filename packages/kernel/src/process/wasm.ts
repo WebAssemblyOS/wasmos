@@ -1,6 +1,6 @@
 import { Process, Env } from "./process";
 import { Wasi } from "../wasi";
-import { loader, ASImport } from "@wasmos/assemblyscript/src";
+import { loader, ASImport } from "@wasmos/assemblyscript/src/index";
 import { UTF8 } from "./utf8";
 
 export class ASProcess extends Process implements Wasi.Wasi {

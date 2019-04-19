@@ -1,4 +1,5 @@
-export * from "@wasmos/wasa";
+import "@wasmos/wasa/assembly";
+import "../../../node_modules/assemblyscript/std/assembly/index";
 //
 // declare class Console {
 //   /**
