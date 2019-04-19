@@ -11,7 +11,7 @@
     "clean": "lerna clean -y",
     "linkDev": "lerna exec \"ldev\"",
     "ci": "npm-run-all clean bootstrap check ci:test",
-    "ci:test": "npm run test -- -i"
+    "ci:test": "npm run test -- -i || npm run test -- -i"
   },
   "repository": {
     "type": "git",
