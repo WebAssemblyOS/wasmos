@@ -12,8 +12,8 @@
     "clean": "lerna clean -y",
     "clean:soft": "lerna exec \"rm -rf node_modules/**/node_modules\" ",
     "linkDev": "lerna exec \"ldev\"",
-    "ci": "npm-run-all clean bootstrap check ci:test",
-    "ci:test": "npm run test -- -i || npm run test -- -i"
+    "ci": "npm-run-all clean bootstrap check ci:test test:as",
+    "ci:test": "npm run test:jest -- -i || npm run test:jest -- -i"
   },
   "repository": {
     "type": "git",
