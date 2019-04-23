@@ -4,7 +4,7 @@
 // import { Console } from "@wasmos/wasa";
 // import "allocator/arena";
 
-import { Console } from "../wasa";
+// import { Console } from "../wasa/mock";
 
 export const enum ExitStatus {
   EXIT_FAILURE = -1,

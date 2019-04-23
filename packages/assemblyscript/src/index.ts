@@ -1,9 +1,6 @@
-export * from "./compiler";
+export * from "./compiler/compiler";
 import * as loader from "assemblyscript/lib/loader/lib";
 export { loader };
 export * from "assemblyscript/lib/host/lib";
 
-
-export async function main() {
-
-}
+export async function main() {}

@@ -29,7 +29,8 @@
   "license": "MIT",
   "dependencies": {
     "@wasmos/fs": "git:github.com/WebAssemblyOS/fs#v0.0.2",
+    "@wasmos/wasa": "git:github.com/WebAssemblyOS/wasa",
     "assemblyscript": "github:willemneal/assemblyscript#fa7c0fa7ec4d0e623731efbbb01547921e2f8b1f",
-    "@wasmos/wasa": "git:github.com/WebAssemblyOS/wasa"
+    "assemblyscript-json": "github:WebAssemblyOS/assemblyscript-json"
   }
 }
