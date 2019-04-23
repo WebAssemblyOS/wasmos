@@ -1,6 +1,6 @@
-import { glob, fs, mkdirp, assemblyFolders } from "@wasmos/fs/src/index";
+import { glob, fs, mkdirp } from "@wasmos/fs/src/index";
 import * as asc from "assemblyscript/cli/asc";
-
+import { linkLibrary } from "../linker";
 import * as path from "path";
 import assert = require("assert");
 
@@ -35,36 +35,6 @@ interface CompilerOptions {
 
 function isRoot(dir: string): boolean {
   return path.basename(dir) !== "";
-}
-
-export async function linkLibrary(rootPath: string): Promise<string> {
-  let folders = await assemblyFolders(rootPath);
-  let assemblyFolder = path.join(rootPath, "node_modules", ".assembly");
-  await mkdirp(assemblyFolder);
-  let pwd = process.cwd();
-  process.chdir(assemblyFolder);
-  await Promise.all(
-    folders.map(async (v: string) => {
-      let folder = path.dirname(v);
-      let grandFolder = path.dirname(folder);
-      folder = path.basename(folder);
-      while (path.basename(grandFolder) != "node_modules") {
-        folder = path.join(path.basename(grandFolder), folder);
-        grandFolder = path.dirname(grandFolder);
-      }
-      if (path.basename(path.dirname(folder)) != "node_modules") {
-        await mkdirp(path.dirname(folder));
-      }
-      let folderExists = await fs.pathExists(folder);
-      if (!folderExists) {
-        let realPath = await fs.realpath(v);
-        await fs.symlink(realPath, folder, "dir");
-      }
-    })
-  );
-  process.chdir(pwd);
-
-  return assemblyFolder;
 }
 
 export class Compiler {

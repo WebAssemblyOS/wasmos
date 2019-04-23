@@ -4,14 +4,16 @@
   "description": "A set of runtime tools for WebAssembly and AssemblyScript",
   "main": "dist/index.js",
   "scripts": {
-    "test": "jest",
+    "test:jest": "jest",
     "test:as": "asp",
+    "test": "npm-run-all test:jest test:as",
     "check": "tsc --noEmit",
     "bootstrap": "lerna bootstrap && npm run linkDev",
     "clean": "lerna clean -y",
+    "clean:soft": "lerna exec \"rm -rf node_modules/**/node_modules\" ",
     "linkDev": "lerna exec \"ldev\"",
-    "ci": "npm-run-all clean bootstrap check ci:test",
-    "ci:test": "npm run test -- -i || npm run test -- -i"
+    "ci": "npm-run-all clean bootstrap check ci:test test:as",
+    "ci:test": "npm run test:jest -- -i || npm run test:jest -- -i"
   },
   "repository": {
     "type": "git",

@@ -1,4 +1,3 @@
 export class FileDescriptor {
-  id: number;
-  offset: number;
+  constructor(public id: u32, public offset: u32 = 0) {}
 }

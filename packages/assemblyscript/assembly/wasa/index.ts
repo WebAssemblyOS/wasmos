@@ -1,3 +1,3 @@
-import { Console, CommandLine } from "@wasmos/wasa";
-
-export { Console, CommandLine };
+import * as wasa from "@wasmos/wasa";
+import * as mock from "./mock";
+export { wasa };
