@@ -54,13 +54,13 @@ git commit -m "added empty file"
 git push origin dev-echo ## Again this will be different for you
 ```
 
-After filling out the file, add it again, commit, and push it.  Then you can open a pull request to merge with `wasmos/ash` branch.
+After filling out the file, add it again, commit, and push it.  Then you can open a pull request to merge with `wasmos/ash` branch. Make sure that in your pull request you include `fixes #issueNumber`, a handy drop down will help you find the right one after you type `#`.
 
 Then open another issue to write tests for echo.  Checkout `packages/ash/assembly/__tests__/echo.spec.ts` as a place to start. To test your AssemblyScript run `npx asp`
 
 ## Other things to know
 
-To access the file system there is a global that your file named `fs`, however, it is important that you include this in your tests, which defines it as the mock.
+To access the file system there is a global that your file named `fs`, however, it is important that you include this in your tests, which defines it as the mock.  This shouldn't be an issue if you copied `echo.spec.ts`.
 
 `fs.open(path: string): fd` this returns a file descriptor, which is a 32 bit unsigned integer.  It is the identifer a FileDescriptor class, which you can access by using `fs.get(fd: fd): FileDescriptor`.  However, this is only for the mock so the "proper" api to pass it when reading or writing to the file.
 
