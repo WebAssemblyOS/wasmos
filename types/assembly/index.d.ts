@@ -1549,7 +1549,7 @@ declare class Float64Array extends TypedArray<f64> {}
 /** Class representing a sequence of values of type `T`. */
 declare class Array<T> {
   static isArray<U>(value: any): value is Array<any>;
-
+  buffer_: ArrayBuffer;
   [key: number]: T;
   /** Current length of the array. */
   length: i32;
