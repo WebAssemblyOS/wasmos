@@ -24,7 +24,9 @@
   "dependencies": {
     "@wasmos/assemblyscript": "git:github.com/WebAssemblyOS/assemblyscript#v0.0.2",
     "@wasmos/fs": "git:github.com/WebAssemblyOS/fs#v0.0.2",
-    "@wasmos/kernel": "git:github.com/WebAssemblyOS/kernel#v0.0.2",
+    "@wasmos/kernel": "git:github.com/WebAssemblyOS/kernel#v0.0.2"
+  },
+  "devDependencies": {
     "xterm": "^3.12.0"
   },
   "gitHead": "feef85b557c8395979e6d5f67db35a488eea1f6d"

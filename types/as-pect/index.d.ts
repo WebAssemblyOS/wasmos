@@ -11,7 +11,6 @@
  */
 declare function describe(description: string, callback: () => void): void;
 
-declare function test(): void;
 /**
  * This function creates a test inside the given test group. It must be placed inside a describe
  * block.

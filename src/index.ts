@@ -1,7 +1,7 @@
 /// <reference lib="dom" />
 
 import { Kernel } from "../packages/kernel/src";
-import { fs } from "../packages/kernel/packages/fs/src";
+import { fs } from "../packages/fs/src";
 import { bootup } from "./loader";
 
 export async function main() {

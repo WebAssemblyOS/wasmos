@@ -7,7 +7,7 @@
     "test:jest": "jest",
     "test:as": "asp",
     "test": "npm-run-all test:jest test:as",
-    "check": "tsc --noEmit",
+    "check": "tsc -p tsconfig.ts.json --noEmit",
     "bootstrap": "lerna bootstrap && npm run linkDev",
     "clean": "lerna clean -y",
     "clean:soft": "lerna exec \"rm -rf node_modules/**/node_modules\" ",
@@ -49,7 +49,8 @@
     "webpack": "^4.29.5",
     "webpack-cli": "^3.2.3",
     "webpack-dev-server": "^3.2.0",
-    "@wasmos/utils": "file:./utils"
+    "@wasmos/utils": "file:./utils",
+    "@types/assembly": "file:./types"
   },
   "dependencies": {
     "@types/filesystem": "0.0.28",

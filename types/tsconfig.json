@@ -13,10 +13,8 @@
     "module": "commonjs",
     "noLib": true,
     "allowJs": false,
-    "typeRoots": [
-      "./types",
-      "../node_modules/*/assembly/types",
-      "../../../node_modules/as-pect/assembly/__tests__"
-    ]
-  }
+    "typeRoots": ["./as-pect", "./wasa", "./assembly"]
+  },
+  "include": ["**/*.d.ts"],
+  "exclude": ["node_modules/"]
 }
