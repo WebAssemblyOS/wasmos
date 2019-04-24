@@ -1,18 +1,17 @@
 {
+  "extends": "./tsconfig.base.json",
   "compilerOptions": {
-    // "lib": ["webworker", "es6", "scripthost", "es2015", "es2017"],
-    "module": "commonjs",
-    "moduleResolution": "node",
-    "esModuleInterop": true,
-    "target": "es6",
-    "allowJs": true,
-    "strict": false,
-    "typeRoots": [
-      "node_modules/@types",
-      "**/node_modules/@types",
-      "node_modules/dropbox/src"
-    ]
+    "typeRoots": ["./types"],
+    "types": ["assembly", "wasa", "as-pect"],
+    "noLib": true,
+    "alwaysStrict": true,
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noEmitOnError": true,
+    "strictNullChecks": true,
+    "experimentalDecorators": true
   },
-  "exclude": ["node_modules/**/*", "packages/**/node_modules/"],
-  "include": ["src/**/*", "packages/*/src/**/*", "packages/kernel/*/src/**/*"]
+  "include": ["packages/*/assembly/**/*"],
+  "exclude": ["**/assemblyscript/src", "packages/**/node_modules/**/*"]
 }

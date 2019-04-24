@@ -1,0 +1,14 @@
+{
+  "extends": "./tsconfig.base.json",
+  "include": ["./src/**/*.ts", "packages/*/src/**/*.ts"],
+  "exclude": ["packages/**/node_modules/**/*"],
+  "compilerOptions": {
+    "lib": ["es2017", "es2015"],
+    "outDir": "./dist",
+    "typeRoots": [
+      "node_modules/@types",
+      "**/node_modules/@types",
+      "node_modules/dropbox/src"
+    ]
+  }
+}
