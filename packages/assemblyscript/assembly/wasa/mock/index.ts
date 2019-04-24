@@ -5,7 +5,6 @@ import { Filesystem as _fs, FileDescriptor, Stdout } from "./fs";
 
 let fs = _fs.Default();
 export { fs };
-var fd = 1;
 export type Descriptor = usize;
 
 export class Filesystem {
@@ -259,29 +258,33 @@ export class Environ {
 }
 
 export class CommandLine {
-  args: Array<string> = new Array<string>();
+  static _args: Array<string> = new Array<string>();
 
-  push(item: string): void {
-    this.args.push(item);
+  static push(item: string): void {
+    this._args.push(item);
   }
 
   /**
    * Return all the command-line arguments
    */
-  all(): Array<string> {
-    return this.args;
+  static all(): Array<string> {
+    return this._args;
   }
 
   /**
    * Return the i-th command-ine argument
    * @param i index
    */
-  get(i: usize): string | null {
-    let args_len: usize = this.args[0].length;
+  static get(i: usize): string | null {
+    let args_len: usize = this._args[0].length;
     if (i < args_len) {
-      return this.args[i];
+      return this._args[i];
     }
     return null;
+  }
+
+  get args(): Array<string> {
+    return CommandLine._args;
   }
 }
 

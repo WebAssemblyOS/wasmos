@@ -93,6 +93,9 @@ export class Filesystem {
 
   static Default(): Filesystem {
     let fs = new Filesystem();
+    fs.open("/dev/fd/0")
+    fs.open("/dev/fd/1")
+    fs.open("/dev/fd/2")
     return fs;
   }
 
