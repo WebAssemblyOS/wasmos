@@ -1,4 +1,3 @@
-import { FileDescriptor as _FileDescriptor } from "../../../../kernel/packages/fs/src/wasi/index";
 import { StringUtils } from ".";
 
 type path = string;
