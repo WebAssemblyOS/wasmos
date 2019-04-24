@@ -13,7 +13,6 @@ export class FileDescriptor {
   }
 
   writeString(str: string): void {
-    log(str);
     // TODO: std should expose memcpy?
     memory.copy(this.data + this.offset, str.toUTF8(), str.lengthUTF8);
     this.offset += str.lengthUTF8;
@@ -48,9 +47,18 @@ export class FileDescriptor {
     this.offset += str.lengthUTF8 + 1; //For new line
     return str;
   }
-
+  /**
+   * Resets the offset to 0
+   */
   reset(): void {
-    this.offset = 0;
+    this.seek(0);
+  }
+
+  /**
+   * set seek (offset)
+   */
+  seek(offset: usize): void {
+    this.offset = offset
   }
 
   get data(): usize {
@@ -64,9 +72,9 @@ export class Stdout extends FileDescriptor {
   }
 }
 
-class File {
-  static DefaultSize: u32 = 1024;
+export class File {
   private _data: ArrayBuffer;
+  static DefaultSize: u32 = 1024;
   constructor(public path: string) {
     this._data = new ArrayBuffer(File.DefaultSize);
   }
@@ -78,6 +86,10 @@ class File {
     let newData = new ArrayBuffer(this._data.byteLength * 2);
     memory.copy(newData.data, this.data, this._data.byteLength);
     return this;
+  }
+
+  erase(): void {
+    this._data = new ArrayBuffer(File.DefaultSize);
   }
 }
 
