@@ -1,3 +1,6 @@
+declare type fd = usize;
+declare type path = string;
+
 declare class Console {
   /**
    * Write a string to the console
@@ -71,8 +74,7 @@ declare class File {
   data: usize;
   grow(): File;
 }
-type fd = usize;
-type path = string;
+
 
 declare class Directory extends File {
   parent: Directory;
@@ -100,3 +102,5 @@ declare class Filesystem {
   writeString(fd: fd, data: string): void;
   close(fd: number): void;
 }
+
+declare var fs: Filesystem;
