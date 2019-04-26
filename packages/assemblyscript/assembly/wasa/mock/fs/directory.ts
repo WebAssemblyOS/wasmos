@@ -1,6 +1,6 @@
 import { Inode } from "./inode"
 
-class Directory extends File {
+export class Directory extends Inode {
 
 
 }
