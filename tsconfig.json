@@ -17,7 +17,14 @@
     "noImplicitThis": true,
     "noEmitOnError": true,
     "strictNullChecks": true,
-    "experimentalDecorators": true
+    "experimentalDecorators": true,
+    "baseUrl": ".",
+    "paths": {
+      "*": [
+        "packages/assemblyscript/assembly/std/*",
+        "packages/*/assembly",
+      ]
+    }
   },
   "include": [
     "packages/*/assembly/**/*"
