@@ -14,7 +14,7 @@ export class Filesystem {
    * @param dirfd Base directory descriptor (will be automatically set soon)
    */
   static openForRead(path: string, dirfd: Descriptor = 3): Descriptor {
-    return fs.open(path);
+    return fs.openFile(path);
   }
 
   /**
@@ -23,7 +23,11 @@ export class Filesystem {
    * @param dirfd Base directory descriptor (will be automatically set soon)
    */
   static openForWrite(path: string, dirfd: Descriptor = 3): Descriptor {
-    return fs.open(path);
+    return fs.openFile(path);
+  }
+
+  static openDirectory(path: string): Descriptor {
+    return fs.openDirectory(path)
   }
 }
 
@@ -77,6 +81,7 @@ export class IO {
     data: Array<u8> = [],
     chunk_size: usize = 4096
   ): Array<u8> | null {
+    fs.get(fd).read(data);
     return data;
   }
 
@@ -91,6 +96,7 @@ export class IO {
     data: Array<u8> = [],
     chunk_size: usize = 4096
   ): Array<u8> | null {
+    data.buffer_ = changetype<ArrayBuffer>(fs.get(fd).data);
     return data;
   }
 
@@ -99,9 +105,15 @@ export class IO {
    * @param fd file descriptor
    * @param chunk_size chunk size (default: 4096)
    */
-  static readString(fd: Descriptor, chunk_size: usize = 4096): string | null {
-    let s = "hello world";
-    return s;
+  static readString(fd: Descriptor, chunk_size: usize = 4096): string {
+    return fs.get(fd).readString(chunk_size)
+  }
+
+  /**
+   * Reach an UTF8 String from a file descriptor until a new line is reached.
+   */
+  static readLine(fd: Descriptor, chunk_size: usize = 4096): string {
+    return fs.get(fd).readLine(chunk_size)
   }
 
   static reset(fd: Descriptor): void {
@@ -226,7 +238,7 @@ export class Process {
 }
 
 export class EnvironEntry {
-  constructor(readonly key: string, readonly value: string) {}
+  constructor(readonly key: string, readonly value: string) { }
 }
 
 export class Environ {
@@ -288,11 +300,28 @@ export class CommandLine {
   }
 }
 
+const newLine: u8 = 10;
+
 export class StringUtils {
-  static fromCString(cstring: usize): string {
-    let size = 0;
-    while (load<u8>(cstring + size) != 0) {
+  static isNewLine(ptr: usize): boolean {
+    return load<u8>(ptr) == newLine;
+  }
+
+  static fromCString(cstring: usize, max: usize = 4096): string {
+    let size: usize = 0;
+    while (load<u8>(cstring + size) != 0 && size < max) {
       size++;
+    }
+    return String.fromUTF8(cstring, size);
+  }
+
+  static fromCStringTilNewLine(cstring: usize, max: usize = 4096): string {
+    let size: usize = 0;
+    while (load<u8>(cstring + size) != 0 && size < max) {
+      size++;
+      if (this.isNewLine(cstring + size - 1)) {
+        break;
+      }
     }
     return String.fromUTF8(cstring, size);
   }

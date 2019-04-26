@@ -1,13 +1,13 @@
 import { Console, IO, fs, CommandLine } from "../../../assemblyscript/assembly/wasa/mock";
-import { FileDescriptor, File} from "../../../assemblyscript/assembly/wasa/mock/fs";
+import { FileDescriptor, File } from "../../../assemblyscript/assembly/wasa/mock/fs";
 
 import { main } from "../bin/echo";
 
 let Hello = "Hello";
 let World = "World";
 
-function openFile(path: string): FileDescriptor{
-  return fs.get(fs.open(path));
+function openFile(path: string): FileDescriptor {
+  return fs.get(fs.openFile(path));
 }
 
 function openStdout(): FileDescriptor {
@@ -37,9 +37,7 @@ describe("echo", (): void => {
     stdout.reset();
     expect<string>(stdout.readString()).toBe(Hello + " " + World + "\n")
     stdout.reset();
-    expect<string>(stdout.readString()).toBe(stdout2.readString())
-
-
+    expect<string>(stdout.readString()).toBe(stdout2.readString());
   })
 
   it("should print no newline with -n", () => {

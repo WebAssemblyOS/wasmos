@@ -1,4 +1,4 @@
-import { Console, IO, fs } from "../wasa/mock";
+import { Console, IO, fs, StringUtils } from "../wasa/mock";
 import * as echo from "../bin/echo";
 import { JSONDecoder } from "../../node_modules/assemblyscript-json/assembly/decoder";
 import { JSONEncoder } from "../../node_modules/assemblyscript-json/assembly/encoder";
@@ -54,7 +54,7 @@ describe("Console", (): void => {
       "Two non-unique file descriptors points to the same object"
     );
 
-    stdout = fs.get(fs.open("/dev/fd/1"));
+    stdout = fs.get(fs.openFile("/dev/fd/1"));
     expect<usize>(stdout.offset).toBe(
       0,
       "A fresh file descriptor has a seek (offset) of 0"
@@ -76,3 +76,11 @@ describe("Json", (): void => {
     roundripTest(jsonStr, jsonStr);
   });
 });
+
+describe("readLine", (): void => {
+  it("should read until newline", (): void => {
+    let str = "Hello\nWorld";
+    let utfStr = str.toUTF8();
+    expect<string>(StringUtils.fromCStringTilNewLine(utfStr)).toStrictEqual("Hello\n")
+  })
+})
