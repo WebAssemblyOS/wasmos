@@ -4,7 +4,7 @@ type path = string;
 type fd = usize;
 
 export class FileDescriptor {
-  constructor(public file: File, public id: u32, public offset: u32) {}
+  constructor(public file: File, public id: u32, public offset: u32) { }
 
   write(bytes: Array<u8>): void {
     for (let i = 0; i < bytes.length; i++) {
@@ -42,11 +42,18 @@ export class FileDescriptor {
     this.offset = offset;
   }
 
-  readString(): string {
-    let str = StringUtils.fromCString(this.data + this.offset);
-    this.offset += str.lengthUTF8 + 1; //For new line
+  readString(max: usize = 4096): string {
+    let str = StringUtils.fromCString(this.data + this.offset, max);
+    this.offset += str.lengthUTF8 + 1; //For null character
     return str;
   }
+
+  readLine(max?: usize): string {
+    let str = StringUtils.fromCStringTilNewLine(this.data + this.offset, max);
+    this.offset += str.lengthUTF8 + 1; //For null character
+    return str;
+  }
+
   /**
    * Resets the offset to 0
    */
@@ -98,16 +105,20 @@ class Directory extends File {
   children: Array<File>;
 }
 
+
+
 export class Filesystem {
   files: Map<fd, FileDescriptor> = new Map<fd, FileDescriptor>();
   paths: Map<path, File> = new Map<path, File>();
   highestFD: usize = 0;
+  pwd: fd;
 
   static Default(): Filesystem {
     let fs = new Filesystem();
-    fs.open("/dev/fd/0")
-    fs.open("/dev/fd/1")
-    fs.open("/dev/fd/2")
+    fs.pwd = fs.openDirectory("/")
+    fs.openFile("/dev/fd/0")
+    fs.openFile("/dev/fd/1")
+    fs.openFile("/dev/fd/2")
     return fs;
   }
 
@@ -119,7 +130,7 @@ export class Filesystem {
     return this.files.get(fd);
   }
 
-  open(path: path): fd {
+  openFile(path: path): fd {
     let fd = this.highestFD++;
     if (!this.paths.has(path)) {
       this.paths.set(path, new File(path));
@@ -145,5 +156,9 @@ export class Filesystem {
   }
   close(fd: number): void {
     this.files.delete(fd);
+  }
+  openDirectory(path: string): fd {
+    // this.open()
+    return 0;
   }
 }

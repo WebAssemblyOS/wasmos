@@ -32,6 +32,7 @@ declare class Console {
 declare function abort(): void;
 
 
+
 declare class CommandLine {
   static all(): Array<string>
   static push(s: string): void;
@@ -55,6 +56,8 @@ declare class FileDescriptor {
   pread(bytes: Array<u8>): void;
 
   readString(): string;
+
+
   /**
    * Resets the offset to 0
    */
@@ -82,7 +85,7 @@ declare class Directory extends File {
 }
 
 declare class Filesystem {
-  files: Map<fd, FileDescriptor> ;
+  files: Map<fd, FileDescriptor>;
   paths: Map<path, File>;
 
   static Default(): Filesystem;
@@ -100,7 +103,10 @@ declare class Filesystem {
   readString(fd: fd, offset?: usize): string;
 
   writeString(fd: fd, data: string): void;
+
   close(fd: number): void;
+
+  readLine(fd: number, max?: usize): string;
 }
 
 declare var fs: Filesystem;
