@@ -1,9 +1,12 @@
 import { StringUtils } from ".";
+import { Wasi } from '../../../../kernel/src/wasi/wasi';
 
 type path = string;
 type fd = usize;
 
 export class FileDescriptor {
+  stat: Wasi.fdstat;
+
   constructor(public file: File, public id: u32, public offset: u32) { }
 
   write(bytes: Array<u8>): void {
@@ -58,14 +61,33 @@ export class FileDescriptor {
    * Resets the offset to 0
    */
   reset(): void {
-    this.seek(0);
+    this.seek(0, Wasi.whence.SET);
   }
 
   /**
    * set seek (offset)
    */
-  seek(offset: usize): void {
-    this.offset = offset
+  seek(offset: Wasi.filedelta, whence: Wasi.whence = Wasi.whence.CUR): usize {
+    let newOffset: usize = 0;
+    switch (whence) {
+      case Wasi.whence.CUR: {
+        newOffset = <usize>(this.offset + offset);
+        break;
+      }
+      case Wasi.whence.END: {
+        newOffset = <usize>(this.file.length - Math.abs(offset));
+        break;
+      }
+      case Wasi.whence.SET: {
+        newOffset = <usize>Math.abs(offset);
+        break;
+      }
+      default: {
+        Process.exit(1)
+      }
+    }
+    this.offset = newOffset;
+    return newOffset
   }
 
   get data(): usize {
@@ -73,18 +95,42 @@ export class FileDescriptor {
   }
 }
 
-export class Stdout extends FileDescriptor {
-  constructor(file: File) {
-    super(file, 1, 0);
+export class DirectoryDescriptor extends FileDescriptor {
+
+  get directory(): Directory {
+    return this.file as Directory;
+  }
+
+  get children(): File[] {
+    return this.directory.children;
+  }
+
+  addFile(file: File): void {
+    this.directory.children.push(file);
   }
 }
 
 export class File {
-  private _data: ArrayBuffer;
-  static DefaultSize: u32 = 1024;
   constructor(public path: string) {
     this._data = new ArrayBuffer(File.DefaultSize);
   }
+  /**
+   * 
+   * @param type File Type see Wasi.filetype
+   * @param path Path
+   * @param dirfd 
+   */
+  static create(type: Wasi.filetype, path: string, dirfd: fd): File {
+    switch (type) {
+      case Wasi.filetype.DIRECTORY: {
+        return new Directory(path)
+      }
+    }
+    return new File(path);
+  }
+  private _data: ArrayBuffer;
+  static DefaultSize: u32 = 1024;
+
   get data(): usize {
     return this._data.data;
   }
@@ -98,6 +144,12 @@ export class File {
   erase(): void {
     this._data = new ArrayBuffer(File.DefaultSize);
   }
+
+  get length(): usize {
+    return this._data.byteLength;
+  }
+
+  stat: Wasi.filestat
 }
 
 class Directory extends File {
@@ -111,14 +163,13 @@ export class Filesystem {
   files: Map<fd, FileDescriptor> = new Map<fd, FileDescriptor>();
   paths: Map<path, File> = new Map<path, File>();
   highestFD: usize = 0;
-  pwd: fd;
+
+  get cwd(): fd {
+    return Process.cwd
+  }
 
   static Default(): Filesystem {
     let fs = new Filesystem();
-    fs.pwd = fs.openDirectory("/")
-    fs.openFile("/dev/fd/0")
-    fs.openFile("/dev/fd/1")
-    fs.openFile("/dev/fd/2")
     return fs;
   }
 
@@ -130,13 +181,17 @@ export class Filesystem {
     return this.files.get(fd);
   }
 
-  openFile(path: path): fd {
+  private open(path: path, type: Wasi.filetype, dirfd: fd): fd {
     let fd = this.highestFD++;
     if (!this.paths.has(path)) {
-      this.paths.set(path, new File(path));
+      this.paths.set(path, File.create(type, path, fd));
     }
     this.set(fd, new FileDescriptor(this.paths.get(path), fd, 0));
     return fd;
+  }
+
+  openFile(dirfd: fd, path: path): fd {
+    return this.open(path, Wasi.filetype.REGULAR_FILE, dirfd);
   }
 
   write(fd: fd, data: Array<u8>): void {
@@ -154,11 +209,20 @@ export class Filesystem {
   writeString(fd: fd, data: string): void {
     this.get(fd).writeString(data);
   }
-  close(fd: number): void {
+
+  close(fd: fd): void {
     this.files.delete(fd);
   }
-  openDirectory(path: string): fd {
-    // this.open()
-    return 0;
+
+  openDirectory(dirfd: fd, path: string): fd {
+    return this.open(path, Wasi.filetype.DIRECTORY, dirfd);
   }
+  createDirectory(dirfd: fd, path: string): fd {
+    return this.openDirectory(dirfd, path);
+  }
+
+  erase(fd: fd): void {
+    this.get(fd).file.erase()
+  }
+
 }

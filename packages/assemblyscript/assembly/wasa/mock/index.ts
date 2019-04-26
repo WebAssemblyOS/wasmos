@@ -1,20 +1,22 @@
 // The entry file of your WebAssembly module.
 
 import { RNG } from "./random";
-import { Filesystem as _fs, FileDescriptor, Stdout } from "./fs";
+import { Filesystem as _fs, FileDescriptor } from './fs';
+import { Wasi } from '../../../../kernel/src/wasi/wasi';
 
-let fs = _fs.Default();
-export { fs };
-export type Descriptor = usize;
+type fd = usize;
 
-export class Filesystem {
+// @ts-ignore decorator is valid
+@global
+export class fs {
+  static readonly fs: _fs = _fs.Default();
   /**
    * A simplified interface to open a file for read operations
    * @param path Path
    * @param dirfd Base directory descriptor (will be automatically set soon)
    */
-  static openForRead(path: string, dirfd: Descriptor = 3): Descriptor {
-    return fs.openFile(path);
+  static openForRead(path: string, dirfd: fd = 3): fd {
+    return this.fs.openFile(dirfd, path);
   }
 
   /**
@@ -22,23 +24,28 @@ export class Filesystem {
    * @param path Path
    * @param dirfd Base directory descriptor (will be automatically set soon)
    */
-  static openForWrite(path: string, dirfd: Descriptor = 3): Descriptor {
-    return fs.openFile(path);
+  static openForWrite(path: string, dirfd: fd = 3): fd {
+    return this.fs.openFile(dirfd, path);
   }
 
-  static openDirectory(path: string): Descriptor {
-    return fs.openDirectory(path)
+  static openDirectory(path: string, dirfd: fd): fd {
+    return this.fs.openDirectory(dirfd, path)
   }
-}
+  /**
+   * 
+   * @param path path of new directory
+   * @param dirfd File fd for 
+   */
+  static createDirectory(path: string, dirfd: fd = Process.cwd): fd {
+    return this.fs.createDirectory(dirfd, path);
+  }
 
-export class IO {
-  data: Uint8Array;
   /**
    * Close a file descriptor
    * @param fd file descriptor
    */
-  static close(fd: Descriptor): void {
-    fs.close(fd);
+  static close(fd: fd): void {
+    this.fs.close(fd);
   }
 
   /**
@@ -46,8 +53,8 @@ export class IO {
    * @param fd file descriptor
    * @param data data
    */
-  static write(fd: Descriptor, data: Array<u8>): void {
-    fs.write(fd, data);
+  static write(fd: fd, data: Array<u8>): void {
+    this.fs.write(fd, data);
   }
 
   /**
@@ -56,9 +63,9 @@ export class IO {
    * @param s string
    * @param newline `true` to add a newline after the string
    */
-  static writeString(fd: Descriptor, s: string, newline: bool = false): void {
+  static writeString(fd: fd, s: string, newline: bool = false): void {
     let str = s + (newline ? "\n" : "");
-    fs.get(fd).writeString(str);
+    this.fs.get(fd).writeString(str);
   }
 
   /**
@@ -66,7 +73,7 @@ export class IO {
    * @param fd file descriptor
    * @param s string
    */
-  static writeStringLn(fd: Descriptor, s: string): void {
+  static writeStringLn(fd: fd, s: string): void {
     this.writeString(fd, s, true);
   }
 
@@ -77,11 +84,11 @@ export class IO {
    * @param chunk_size chunk size (default: 4096)
    */
   static read(
-    fd: Descriptor,
+    fd: fd,
     data: Array<u8> = [],
     chunk_size: usize = 4096
   ): Array<u8> | null {
-    fs.get(fd).read(data);
+    this.fs.get(fd).read(data);
     return data;
   }
 
@@ -92,11 +99,11 @@ export class IO {
    * @param chunk_size chunk size (default: 4096)
    */
   static readAll(
-    fd: Descriptor,
+    fd: fd,
     data: Array<u8> = [],
     chunk_size: usize = 4096
   ): Array<u8> | null {
-    data.buffer_ = changetype<ArrayBuffer>(fs.get(fd).data);
+    data.buffer_ = changetype<ArrayBuffer>(this.fs.get(fd).data);
     return data;
   }
 
@@ -105,46 +112,73 @@ export class IO {
    * @param fd file descriptor
    * @param chunk_size chunk size (default: 4096)
    */
-  static readString(fd: Descriptor, chunk_size: usize = 4096): string {
-    return fs.get(fd).readString(chunk_size)
+  static readString(fd: fd, chunk_size: usize = 4096): string {
+    return this.fs.get(fd).readString(chunk_size)
   }
 
   /**
    * Reach an UTF8 String from a file descriptor until a new line is reached.
    */
-  static readLine(fd: Descriptor, chunk_size: usize = 4096): string {
-    return fs.get(fd).readLine(chunk_size)
+  static readLine(fd: fd, chunk_size: usize = 4096): string {
+    return this.fs.get(fd).readLine(chunk_size)
   }
 
-  static reset(fd: Descriptor): void {
-    fs.get(fd).reset();
+  static reset(fd: fd): void {
+    this.seek(fd, 0, Wasi.whence.SET);
   }
+  /**
+   * 
+   * @param fd File fd
+   * returns the current offset of the file descriptor
+   */
+  static tell(fd: fd): usize {
+    return this.fs.get(fd).offset;
+  }
+
+  /**
+   * 
+   * @param fd File fd
+   * @param offset The number of bytes to move
+   * @param whence The base from which the offset is relative
+   */
+  static seek(fd: fd, offset: Wasi.filedelta, whence: Wasi.whence = Wasi.whence.CUR): usize {
+    return this.get(fd).seek(offset, whence);
+  }
+
+  static get(fd: fd): FileDescriptor {
+    return this.fs.get(fd);
+  }
+
+  static erase(fd: fd): void {
+    this.fs.erase(fd);
+  }
+
 }
 
 // @ts-ignore: Decorators *are* valid here!
 @global
 export class Console {
-  private static _stdin: Descriptor | null = null;
-  private static _stdout: Descriptor | null = null;
-  private static _stderr: Descriptor | null = null;
+  private static _stdin: fd | null = null;
+  private static _stdout: fd | null = null;
+  private static _stderr: fd | null = null;
 
-  static get stdin(): Descriptor {
+  static get stdin(): fd {
     if (Console._stdin == null) {
-      Console._stdin = Filesystem.openForRead("/dev/fd/0");
+      Console._stdin = fs.openForRead("/dev/fd/0");
     }
     return Console._stdin;
   }
 
-  static get stdout(): Descriptor {
+  static get stdout(): fd {
     if (Console._stdout == null) {
-      Console._stdout = Filesystem.openForWrite("/dev/fd/1");
+      Console._stdout = fs.openForWrite("/dev/fd/1");
     }
     return Console._stdout;
   }
 
-  static get stderr(): Descriptor {
+  static get stderr(): fd {
     if (Console._stderr == null) {
-      Console._stderr = Filesystem.openForRead("/dev/fd/2");
+      Console._stderr = fs.openForRead("/dev/fd/2");
     }
     return Console._stderr;
   }
@@ -155,14 +189,14 @@ export class Console {
    * @param newline `false` to avoid inserting a newline after the string
    */
   static write(s: string, newline: bool = true): void {
-    IO.writeString(this.stdout, s, newline);
+    fs.writeString(this.stdout, s, newline);
   }
 
   /**
    * Read an UTF8 string from the console, convert it to a native string
    */
   static readAll(): string | null {
-    return IO.readString(this.stdin);
+    return fs.readString(this.stdin);
   }
 
   /**
@@ -178,7 +212,7 @@ export class Console {
    * @param newline `false` to avoid inserting a newline after the string
    */
   static error(s: string, newline: bool = true): void {
-    IO.writeString(this.stdout, s, newline);
+    fs.writeString(this.stdout, s, newline);
   }
 }
 
@@ -233,8 +267,13 @@ export class Process {
    * @param status exit code
    */
   static exit(status: u32): void {
+    if (status != Wasi.ExitSuccess) {
+      abort("Error ");
+    }
     abort();
   }
+
+  static cwd: fd;
 }
 
 export class EnvironEntry {
@@ -297,6 +336,12 @@ export class CommandLine {
 
   get args(): Array<string> {
     return CommandLine._args;
+  }
+  /**
+   * Deletes arguments
+   */
+  static reset(): void {
+    this._args = new Array<string>();
   }
 }
 

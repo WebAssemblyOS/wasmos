@@ -1,11 +1,10 @@
-import { Console, IO, fs, StringUtils } from "../wasa/mock";
+import { Console, fs, StringUtils } from "../wasa/mock";
 import * as echo from "../bin/echo";
 import { JSONDecoder } from "../../node_modules/assemblyscript-json/assembly/decoder";
 import { JSONEncoder } from "../../node_modules/assemblyscript-json/assembly/encoder";
 import { FileDescriptor } from "../wasa/mock/fs";
 
 let jsonStr = '{"hello":"world"}';
-
 const STDOUT: string = "/dev/fd/1";
 var stdout: FileDescriptor;
 var encoder: JSONEncoder;
@@ -38,23 +37,23 @@ function roundripTest(jsonString: string, expectedString: string = ""): bool {
 beforeAll(
   (): void => {
     encoder = new JSONEncoder();
-    std_in = fs.get(Console.stdin);
-    std_out = fs.get(Console.stdout);
-    std_err = fs.get(Console.stderr);
+    std_in = fs.fs.get(Console.stdin);
+    std_out = fs.fs.get(Console.stdout);
+    std_err = fs.fs.get(Console.stderr);
   }
 );
 
 describe("Console", (): void => {
   it("should be print hello World", (): void => {
     Console.log(jsonStr);
-    let std1 = fs.get(std_out.id);
-    let std2 = fs.get(std_out.id);
+    let std1 = fs.fs.get(std_out.id);
+    let std2 = fs.fs.get(std_out.id);
     expect<FileDescriptor>(std1).toStrictEqual(
       std2,
       "Two non-unique file descriptors points to the same object"
     );
 
-    stdout = fs.get(fs.openFile("/dev/fd/1"));
+    stdout = fs.fs.get(fs.openForRead("/dev/fd/1"));
     expect<usize>(stdout.offset).toBe(
       0,
       "A fresh file descriptor has a seek (offset) of 0"
