@@ -2,7 +2,54 @@ import { WasiResult } from '../..';
 import { Wasi } from '../../../wasi';
 import { hasFlag } from '../../../flag';
 import { StringUtils } from '..';
+// import * as path from "../path";
 
+
+
+const PATH_SEP: string = "/"
+
+export namespace path {
+    export function basename(path: string): string {
+        return getPath(path)
+    }
+
+
+    export function dirname(path: string): string {
+        return getPath(path, 1);
+    }
+
+    export function getPath(path: string, index: usize = 0): string {
+        let paths: string[] = path.split(PATH_SEP);
+        let path_index: usize = <usize>Math.max(paths.length - 1 - index, 0);
+        return paths[path_index]
+    }
+
+
+    export function join(paths: string[]): string {
+        let paths_cleaned: string[] = [];
+        for (let i: usize = 0; i < (paths.length as usize); i++) {
+            let path: string = paths[i];
+            if (path.endsWith('/')) {
+                path = path.slice(0, paths.length - 1);
+            }
+            if (path.startsWith("./")) {
+                path = path.slice(2)
+            }
+            paths_cleaned.push(path)
+        }
+        return paths_cleaned.join(PATH_SEP);
+    }
+
+    export function isAbsolute(path: string): bool {
+        return path.startsWith("/");
+    }
+
+    export function relative(pathFrom: string, pathTo: string): string {
+        //TODO
+        return ""
+    }
+
+}
 
 
 export type path = string;
@@ -182,7 +229,7 @@ export class File {
 }
 
 class Directory extends File {
-    parent: Directory;
+    parent: Directory = <Directory>this;
     children: Array<File>;
 }
 
@@ -193,6 +240,11 @@ export class FileSystem {
     highestFD: usize = 77;
     nextFD: FileDescriptor;
     private _cwd: fd;
+
+    constructor() {
+        this.paths.set("/", new Directory("/"));
+    }
+
     get cwd(): fd {
         return this._cwd
     }
@@ -214,17 +266,38 @@ export class FileSystem {
         return WasiResult.resolve<FileDescriptor>(this.files.get(fd));
     }
 
-    private _open(path: path, type: Wasi.filetype, dirfd: fd, options: Wasi.oflags): WasiResult<FileDescriptor> {
-        let fd = this.highestFD++;
-        if (!this.paths.has(path)) {
+    private _open(_path: path, type: Wasi.filetype, dirfd: fd, options: Wasi.oflags): WasiResult<FileDescriptor> {
+        let fullPath: string = this.fullPath(dirfd, _path)
+        if (!this.paths.has(fullPath)) {
             if (hasFlag(options, Wasi.oflags.CREAT)) {
-                log<usize>(options)
-                this.paths.set(path, File.create(type, path, fd, options));
+                this.paths.set(_path, File.create(type, _path, this.highestFD, options));
             } else {
                 return WasiResult.fail<FileDescriptor>(Wasi.errno.NOENT);
             }
         }
-        this.set(fd, new FileDescriptor(fd, this.paths.get(path), 0));
+        let fd = this.highestFD++;
+        // let parent: DirectoryDescriptor | null = null;;
+        // if (path.dirname(fullPath) != fullPath) {
+        //     let result = this.openDirectoryAt(dirfd, path.dirname(fullPath));
+        //     if (result.failed) {
+        //         WasiResult.fail<FileDescriptor>(result.error);
+        //     }
+        //     parent = result.result;
+        // }
+        let file: File = this.paths.get(fullPath);
+        switch (type) {
+            case Wasi.filetype.REGULAR_FILE: {
+                this.set(fd, new FileDescriptor(fd, file, 0));
+                break;
+            }
+            case Wasi.filetype.DIRECTORY: {
+                let dir = new DirectoryDescriptor(fd, file, 0)
+                this.set(fd, dir)
+            }
+        }
+        // if (parent != null) {
+        //     parent.addFile(file)
+        // }
         return this.get(fd);
     }
 
@@ -246,7 +319,7 @@ export class FileSystem {
 
     write(fd: fd, data: Array<u8>): Wasi.errno {
         let res = this.get(fd)
-        if (res.error) {
+        if (res.failed) {
             return res.error;
 
         }
@@ -290,8 +363,8 @@ export class FileSystem {
         this.files.delete(fd);
     }
 
-    openDirectoryAt(dirfd: fd, path: string, create: boolean = false): WasiResult<FileDescriptor> {
-        return this.openAt(path, Wasi.filetype.DIRECTORY, dirfd, Wasi.oflags.DIRECTORY | (create ? Wasi.oflags.CREAT : 0));
+    openDirectoryAt(dirfd: fd, path: string, create: boolean = false): WasiResult<DirectoryDescriptor> {
+        return this.openAt(path, Wasi.filetype.DIRECTORY, dirfd, Wasi.oflags.DIRECTORY | (create ? Wasi.oflags.CREAT : 0)) as WasiResult<DirectoryDescriptor>;
     }
 
     createDirectoryAt(dirfd: fd, path: string): WasiResult<FileDescriptor> {
@@ -320,6 +393,16 @@ export class FileSystem {
             return WasiResult.fail<Ref<usize>>(res.error);
         }
         return WasiResult.resolve<Ref<usize>>(new Ref(res.result.seek(offset, whence)));
+    }
+
+    fullPath(dirfd: fd, _path: string): string {
+        if (!path.isAbsolute(_path)) {
+            return path.join([this.dirfdPath(dirfd), _path]);
+        }
+        return _path;
+    }
+    dirfdPath(dirfd: fd): string {
+        return this.get(dirfd).result.file!.path;
     }
 }
 
