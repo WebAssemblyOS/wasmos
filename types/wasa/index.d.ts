@@ -6,6 +6,7 @@ declare class Tuple<T1, T2> {
   first: T1;
   second: T2;
 }
+
 declare class WasiResult<T> extends Tuple<T | null, Wasi.errno> {
   constructor(first: T | null, second?: Wasi.errno);
 

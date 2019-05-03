@@ -1,5 +1,5 @@
 import { WasiResult } from '../..';
-import { Wasi } from '../../../wasi/index';
+import { Wasi } from '../../../wasi';
 import { hasFlag } from '../../../flag';
 import { StringUtils } from '..';
 
@@ -265,17 +265,17 @@ export class FileSystem {
     readString(fd: fd, offset: usize = 0): WasiResult<string> {
         let res = this.get(fd);
         if (res.failed) {
-            return WasiResult.fail(res.error);
+            return WasiResult.fail<string>(res.error);
         }
-        return WasiResult.resolve(res.result.readString());
+        return WasiResult.resolve<string>(res.result.readString());
     }
 
     readline(fd: fd, max?: usize): WasiResult<string> {
         let res = this.get(fd);
         if (res.failed) {
-            return WasiResult.fail(res.error);
+            return WasiResult.fail<string>(res.error);
         }
-        return WasiResult.resolve(res.result.readLine(max));
+        return WasiResult.resolve<string>(res.result.readLine(max));
     }
 
     writeString(fd: fd, data: string, newline: boolean): Wasi.errno {
@@ -309,7 +309,7 @@ export class FileSystem {
     erase(fd: fd): WasiResult<void> {
         let res = this.get(fd);
         if (res.failed) {
-            return WasiResult.fail(res.error);
+            return WasiResult.fail<void>(res.error);
         }
         return WasiResult.void(this.get(fd).result.erase());
     }
@@ -317,9 +317,9 @@ export class FileSystem {
     seek(fd: fd, offset: Wasi.filedelta, whence: Wasi.whence = Wasi.whence.CUR): WasiResult<Ref<usize>> {
         let res = this.get(fd);
         if (res.failed) {
-            return WasiResult.fail(res.error);
+            return WasiResult.fail<Ref<usize>>(res.error);
         }
-        return WasiResult.resolve(new Ref(res.result.seek(offset, whence)));
+        return WasiResult.resolve<Ref<usize>>(new Ref(res.result.seek(offset, whence)));
     }
 }
 

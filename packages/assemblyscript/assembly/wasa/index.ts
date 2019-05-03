@@ -31,9 +31,8 @@ export class WasiResult<T> extends Tuple<T | null, Wasi.errno> {
         return new WasiResult<T>(null, err);
     }
 
-
-    static void<T>(res: Wasi.errno): WasiResult<T> {
-        return this.fail(res);
+    static void(res: Wasi.errno): WasiResult<void> {
+        return this.fail<void>(res);
     }
 }
 
