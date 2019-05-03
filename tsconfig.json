@@ -1,8 +1,15 @@
 {
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
-    "typeRoots": ["./types"],
-    "types": ["assembly", "wasa", "as-pect"],
+    "typeRoots": [
+      "./types"
+    ],
+    "types": [
+      "assembly",
+      "wasa",
+      "as-pect",
+      "wasi"
+    ],
     "noLib": true,
     "alwaysStrict": true,
     "noImplicitAny": true,
@@ -12,6 +19,11 @@
     "strictNullChecks": true,
     "experimentalDecorators": true
   },
-  "include": ["packages/*/assembly/**/*"],
-  "exclude": ["**/assemblyscript/src", "packages/**/node_modules/**/*"]
+  "include": [
+    "packages/*/assembly/**/*"
+  ],
+  "exclude": [
+    "**/assemblyscript/src",
+    "packages/**/node_modules/**/*"
+  ]
 }

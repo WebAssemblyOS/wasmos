@@ -32,9 +32,11 @@
   },
   "homepage": "https://github.com/WebAssemblyOS/wasmos#readme",
   "devDependencies": {
+    "@types/assembly": "file:./types",
     "@types/fs-extra": "^5.0.5",
     "@types/node": "^11.9.5",
     "@types/webassembly-js-api": "0.0.2",
+    "@wasmos/utils": "file:./utils",
     "as-pect": "github:jtenner/as-pect",
     "browserfs": "git:github.com/jvilk/browserfs",
     "dropbox": "~4.0.9",
@@ -48,9 +50,7 @@
     "typescript": "^3.4.2",
     "webpack": "^4.29.5",
     "webpack-cli": "^3.2.3",
-    "webpack-dev-server": "^3.2.0",
-    "@wasmos/utils": "file:./utils",
-    "@types/assembly": "file:./types"
+    "webpack-dev-server": "^3.2.0"
   },
   "dependencies": {
     "@types/filesystem": "0.0.28",

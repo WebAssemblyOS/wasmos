@@ -1,42 +1,41 @@
-
 import { main as cat } from "../bin/cat";
 
-let Hello = "Hello";
-let World = "World";
-let testFile: usize = 0;
-type fd = usize;
+import { Console, fs, Process, CommandLine } from '../../../assemblyscript/assembly/wasa/mock';
+import { FileDescriptor } from '../../../assemblyscript/assembly/wasa/mock/fs';
+import { openStdout, Hello, World, testFile } from './mocks';
 
 
-function openStdout(): fd {
-  return fs.openForRead("/dev/fd/1");
-}
 
-var stdout: fd;
-var stdout2: fd;
+
+// var stdout: fd;
+
+var stdout2: FileDescriptor;
 
 describe("cat", (): void => {
+    beforeAll(
+        (): void => {
+            stdout2 = openStdout();
+            testFile().writeString(Hello + " " + World);
+        }
+    );
 
-  beforeEach((): void => {
-    // testFile = fs.openForWrite("/test");
-    // fs.writeString(testFile, Hello + " " + World);
-    // fs.reset(Console.stdout);
-    // fs.reset(stdout);
-    // stdout2 = openStdout();
-    // fs.erase(stdout);
-    // CommandLine.reset();
-    // CommandLine.push("cat");
+    beforeEach((): void => {
+        Console.stdout.reset()
+        stdout2.reset()
+        Console.stdout.erase()
+        CommandLine.reset();
+        CommandLine.push("cat");
+    })
 
-  })
-
-  it("should print newline by default", (): void => {
-    //   CommandLine.push("/test")
-    //   cat(CommandLine.all())
-    //   let str = Hello + " " + World + "\n";
-    //   expect<u32>(fs.tell(stdout)).toBe(str.lengthUTF8, "Two extra characters for space and \\n")
-    //   fs.reset(stdout);
-    //   expect<string>(fs.readString(stdout)).toBe(Hello + " " + World + "\n")
-    //   fs.reset(stdout);
-    //   expect<string>(fs.readString(stdout)).toBe(fs.readString(stdout2));
-  })
+    it("should print newline by default", (): void => {
+        CommandLine.push("/test")
+        cat(CommandLine.all())
+        let str = Hello + " " + World + "\n";
+        expect<u32>(Console.stdout.tell()).toBe(str.lengthUTF8, "Two extra characters for space and \\n")
+        Console.stdout.reset()
+        expect<string>(Console.stdout.readString()).toBe(Hello + " " + World + "\n")
+        Console.stdout.reset()
+        expect<string>(Console.stdout.readString()).toBe(stdout2.readString());
+    })
 
 })
