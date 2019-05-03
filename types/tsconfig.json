@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "alwaysStrict": true,
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noEmitOnError": true,
+    "strictNullChecks": true,
+    "experimentalDecorators": true,
+    "target": "es6",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "module": "commonjs",
+    "noLib": true,
+    "allowJs": false,
+    "typeRoots": ["./as-pect", "./wasa", "./assembly"]
+  },
+  "include": ["**/*.d.ts"],
+  "exclude": ["node_modules/"]
+}

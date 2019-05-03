@@ -1,6 +1,10 @@
+// import { IO, Console } from "@wasmos/wasa";
+
 // import {_process, Process} from "../preamble";
-import { log } from "../../lib/host/assembly";
-import "allocator/arena";
+// import { Console } from "@wasmos/wasa";
+// import "allocator/arena";
+
+// import { Console } from "../wasa/mock";
 
 export const enum ExitStatus {
   EXIT_FAILURE = -1,
@@ -8,6 +12,6 @@ export const enum ExitStatus {
 }
 
 export function _main(argv: string[]): ExitStatus {
-  log<string>(argv.slice(1).join(" "));
+  Console.log(argv.slice(1).join(" "));
   return ExitStatus.EXIT_SUCCESS;
 }

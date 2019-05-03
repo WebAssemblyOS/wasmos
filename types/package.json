@@ -1,0 +1,16 @@
+{
+  "name": "@types/assembly",
+  "version": "0.0.2",
+  "files": [
+    "*"
+  ],
+  "keywords": [
+    "AssemblyScript",
+    "Kernel",
+    "OS",
+    "WebAssembly",
+    "WebAssemblyOS"
+  ],
+  "author": "Willem Wyndham",
+  "license": "MIT"
+}

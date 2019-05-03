@@ -1,17 +1,21 @@
 {
   "name": "@wasmos/assemblyscript",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Fork of AssemblyScript",
   "main": "dist/index.js",
-  "types": "src/index.ts",
+  "typings": "assembly/index",
   "scripts": {
-    "build": ""
+    "test": "jest"
   },
   "files": [
     "lib/",
     "tsconfig.json",
-    "tsconfig-base.json"
+    "tsconfig-base.json",
+    "bin/"
   ],
+  "bin": {
+    "wasmos-asc": "./bin/wasmos-asc.ts"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/WebAssemblyOS/wasmos/tree/master/packages/assemblyscript"
@@ -23,12 +27,10 @@
   ],
   "author": "Willem Wyndham",
   "license": "MIT",
-  "devDependencies": {
-    "assemblyscript": "github:willemneal/assemblyscript#b7d8e1300a578fb76ff25f9dfab9de8c5a1cde94",
-    "ts-node": "^8.0.3",
-    "typescript": "^3.4.1"
-  },
   "dependencies": {
-    "acorn": "^6.0.0"
+    "@wasmos/fs": "git:github.com/WebAssemblyOS/fs#v0.0.2",
+    "@wasmos/wasa": "git:github.com/WebAssemblyOS/wasa",
+    "assemblyscript": "github:willemneal/assemblyscript#fa7c0fa7ec4d0e623731efbbb01547921e2f8b1f",
+    "assemblyscript-json": "github:WebAssemblyOS/assemblyscript-json"
   }
 }

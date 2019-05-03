@@ -1,0 +1,22 @@
+{
+  "name": "@wasmos/os",
+  "version": "0.0.2",
+  "description": "AssemeblyScript version of node's 'os' module",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "echo test at top level"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/WebAssemblyOS/wasmos/tree/master/packages/os"
+  },
+  "keywords": [
+    "AssemblyScript",
+    "Kernel",
+    "OS",
+    "WebAssembly",
+    "WebAssemblyOS"
+  ],
+  "author": "Willem Wyndham",
+  "license": "MIT"
+}

@@ -1,10 +1,12 @@
 {
   "name": "@wasmos/ash",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "AssemblyScript Shell",
   "main": "dist/index.js",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "build": "webpack --mode development",
+    "watch": "webpack-dev-server --mode development --env=dev"
   },
   "repository": {
     "type": "git",
@@ -20,9 +22,12 @@
   "author": "Willem Wyndham",
   "license": "MIT",
   "dependencies": {
-    "@wasmos/assemblyscript": "file:../assemblyscript",
-    "browserfs": "^1.4.3",
-    "ts-node": "^8.0.3",
-    "typescript": "^3.4.1"
-  }
+    "@wasmos/assemblyscript": "git:github.com/WebAssemblyOS/assemblyscript#v0.0.2",
+    "@wasmos/fs": "git:github.com/WebAssemblyOS/fs#v0.0.2",
+    "@wasmos/kernel": "git:github.com/WebAssemblyOS/kernel#v0.0.2"
+  },
+  "devDependencies": {
+    "xterm": "^3.12.0"
+  },
+  "gitHead": "feef85b557c8395979e6d5f67db35a488eea1f6d"
 }

@@ -1,3 +1,0 @@
-[submodule "packages/wasa"]
-	path = packages/wasa
-	url = git@github.com:WebAssemblyOS/wasa.git

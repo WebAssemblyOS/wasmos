@@ -1,15 +1,29 @@
 {
+  "extends": "./tsconfig.base.json",
   "compilerOptions": {
-    "lib": ["webworker", "es6", "scripthost"],
-    "module": "commonjs",
-    "moduleResolution": "node",
-    "esModuleInterop": true,
-    "target": "es6",
-    "allowJs": true,
-    "strict": false
+    "typeRoots": [
+      "./types"
+    ],
+    "types": [
+      "assembly",
+      "wasa",
+      "as-pect",
+      "wasi"
+    ],
+    "noLib": true,
+    "alwaysStrict": true,
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noEmitOnError": true,
+    "strictNullChecks": true,
+    "experimentalDecorators": true
   },
   "include": [
-    "src/**/*.ts",
-    "./build.ts"
+    "packages/*/assembly/**/*"
+  ],
+  "exclude": [
+    "**/assemblyscript/src",
+    "packages/**/node_modules/**/*"
   ]
 }
