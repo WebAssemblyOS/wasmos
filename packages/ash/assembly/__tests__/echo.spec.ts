@@ -1,55 +1,55 @@
-import { Console, IO, fs, CommandLine } from "../../../assemblyscript/assembly/wasa/mock";
-import { FileDescriptor, File } from "../../../assemblyscript/assembly/wasa/mock/fs";
 
-import { main } from "../bin/echo";
+import { Console, fs, Process, CommandLine } from '../../../assemblyscript/assembly/wasa/mock';
+import { FileDescriptor } from '../../../assemblyscript/assembly/wasa/mock/fs';
+import { openStdout, Hello, World } from './mocks';
+import { main as echo } from "../bin/echo";
 
-let Hello = "Hello";
-let World = "World";
+type fd = usize;
 
-function openFile(path: string): FileDescriptor {
-  return fs.get(fs.openFile(path));
-}
 
-function openStdout(): FileDescriptor {
-  return openFile("/dev/fd/1");
-}
 
-var stdout: FileDescriptor;
 var stdout2: FileDescriptor;
+// let stdout = Console.stdout;
+
 
 describe("echo", (): void => {
-  beforeEach((): void => {
-    stdout = fs.get(Console.stdout)
-    stdout.reset()
-    stdout2 = openStdout();
-    stdout.file.erase();
-    CommandLine._args = new Array<string>();
-    CommandLine.push("echo");
+  beforeAll(
+    (): void => {
+      stdout2 = openStdout();
+    }
+  );
 
+  beforeEach((): void => {
+    Console.stdout.reset();
+    stdout2.reset();
+    Console.stdout.erase()
+    CommandLine.reset();
+    CommandLine.push("echo");
   })
 
   it("should print newline by default", (): void => {
     CommandLine.push(Hello)
     CommandLine.push(World)
-    main(CommandLine.all())
+    echo(CommandLine.all())
     let str = Hello + " " + World + "\n";
-    expect<u32>(stdout.offset).toBe(str.lengthUTF8, "Two extra characters for space and \\n")
-    stdout.reset();
-    expect<string>(stdout.readString()).toBe(Hello + " " + World + "\n")
-    stdout.reset();
-    expect<string>(stdout.readString()).toBe(stdout2.readString());
+    let stdoutStr = stdout2.readString()
+    expect<u32>(Console.stdout.tell()).toBe(str.lengthUTF8, "Two extra characters for space and \\n")
+    Console.stdout.reset();
+    expect<string>(Console.stdout.readString()).toBe(Hello + " " + World + "\n")
+    Console.stdout.reset();
+    expect<string>(Console.stdout.readString()).toBe(stdoutStr);
   })
 
   it("should print no newline with -n", () => {
     CommandLine.push("-n")
     CommandLine.push(Hello)
     CommandLine.push(World)
-    log(CommandLine.all())
-    main(CommandLine.all())
-    let offset = stdout.offset
+    echo(CommandLine.all())
     let str = Hello + " " + World;
-    expect<u32>(offset).toBe(str.lengthUTF8, "One extra character for space")
-    stdout.reset()
-    expect<string>(stdout.readString()).toBe(Hello + " " + World)
+    expect<u32>(Console.stdout.tell()).toBe(str.lengthUTF8 + 1, "Two extra characters for space and \\n")
+    Console.stdout.reset();
+    expect<string>(Console.stdout.readString()).toBe(str)
+    Console.stdout.reset();
+    expect<string>(Console.stdout.readString()).toBe(stdout2.readString());
   })
 })

@@ -8,14 +8,13 @@ module.exports = {
   /**
    * A set of globs passed to the glob package that quality files to be added to each test.
    */
-  add: [],
+  add: ["packages/assemblyscript/assembly/__tests__/wasa.include.ts"],
   /**
    * All the compiler flags needed for this test suite. Make sure that a binary file is output.
    */
   flags: {
     "--validate": [],
     "--debug": [],
-    "--measure": [],
     /** This is required. Do not change this. */
     "--binaryFile": ["output.wasm"]
   },

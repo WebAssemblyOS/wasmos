@@ -1989,3 +1989,5 @@ declare function start(
   propertyKey: string,
   descriptor: TypedPropertyDescriptor<any>
 ): TypedPropertyDescriptor<any> | void;
+
+declare function abort(str?: string): void
