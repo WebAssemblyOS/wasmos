@@ -64,6 +64,7 @@ declare class CommandLine {
 }
 
 declare class FileDescriptor {
+  erase(): void
 
   file: File;
   fd: u32;
@@ -71,7 +72,7 @@ declare class FileDescriptor {
 
   write(bytes: Array<u8>): void;
 
-  writeString(str: string): void;
+  writeString(str: string, newline?: bool): void;
 
   copyByte(ptr: usize): void;
 

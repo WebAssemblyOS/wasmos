@@ -5,7 +5,8 @@
   "main": "dist/index.js",
   "scripts": {
     "test:jest": "jest",
-    "test:as": "asp",
+    "test:as": "asp --reporter=SummaryTestReporter",
+    "asp": "asp",
     "test": "npm-run-all test:jest test:as",
     "check": "tsc -p tsconfig.ts.json --noEmit",
     "bootstrap": "lerna bootstrap && npm run linkDev",

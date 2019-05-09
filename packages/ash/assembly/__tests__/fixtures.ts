@@ -1,5 +1,5 @@
 import { Console, fs, Process, CommandLine } from '../../../assemblyscript/assembly/wasa/mock';
-import { FileDescriptor } from '../../../assemblyscript/assembly/wasa/mock/fs';
+import { FileDescriptor } from '../../../assemblyscript/assembly/wasa/mock/fs/fs';
 
 Console.stdin
 Console.stdout
@@ -27,6 +27,6 @@ export function testFile(): FileDescriptor {
 
 export const Hello = "Hello";
 export const World = "World";
-export const Hello_World = Hello + " " + World;
+export const Hello_World = "Hello World";
 
-// export { _Console as Console, fs, Process, CommandLine, FileDescriptor }
+export { Console, fs, Process, CommandLine, FileDescriptor }

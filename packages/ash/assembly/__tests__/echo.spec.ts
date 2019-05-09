@@ -1,7 +1,7 @@
 
 import { Console, fs, Process, CommandLine } from '../../../assemblyscript/assembly/wasa/mock';
-import { FileDescriptor } from '../../../assemblyscript/assembly/wasa/mock/fs';
-import { openStdout, Hello, World } from './mocks';
+import { FileDescriptor } from '../../../assemblyscript/assembly/wasa/mock/fs/fs';
+import { openStdout, Hello, World } from './fixtures';
 import { main as echo } from "../bin/echo";
 
 type fd = usize;

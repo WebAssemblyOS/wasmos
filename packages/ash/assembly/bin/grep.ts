@@ -1,6 +1,5 @@
 // import {RegExp} from "../regexp";
 // import {Argas} from "arg-as"
-Console;
 export function _main(args: string): i32 {
   // let argv: string[] = args.split(" ");
   // let pattern = new RegExp(argv[1]);

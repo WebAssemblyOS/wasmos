@@ -1,9 +1,7 @@
 import { main as cat } from "../bin/cat";
-
 import { Console, fs, Process, CommandLine } from '../../../assemblyscript/assembly/wasa/mock';
 import { FileDescriptor } from '../../../assemblyscript/assembly/wasa/mock/fs';
-import { openStdout, Hello, World, testFile } from './mocks';
-
+import { openStdout, Hello, World, testFile } from './fixtures';
 
 
 
