@@ -1,9 +1,10 @@
 import { Console, fs, Process, CommandLine } from '../../../assemblyscript/assembly/wasa/mock';
 import { FileDescriptor } from '../../../assemblyscript/assembly/wasa/mock/fs/fs';
+import { Wasi } from '../../../assemblyscript/assembly/wasi';
 
-Console.stdin
-Console.stdout
-Console.stderr
+beforeAll(() => {
+    fs.fs;
+})
 
 export function openStdout(): FileDescriptor {
     return open("/dev/fd/1");
@@ -12,7 +13,7 @@ export function openStdout(): FileDescriptor {
 export function open(path: string): FileDescriptor {
     let FD = fs.openForRead(path)
     if (FD.failed) {
-        abort();
+        abort(Wasi.errno.toString(FD.error));
     }
     return FD.result;
 }

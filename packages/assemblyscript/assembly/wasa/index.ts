@@ -1,6 +1,6 @@
 
 import * as mock from "./mock";
-import { Wasi } from '../../../kernel/src/wasi/wasi';
+import { Wasi } from '../wasi';
 
 class Tuple<T1, T2> {
     constructor(public first: T1, public second: T2) { }

@@ -1,6 +1,12 @@
 
-// import { Console, fs, Process, CommandLine, fd } from '../wasa/mock/index';
+import { Console, fs, Process, CommandLine, fd } from '../wasa/mock/index';
 import { Wasi } from "../wasi";
+
+beforeAll(() => {
+
+    fs.fs.init();
+
+})
 /** This file is included with tests so that the default globals are set up properly. */
 //@ts-ignore
 // @global

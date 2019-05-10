@@ -7,13 +7,17 @@ let DefaultFS = FileSystem.Default();
 // @ts-ignore decorator is valid
 @global
 export class fs {
-    private static _fs: FileSystem = DefaultFS;
+    public static _fs: FileSystem = DefaultFS;
+    private static initialized: bool = false;
 
     static set fs(_fs: FileSystem) {
         fs._fs = _fs;
     }
 
     static get fs(): FileSystem {
+        if (!fs.initialized) {
+            fs._fs.init();
+        }
         return fs._fs;
     }
     /**
@@ -37,6 +41,11 @@ export class fs {
     static openDirectory(path: string, dirfd: fd): WasiResult<FileDescriptor> {
         return this.fs.openDirectoryAt(dirfd, path)
     }
+
+    static open(path: string, type: Wasi.filetype, options: Wasi.oflags, dirfd: fd = this.fs.cwd): WasiResult<FileDescriptor> {
+        return this.fs.openAt(path, type, dirfd, options);
+    }
+
     /**
      * 
      * @param path path of new directory
