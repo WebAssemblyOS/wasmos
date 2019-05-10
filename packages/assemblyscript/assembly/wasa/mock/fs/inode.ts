@@ -3,6 +3,7 @@ import * as Wasi from "../../../std/bindings/wasi";
 
 
 export class Inode {
+    static inode: Wasi.inode;
     constructor(public path: string) {
         this._data = new ArrayBuffer(Inode.DefaultSize);
         this._stat = new Wasi.filestat();

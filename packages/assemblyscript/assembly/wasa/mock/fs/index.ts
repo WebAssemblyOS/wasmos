@@ -91,9 +91,6 @@ export class fs {
     static read(fd: fd, data: Array<u8> = [], chunk_size: usize = 4096): Wasi.errno {
         return this.fs.read(fd, data);
     }
-    this.offset = newOffset;
-    return newOffset
-  }
 
     /**
      * Read from a file descriptor until the end of the stream
@@ -155,8 +152,6 @@ export class fs {
     static erase(fd: fd): void {
         this.fs.erase(fd);
     }
-    this.set(fd, new FileDescriptor(fd, this.paths.get(path), 0));
-    return this.get(fd);
-  }
+
 
 }

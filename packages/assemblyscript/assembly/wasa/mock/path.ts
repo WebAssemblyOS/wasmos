@@ -1,22 +1,29 @@
 const PATH_SEP: string = "/"
+
 export function basename(path: string): string {
-  return getPath(path)
+  return getPath(path, -2, -1);
 }
 
 
 export function dirname(path: string): string {
-  return getPath(path, 1);
+  log(path);
+  if (path == PATH_SEP) {
+    return path;
+  }
+  return getPath(path, 0, -2);
 }
 
-export function getPath(path: string, index: usize = 0): string {
+export function getPath(path: string, from: usize, to: usize): string {
   let paths: string[] = path.split(PATH_SEP);
-  let path_index: usize = <usize>Math.max(paths.length - 1 - index, 0);
-  return paths[path_index]
+  let start: usize = <usize>Math.max((from + paths.length) % paths.length, 0);
+  let end: usize = <usize>Math.max((to + paths.length) % paths.length, 1);
+  let res: string[] = paths.slice(start, end);
+  return PATH_SEP + res.join(PATH_SEP);
 }
 
 
 export function join(paths: string[]): string {
-  let paths_cleaned: string[] = [];
+  let paths_cleaned: string[] = new Array<string>();
   for (let i: usize = 0; i < (paths.length as usize); i++) {
     let path: string = paths[i];
     if (path.endsWith('/')) {

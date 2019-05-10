@@ -1,7 +1,7 @@
 import { RNG } from "./xor";
 
 export class Random {
-    static RNG: RNG = RNG.fromSeed(42);
+    static RNG: RNG = RNG.fromSeed(84);
 
     /**
      * Fill a buffer with random data
@@ -9,7 +9,7 @@ export class Random {
      */
     static randomFill(buffer: ArrayBuffer): void {
         for (let i = 0; i < buffer.byteLength; i++) {
-            store<i8>(buffer.data, this.RNG.next(), i);
+            store<i8>(buffer.data + i, this.RNG.next());
         }
     }
 
@@ -21,5 +21,13 @@ export class Random {
         let array = new Uint8Array(len);
         this.randomFill(array.buffer);
         return array;
+    }
+
+    static randomU32(): u32 {
+        let len = sizeof<u32>();
+        let array = this.randomBytes(len) as Uint32Array;
+        return array[1];
+
+
     }
 }
