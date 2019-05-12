@@ -51,6 +51,12 @@ describe("readLine", (): void => {
     let utfStr = str.toUTF8();
     expect<string>(StringUtils.fromCStringTilNewLine(utfStr, str.lengthUTF8)).toStrictEqual("Hello\n")
   });
+
+  it("should read return null after no more lines", (): void => {
+    let str = "Hello World";
+    let utfStr = str.toUTF8();
+    expect<string>(StringUtils.fromCStringTilNewLine(utfStr, str.lengthUTF8 - 2)).toBeNull();
+  });
 });
 
 describe("Open", (): void => {

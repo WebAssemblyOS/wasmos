@@ -146,10 +146,6 @@ export class DirectoryDescriptor extends FileDescriptor {
         return this.directory.children;
     }
 
-    addFile(file: File): void {
-        this.directory.children.push(file);
-    }
-
     listDir(): File[] {
         return this.children;
     }

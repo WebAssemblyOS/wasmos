@@ -113,7 +113,7 @@ export class StringUtils {
     while (load<u8>(cstring + size) != 0 && size < max) {
       size++;
     }
-    if (size > max) {
+    if (size >= max && load<u8>(cstring + size) != 0) {
       return null;
     }
     return String.fromUTF8(cstring, size);
@@ -127,7 +127,7 @@ export class StringUtils {
         break;
       }
     }
-    if (size > max) {
+    if (size >= max && load<u8>(cstring + size) != 0) {
       return null;
     }
     return String.fromUTF8(cstring, size);

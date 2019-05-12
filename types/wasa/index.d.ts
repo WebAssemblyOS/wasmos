@@ -55,29 +55,52 @@ declare class CommandLine {
 }
 
 declare class FileDescriptor {
-  erase(): Wasi.errno
 
   file: File | null;
   fd: u32;
   offset: u32;
 
+  /**
+   * Write an array of bytes to a file;
+   */
   write(bytes: Array<u8>): Wasi.errno;
 
+  /**
+   * write string to file.
+   * @str: string
+   * newline: bool
+   */
   writeString(str: string, newline?: bool): Wasi.errno;
 
-
+  /**
+   * Read data into byte array.
+   */
   read(bytes: Array<u8>): Wasi.errno;
 
+  /**
+   * Read data into byte array without moving the offset.
+   */
   pread(bytes: Array<u8>): Wasi.errno;
 
+  /**
+   * read string from file.
+   */
   readString(): WasiResult<string>;
 
+  /**
+   * Read byte from file.
+   */
   readByte(): WasiResult<u8>;
 
+  /**
+   * Read a string up until a new line.
+   */
   readLine(): WasiResult<string>;
 
+  /**
+   * Current offset within the file
+   */
   tell(): u32;
-
 
   /**
    * Resets the offset to 0
@@ -85,9 +108,18 @@ declare class FileDescriptor {
   reset(): void;
 
   /**
-   * set seek (offset)
+   * set seek (offset) relative to whence.
+   * whence can be:
+   * - Wasi.whence.CUR - Current offset
+   * - Wasi.whence.END - End of file
+   * - Wasi.whence.SET - Start of file
    */
   seek(offset: Wasi.filedelta, whence?: Wasi.whence): WasiResult<usize>;
+
+  /**
+   * Removes all data from the file
+   */
+  erase(): Wasi.errno
 }
 
 declare class File {
@@ -98,7 +130,13 @@ declare class File {
 
 
 declare class Directory extends File {
+  /**
+   * Reference to parent directory.
+   */
   parent: Directory;
+  /**
+   * Array of Files contained in directory.
+   */
   children: Array<File>;
 }
 
@@ -118,12 +156,12 @@ declare class fs {
   static openForWrite(path: string, dirfd?: fd): WasiResult<FileDescriptor>;
 
   static openFile(arg0: string): WasiResult<FileDescriptor>;
-
+  //
   static openDirectory(path: string, dirfd?: fd): WasiResult<FileDescriptor>;
   /**
-   * 
+   *
    * @param path path of new directory
-   * @param dirfd File fd for 
+   * @param dirfd File fd for
    */
   static createDirectory(path: string, dirfd?: fd): WasiResult<FileDescriptor>;
 
@@ -189,14 +227,14 @@ declare class fs {
    */
   static reset(fd: fd): void;
   /**
-   * 
+   *
    * @param fd File fd
    * returns the current offset of the file descriptor
    */
   static tell(fd: fd): WasiResult<usize>;
 
   /**
-   * 
+   *
    * @param fd File fd
    * @param offset The number of bytes to move
    * @param whence The base from which the offset is relative
