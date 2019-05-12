@@ -1,3 +1,5 @@
+import { FileDescriptor } from './fs';
+
 // @ts-ignore: Decorators *are* valid here!
 @global
 export class Console {
@@ -8,6 +10,7 @@ export class Console {
 
     static get stdin(): FileDescriptor {
         if (Console._stdin == null) {
+            // @ts-ignore: Private methods and fields shouldn't matter
             Console._stdin = fs.openForRead("/dev/fd/0").result;
         }
         return Console._stdin!;
@@ -15,6 +18,7 @@ export class Console {
 
     static get stdout(): FileDescriptor {
         if (Console._stdout == null) {
+            // @ts-ignore: Private methods and fields shouldn't matter
             Console._stdout = fs.openForWrite("/dev/fd/1").result;
         }
         return Console._stdout!;
@@ -22,6 +26,7 @@ export class Console {
 
     static get stderr(): FileDescriptor {
         if (Console._stderr == null) {
+            // @ts-ignore: Private methods and fields shouldn't matter
             Console._stderr = fs.openForRead("/dev/fd/2").result;
         }
         return Console._stderr!;
@@ -40,7 +45,11 @@ export class Console {
      * Read an UTF8 string from the console, convert it to a native string
      */
     static readAll(): string | null {
-        return this.stdin.readString();
+        let res = this.stdin.readString();
+        if (res.failed) {
+            return null;
+        }
+        return res.result;
     }
 
     /**

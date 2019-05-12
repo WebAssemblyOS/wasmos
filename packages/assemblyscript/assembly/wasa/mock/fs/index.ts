@@ -1,9 +1,12 @@
-import { FileSystem, FileDescriptor, fd, Ref } from "./fs";
+import { FileSystem, FileDescriptor, fd, DirectoryDescriptor } from "./fs";
 import { WasiResult } from '../..';
 import { Wasi } from "../../../wasi";
 export * from "./fs";
 
 let DefaultFS = FileSystem.Default();
+
+const BASE_RIGHTS: Wasi.rights = Wasi.rights.FD_READ | Wasi.rights.FD_WRITE | Wasi.rights.FD_READDIR
+
 // @ts-ignore decorator is valid
 @global
 export class fs {
@@ -25,7 +28,7 @@ export class fs {
      * @param path Path
      * @param dirfd Base directory descriptor (will be automatically set soon)
      */
-    static openForRead(path: string, dirfd: fd = 3): WasiResult<FileDescriptor> {
+    static openForRead(path: string, dirfd: fd): WasiResult<FileDescriptor> {
         return this.fs.openFileAt(dirfd, path);
     }
 
@@ -38,9 +41,14 @@ export class fs {
         return this.fs.openFileAt(dirfd, path);
     }
 
-    static openDirectory(path: string, dirfd: fd): WasiResult<FileDescriptor> {
+    static openDirectoryAt(path: string, dirfd: fd): WasiResult<FileDescriptor> {
         return this.fs.openDirectoryAt(dirfd, path)
     }
+
+    static openFile(path: string): WasiResult<FileDescriptor> {
+        return this.fs.openFile(path);
+    }
+
 
     static open(path: string, type: Wasi.filetype, options: Wasi.oflags, dirfd: fd = this.fs.cwd): WasiResult<FileDescriptor> {
         return this.fs.openAt(path, type, dirfd, options);
@@ -51,8 +59,12 @@ export class fs {
      * @param path path of new directory
      * @param dirfd File fd for 
      */
-    static createDirectory(path: string, dirfd: fd = this.fs.cwd): WasiResult<FileDescriptor> {
+    static createDirectory(path: string, dirfd: fd = this.fs.cwd): WasiResult<DirectoryDescriptor> {
         return this.fs.createDirectoryAt(dirfd, path);
+    }
+
+    static openDirectory(path: string): WasiResult<DirectoryDescriptor> {
+        return this.fs.openDirectory(path);
     }
 
     /**
@@ -108,11 +120,7 @@ export class fs {
      * @param chunk_size chunk size (default: 4096)
      */
     static readAll(fd: fd, data: Array<u8> = [], chunk_size: usize = 4096): Wasi.errno {
-        if (this.fs.get(fd).failed) {
-            return Wasi.errno.BADF;
-        }
-        data.buffer_ = changetype<ArrayBuffer>(this.fs.get(fd).result.data);
-        return Wasi.errno.SUCCESS;
+        return this.fs.read(fd, data);
     }
 
     /**
@@ -139,9 +147,9 @@ export class fs {
      * @param fd File fd
      * returns the current offset of the file descriptor
      */
-    static tell(fd: fd): usize {
+    static tell(fd: fd): WasiResult<usize> {
         // TODO: add error check
-        return this.fs.get(fd).result.offset;
+        return this.fs.tell(fd);
     }
 
     /**
@@ -150,7 +158,7 @@ export class fs {
      * @param offset The number of bytes to move
      * @param whence The base from which the offset is relative
      */
-    static seek(fd: fd, offset: Wasi.filedelta, whence: Wasi.whence = Wasi.whence.CUR): WasiResult<Ref<usize>> {
+    static seek(fd: fd, offset: Wasi.filedelta, whence: Wasi.whence = Wasi.whence.CUR): WasiResult<usize> {
         return this.fs.seek(fd, offset, whence);
     }
 
@@ -158,9 +166,20 @@ export class fs {
         return this.fs.get(fd);
     }
 
-    static erase(fd: fd): void {
-        this.fs.erase(fd);
+    static erase(fd: fd): WasiResult<void> {
+        return this.fs.erase(fd);
     }
 
+    static listdir(fd: fd): WasiResult<Array<File>> {
+        return this.fs.listdir(fd);
+    }
+
+    static delete(path: string): WasiResult<void> {
+        return this.fs.delete(path);
+    }
+
+    static deleteDirectory(path: string): WasiResult<void> {
+        return this.fs.deleteDirectory(path);
+    }
 
 }

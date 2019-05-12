@@ -1,13 +1,4 @@
-
-declare class Ref<T>{
-  val: T;
-}
-declare class Tuple<T1, T2> {
-  first: T1;
-  second: T2;
-}
-
-declare class WasiResult<T> extends Tuple<T | null, Wasi.errno> {
+declare class WasiResult<T> {
   constructor(first: T | null, second?: Wasi.errno);
 
   failed: boolean;
@@ -64,27 +55,26 @@ declare class CommandLine {
 }
 
 declare class FileDescriptor {
-  erase(): void
+  erase(): Wasi.errno
 
-  file: File;
+  file: File | null;
   fd: u32;
   offset: u32;
 
-  write(bytes: Array<u8>): void;
+  write(bytes: Array<u8>): Wasi.errno;
 
-  writeString(str: string, newline?: bool): void;
+  writeString(str: string, newline?: bool): Wasi.errno;
 
-  copyByte(ptr: usize): void;
 
-  writeByte(byte: u8): void;
+  read(bytes: Array<u8>): Wasi.errno;
 
-  read(bytes: Array<u8>): void;
+  pread(bytes: Array<u8>): Wasi.errno;
 
-  readByte(): u8;
+  readString(): WasiResult<string>;
 
-  pread(bytes: Array<u8>): void;
+  readByte(): WasiResult<u8>;
 
-  readString(): string;
+  readLine(): WasiResult<string>;
 
   tell(): u32;
 
@@ -97,11 +87,8 @@ declare class FileDescriptor {
   /**
    * set seek (offset)
    */
-  seek(offset: usize): void;
-
-  data: usize;
+  seek(offset: Wasi.filedelta, whence?: Wasi.whence): WasiResult<usize>;
 }
-
 
 declare class File {
   static DefaultSize: u32;
@@ -129,6 +116,8 @@ declare class fs {
    * @param dirfd Base directory descriptor (will be automatically set soon)
    */
   static openForWrite(path: string, dirfd?: fd): WasiResult<FileDescriptor>;
+
+  static openFile(arg0: string): WasiResult<FileDescriptor>;
 
   static openDirectory(path: string, dirfd?: fd): WasiResult<FileDescriptor>;
   /**
@@ -194,13 +183,17 @@ declare class fs {
    */
   static readLine(fd: fd, chunk_size: usize): WasiResult<string>;
 
+  /**
+   * Equivalent to seek(fd, 0 Wasi.whence.SET) or reseting the offset to 0
+   * @param fd file descriptor
+   */
   static reset(fd: fd): void;
   /**
    * 
    * @param fd File fd
    * returns the current offset of the file descriptor
    */
-  static tell(fd: fd): usize;
+  static tell(fd: fd): WasiResult<usize>;
 
   /**
    * 
@@ -208,11 +201,17 @@ declare class fs {
    * @param offset The number of bytes to move
    * @param whence The base from which the offset is relative
    */
-  static seek(fd: fd, offset: Wasi.filedelta, whence?: Wasi.whence): WasiResult<Ref<usize>>;
+  static seek(fd: fd, offset: Wasi.filedelta, whence?: Wasi.whence): WasiResult<usize>;
 
   static get(fd: fd): WasiResult<FileDescriptor>;
 
-  static erase(fd: fd): void;
+  static erase(fd: fd): WasiResult<void>;
+
+  static listdir(fd: fd): WasiResult<Array<File>>;
+
+  static delete(path: string): WasiResult<void>;
+
+  static deleteDirectory(path: string): WasiResult<void>;
 
 
 }

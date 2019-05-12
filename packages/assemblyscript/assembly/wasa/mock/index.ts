@@ -108,21 +108,27 @@ export class StringUtils {
     return load<u8>(ptr) == newLine;
   }
 
-  static fromCString(cstring: usize, max: usize = 4096): string {
+  static fromCString(cstring: usize, max: usize = 4096): string | null {
     let size: usize = 0;
     while (load<u8>(cstring + size) != 0 && size < max) {
       size++;
     }
+    if (size > max) {
+      return null;
+    }
     return String.fromUTF8(cstring, size);
   }
 
-  static fromCStringTilNewLine(cstring: usize, max: usize = 4096): string {
+  static fromCStringTilNewLine(cstring: usize, max: usize): string | null {
     let size: usize = 0;
     while (load<u8>(cstring + size) != 0 && size < max) {
       size++;
       if (this.isNewLine(cstring + size - 1)) {
         break;
       }
+    }
+    if (size > max) {
+      return null;
     }
     return String.fromUTF8(cstring, size);
   }

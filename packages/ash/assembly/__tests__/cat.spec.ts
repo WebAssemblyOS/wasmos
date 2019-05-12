@@ -33,7 +33,7 @@ describe("cat", (): void => {
         fs.reset(Console.stdout.fd)
         expect<string>(fs.readString(Console.stdout.fd).result).toBe(Hello + " " + World + "\n")
         Console.stdout.reset()
-        expect<string>(Console.stdout.readString()).toBe(stdout2.readString());
+        expect<string>(Console.stdout.readString().result).toBe(stdout2.readString().result);
     })
 
 })

@@ -11,7 +11,7 @@ export function openStdout(): FileDescriptor {
 }
 
 export function open(path: string): FileDescriptor {
-    let FD = fs.openForRead(path)
+    let FD = fs.openFile(path)
     if (FD.failed) {
         abort(Wasi.errno.toString(FD.error));
     }
@@ -23,6 +23,14 @@ export function testFile(): FileDescriptor {
     fd.writeString(Hello_World);
     fd.reset();
     return fd;
+}
+
+export function readString(FD: FileDescriptor): string {
+    let res = FD.readString();
+    if (res.failed) {
+        abort(Wasi.errno.toString(res.error))
+    }
+    return res.result;
 }
 
 

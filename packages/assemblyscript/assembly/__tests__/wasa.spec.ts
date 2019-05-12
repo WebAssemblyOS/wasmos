@@ -3,9 +3,10 @@ import { FileDescriptor } from '../wasa/mock/fs';
 import * as path from "../wasa/mock/path";
 import { FileSystem } from '../wasa/mock/fs/fs';
 import { Wasi } from '../wasi';
+import { WasiResult } from '../wasa/index';
 
 const STDOUT: string = "/dev/fd/1";
-var stdout: FileDescriptor;
+var stdout: WasiResult<FileDescriptor>;
 let jsonStr = '{"hello":"world"}';
 let _fs: FileSystem;
 
@@ -13,7 +14,6 @@ beforeAll(() => {
   _fs = fs.fs;
   _fs.init();
 })
-
 
 describe("Console", (): void => {
   it("should be print hello World", (): void => {
@@ -25,8 +25,8 @@ describe("Console", (): void => {
       "Two non-unique file descriptors points to the same object"
     );
 
-    stdout = fs.openForRead("/dev/fd/1").result;
-    expect<usize>(stdout.offset).toBe(
+    stdout = fs.openFile("/dev/fd/1");
+    expect<usize>(stdout.result.offset).toBe(
       0,
       "A fresh file descriptor has a seek (offset) of 0"
     );
@@ -38,8 +38,8 @@ describe("Console", (): void => {
     // expect<u32>(stdout.offset).toBe(0); //"new line addded"
     // let stdoutStr = fs.readString(stdout.id);
     let newLineStr = jsonStr + "\n";
-    stdout.reset()
-    expect<string>(stdout.readString()).toStrictEqual(newLineStr);
+    stdout.result.reset()
+    expect<string>(stdout.result.readString().result).toStrictEqual(newLineStr);
   });
 });
 
@@ -49,7 +49,7 @@ describe("readLine", (): void => {
   it("should read until newline", (): void => {
     let str = "Hello\nWorld";
     let utfStr = str.toUTF8();
-    expect<string>(StringUtils.fromCStringTilNewLine(utfStr)).toStrictEqual("Hello\n")
+    expect<string>(StringUtils.fromCStringTilNewLine(utfStr, str.lengthUTF8)).toStrictEqual("Hello\n")
   });
 });
 
@@ -78,6 +78,5 @@ describe("Open", (): void => {
     log<string>(Wasi.errno.toString(dir.error));
     expect<bool>(dir.failed).toBeTruthy();
   });
-
 
 });

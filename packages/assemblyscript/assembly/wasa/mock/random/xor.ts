@@ -6,8 +6,6 @@ class RandomNumberGenerator {
 
 //inspired by https://github.com/dubzzz/pure-rand/blob/master/src/generator/XorShift.ts
 
-type RNG = RandomNumberGenerator;
-
 class XorShift128Plus extends RandomNumberGenerator {
   constructor(
     private s01: u32,
@@ -44,4 +42,3 @@ class XorShift128Plus extends RandomNumberGenerator {
   };
 }
 export { XorShift128Plus as RNG }
-
