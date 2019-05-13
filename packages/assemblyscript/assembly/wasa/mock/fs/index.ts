@@ -28,8 +28,16 @@ export class fs {
      * @param path Path
      * @param dirfd Base directory descriptor (will be automatically set soon)
      */
-    static openForRead(path: string, dirfd: fd): WasiResult<FileDescriptor> {
+    static openForRead(path: string, dirfd: fd = fs.fs.cwd): WasiResult<FileDescriptor> {
         return this.fs.openFileAt(dirfd, path);
+    }
+
+    static createFile(path: string): WasiResult<FileDescriptor> {
+        return this.fs.createFile(path);
+    }
+
+    static createFileAt(dirfd: fd, path: string): WasiResult<FileDescriptor> {
+        return this.fs.createFileAt(dirfd, path)
     }
 
     /**
@@ -37,21 +45,22 @@ export class fs {
      * @param path Path
      * @param dirfd Base directory descriptor (will be automatically set soon)
      */
-    static openForWrite(path: string, dirfd: fd = 3): WasiResult<FileDescriptor> {
+    static openForWrite(path: string, dirfd: fd = fs.fs.cwd): WasiResult<FileDescriptor> {
         return this.fs.openFileAt(dirfd, path);
     }
 
-    static openDirectoryAt(path: string, dirfd: fd): WasiResult<FileDescriptor> {
-        return this.fs.openDirectoryAt(dirfd, path)
+
+    static openFile(path: string, options: Wasi.oflags = 0): WasiResult<FileDescriptor> {
+        return this.fs.openFile(path, options);
     }
 
-    static openFile(path: string): WasiResult<FileDescriptor> {
-        return this.fs.openFile(path);
+    static openFileAt(dirfd: fd, path: string, options?: Wasi.oflags): WasiResult<FileDescriptor> {
+        return this.fs.openFileAt(dirfd, path, options)
     }
 
 
-    static open(path: string, type: Wasi.filetype, options: Wasi.oflags, dirfd: fd = this.fs.cwd): WasiResult<FileDescriptor> {
-        return this.fs.openAt(path, type, dirfd, options);
+    static open(path: string, type: Wasi.filetype, options: Wasi.oflags): WasiResult<FileDescriptor> {
+        return this.fs.open(path, type, options);
     }
 
     /**
@@ -59,7 +68,11 @@ export class fs {
      * @param path path of new directory
      * @param dirfd File fd for 
      */
-    static createDirectory(path: string, dirfd: fd = this.fs.cwd): WasiResult<DirectoryDescriptor> {
+    static createDirectory(path: string): WasiResult<DirectoryDescriptor> {
+        return this.fs.createDirectory(path);
+    }
+
+    static createDirectoryAt(dirfd: fd, path: string): WasiResult<DirectoryDescriptor> {
         return this.fs.createDirectoryAt(dirfd, path);
     }
 
@@ -67,6 +80,9 @@ export class fs {
         return this.fs.openDirectory(path);
     }
 
+    static openDirectoryAt(path: string, dirfd: fd): WasiResult<FileDescriptor> {
+        return this.fs.openDirectoryAt(dirfd, path)
+    }
     /**
      * Close a file descriptor
      * @param fd file descriptor
@@ -142,13 +158,13 @@ export class fs {
     static reset(fd: fd): void {
         this.seek(fd, 0, Wasi.whence.SET);
     }
+
     /**
      * 
      * @param fd File fd
      * returns the current offset of the file descriptor
      */
     static tell(fd: fd): WasiResult<usize> {
-        // TODO: add error check
         return this.fs.tell(fd);
     }
 

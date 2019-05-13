@@ -16,7 +16,7 @@ declare class Console {
   /**
    * Write a string to the console
    * @param s string
-   * @param newline `false` to avoid inserting a newline after the string
+   * @param newline `false` by default to avoid inserting a newline after the string.
    */
   static write(s: string, newline?: boolean): void;
 
@@ -154,9 +154,26 @@ declare class fs {
    * @param dirfd Base directory descriptor (will be automatically set soon)
    */
   static openForWrite(path: string, dirfd?: fd): WasiResult<FileDescriptor>;
+  /**
+   * Creates a new file and returning its new File Descriptor
+   * @param path 
+   */
+  static createFile(path: string): WasiResult<FileDescriptor>;
+  /**
+   * 
+   * @param dirfd base Directory
+   * @param path 
+   */
+  static createFileAt(dirfd: fd, path: string): WasiResult<FileDescriptor>;
+  /**
+   * Open file relative to the cwd if not absolute.
+   * @param path 
+   * @param options optional, default Wasi.oflags.CREAT
+   */
+  static openFile(path: string, options?: Wasi.oflags): WasiResult<FileDescriptor>;
 
-  static openFile(arg0: string): WasiResult<FileDescriptor>;
-  //
+  static openFileAt(dirfd: fd, path: string, options?: Wasi.oflags): WasiResult<FileDescriptor>;
+
   static openDirectory(path: string, dirfd?: fd): WasiResult<FileDescriptor>;
   /**
    *

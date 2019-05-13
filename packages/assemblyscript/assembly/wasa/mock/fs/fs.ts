@@ -248,9 +248,9 @@ export class FileSystem {
         return this.get(fd) as WasiResult<DirectoryDescriptor>;
     }
 
-    private _open(_path: string, type: Wasi.filetype, dirfd: fd, options: Wasi.oflags): WasiResult<FileDescriptor> {
+    private _open(_path: string, type: Wasi.filetype, dirfd: fd, options: Wasi.oflags = 0): WasiResult<FileDescriptor> {
         let fullPath: string = this.fullPath(_path, dirfd);
-        let parent: Directory | null = null;
+        let parent: Directory;
         let parentName = path.dirname(fullPath);
         if (!this.paths.has(parentName)) {
             return WasiResult.fail<FileDescriptor>(Wasi.errno.NOENT);
@@ -258,7 +258,7 @@ export class FileSystem {
         parent = this.paths.get(parentName) as Directory;
         if (!this.paths.has(fullPath)) {
             if (hasFlag(options, Wasi.oflags.CREAT)) {
-                this.paths.set(_path, File.create(type, _path, dirfd, options));
+                this.paths.set(fullPath, File.create(type, fullPath, dirfd, options));
             } else {
                 return WasiResult.fail<FileDescriptor>(Wasi.errno.NOENT);
             }
@@ -291,28 +291,36 @@ export class FileSystem {
         return this.get(fd);
     }
 
-    openAt(path: string, type: Wasi.filetype, dirfd: fd, options: Wasi.oflags): WasiResult<FileDescriptor> {
+    openAt(dirfd: fd, path: string, type: Wasi.filetype, options: Wasi.oflags = 0): WasiResult<FileDescriptor> {
         return this._open(path, type, dirfd, options);
     }
 
-    open(path: string, type: Wasi.filetype, options: Wasi.oflags): WasiResult<FileDescriptor> {
-        return this.openAt(path, type, this.cwd, options)
+    open(path: string, type: Wasi.filetype, options?: Wasi.oflags): WasiResult<FileDescriptor> {
+        return this.openAt(this.cwd, path, type, options)
     }
 
-    openFileAt(dirfd: fd, path: string): WasiResult<FileDescriptor> {
-        return this.openAt(path, Wasi.filetype.REGULAR_FILE, dirfd, Wasi.oflags.CREAT);
+    openFileAt(dirfd: fd, path: string, options: Wasi.oflags = 0): WasiResult<FileDescriptor> {
+        return this.openAt(dirfd, path, Wasi.filetype.REGULAR_FILE, options);
     }
 
-    openFile(path: string): WasiResult<FileDescriptor> {
+    openFile(path: string, options: Wasi.oflags = Wasi.oflags.CREAT): WasiResult<FileDescriptor> {
         return this.openFileAt(this.cwd, path);
     }
 
     openDirectoryAt(dirfd: fd, path: string, create: boolean = false): WasiResult<DirectoryDescriptor> {
-        return this.openAt(path, Wasi.filetype.DIRECTORY, dirfd, Wasi.oflags.DIRECTORY | (create ? Wasi.oflags.CREAT : 0)) as WasiResult<DirectoryDescriptor>;
+        return this.openAt(dirfd, path, Wasi.filetype.DIRECTORY, Wasi.oflags.DIRECTORY | (create ? Wasi.oflags.CREAT : 0)) as WasiResult<DirectoryDescriptor>;
     }
 
     createDirectoryAt(dirfd: fd, path: string): WasiResult<DirectoryDescriptor> {
         return this.openDirectoryAt(dirfd, path, true);
+    }
+
+    createFile(path: string): WasiResult<FileDescriptor> {
+        return this.createFileAt(this.cwd, path);
+    }
+
+    createFileAt(dirfd: fd, path: string): WasiResult<FileDescriptor> {
+        return this.openAt(dirfd, path, Wasi.filetype.REGULAR_FILE, Wasi.oflags.CREAT);
     }
 
     openDirectory(path: string, create: boolean = false): WasiResult<DirectoryDescriptor> {

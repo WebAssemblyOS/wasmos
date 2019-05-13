@@ -4,6 +4,9 @@ import { Wasi } from '../../../assemblyscript/assembly/wasi';
 
 beforeAll(() => {
     fs.fs;
+    Console.stdout;
+    Console.stdin;
+    Console.stderr;
 })
 
 export function openStdout(): FileDescriptor {
@@ -11,7 +14,7 @@ export function openStdout(): FileDescriptor {
 }
 
 export function open(path: string): FileDescriptor {
-    let FD = fs.openFile(path)
+    let FD = fs.createFile(path)
     if (FD.failed) {
         abort(Wasi.errno.toString(FD.error));
     }

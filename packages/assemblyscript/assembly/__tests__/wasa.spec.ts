@@ -69,7 +69,7 @@ describe("Open", (): void => {
   });
 
   it("create a top level file", (): void => {
-    let file = _fs.openFileAt(fs.fs.cwd, "/test");
+    let file = _fs.createFileAt(fs.fs.cwd, "./test");
     expect<bool>(file.failed).toBeFalsy();
     expect<string>(file.result.file!.path).toStrictEqual("/test");
   });

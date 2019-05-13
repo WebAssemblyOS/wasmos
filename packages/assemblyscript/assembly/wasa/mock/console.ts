@@ -11,7 +11,7 @@ export class Console {
     static get stdin(): FileDescriptor {
         if (Console._stdin == null) {
             // @ts-ignore: Private methods and fields shouldn't matter
-            Console._stdin = fs.openForRead("/dev/fd/0").result;
+            Console._stdin = fs.createFile("/dev/fd/0").result;
         }
         return Console._stdin!;
     }
@@ -19,7 +19,7 @@ export class Console {
     static get stdout(): FileDescriptor {
         if (Console._stdout == null) {
             // @ts-ignore: Private methods and fields shouldn't matter
-            Console._stdout = fs.openForWrite("/dev/fd/1").result;
+            Console._stdout = fs.createFile("/dev/fd/1").result;
         }
         return Console._stdout!;
     }
@@ -27,7 +27,7 @@ export class Console {
     static get stderr(): FileDescriptor {
         if (Console._stderr == null) {
             // @ts-ignore: Private methods and fields shouldn't matter
-            Console._stderr = fs.openForRead("/dev/fd/2").result;
+            Console._stderr = fs.createFile("/dev/fd/2").result;
         }
         return Console._stderr!;
     }

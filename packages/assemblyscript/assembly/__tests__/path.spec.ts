@@ -36,12 +36,9 @@ describe("path", (): void => {
 
     describe("join", (): void => {
         it("should handle relative links", (): void => {
-            log<string>("HELLO")
             let paths: string[] = new Array<string>();
             paths.push(HOME)
-            log<string>(HOME);
             paths.push(SRC);
-            log(paths.length)
             // expect<string>(paths[0]).not.toBe(null);
             let res = path.join(paths);
             expect<string>(res).not.toBe(null);
