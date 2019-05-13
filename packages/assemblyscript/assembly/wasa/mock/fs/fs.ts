@@ -100,7 +100,7 @@ export class FileDescriptor {
                 break;
             }
             default: {
-                Process.exit(1)
+                return WasiResult.fail<usize>(Wasi.errno.INVAL)
             }
         }
         this.offset = newOffset;

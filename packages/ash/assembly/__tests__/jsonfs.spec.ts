@@ -2,6 +2,7 @@ import { Console, fs, Process, CommandLine } from '../../../assemblyscript/assem
 import { FileDescriptor, FileSystem } from '../../../assemblyscript/assembly/wasa/mock/fs';
 import { parseJSON, openStdout, Hello, World, testFile, open } from './fixtures';
 import { Wasi } from "../../../assemblyscript/assembly/wasi";
+import { fs_str } from "./simple_fs";
 
 describe("fs from JSON", (): void => {
 
@@ -23,7 +24,12 @@ describe("fs from JSON", (): void => {
     });
 
     it("Should handle just a multi-level level directory", (): void => {
-        let s = `{"www": { "test": { "hello": "world"}}}`;
+        let s =
+            `{ "www":  \
+                 { "test": \
+                          { "hello": "world"}\
+                }\
+         }`;
         parseJSON(s);
         expect<string>(open("/www/test/hello").readString().result).toStrictEqual("world");
     });
@@ -33,4 +39,9 @@ describe("fs from JSON", (): void => {
         expect<bool>(res.failed).toBe(true);
         expect<Wasi.errno>(res.error).toBe(Wasi.errno.NOENT)
     });
+
+    it("should handle imported string", () => {
+        parseJSON(fs_str);
+        expect<string>(open("/home/bob/documents/secret.txt").readString().result).toStrictEqual("For my eyes only.\n No one else")
+    })
 });

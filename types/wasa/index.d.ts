@@ -1,17 +1,38 @@
+/**
+ * Helper class for dealing with errors.
+ */
 declare class WasiResult<T> {
   constructor(first: T | null, second?: Wasi.errno);
-
+  /**
+ * Tests if the error is not a success.
+ */
   failed: boolean;
   error: Wasi.errno;
   result: T;
+  /**
+   * Passes value if system call was successful.
+   * @param result - Value returned 
+   */
   static resolve<T>(result: T): WasiResult<T>;
+  /**
+   * Called if an error was encountered.
+   * @param err 
+   */
   static fail<T>(err: Wasi.errno): WasiResult<T>;
+
+  /**
+   * Special case where there is no result type just the error.
+   * @param res error
+   */
   static void<T>(res: Wasi.errno): WasiResult<T>;
 }
 
 declare type fd = usize;
 declare type path = string;
 
+/**
+ * Global console class to access std input/output streams.
+ */
 declare class Console {
   /**
    * Write a string to the console
@@ -54,6 +75,10 @@ declare class CommandLine {
   static reset(): void;
 }
 
+/**
+ * Wrapper class for file descriptors.  
+ * Tracks offset within a file and provides methods to read and write.
+ */
 declare class FileDescriptor {
 
   file: File | null;
