@@ -66,7 +66,6 @@ export class fs {
     /**
      * 
      * @param path path of new directory
-     * @param dirfd File fd for 
      */
     static createDirectory(path: string): WasiResult<DirectoryDescriptor> {
         return this.fs.createDirectory(path);
@@ -80,7 +79,7 @@ export class fs {
         return this.fs.openDirectory(path);
     }
 
-    static openDirectoryAt(path: string, dirfd: fd): WasiResult<FileDescriptor> {
+    static openDirectoryAt(path: string, dirfd: fd): WasiResult<DirectoryDescriptor> {
         return this.fs.openDirectoryAt(dirfd, path)
     }
     /**
@@ -182,11 +181,15 @@ export class fs {
         return this.fs.get(fd);
     }
 
+    static getDir(fd: fd): WasiResult<DirectoryDescriptor> {
+        return this.fs.getDir(fd);
+    }
+
     static erase(fd: fd): WasiResult<void> {
         return this.fs.erase(fd);
     }
 
-    static listdir(fd: fd): WasiResult<Array<File>> {
+    static listdir(fd: fd): WasiResult<DirectoryEntry[]> {
         return this.fs.listdir(fd);
     }
 
@@ -196,6 +199,10 @@ export class fs {
 
     static deleteDirectory(path: string): WasiResult<void> {
         return this.fs.deleteDirectory(path);
+    }
+
+    static grow(fd: fd, amount?: usize): WasiResult<void> {
+        return this.fs.grow(fd, amount);
     }
 
 }

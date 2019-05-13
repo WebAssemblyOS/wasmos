@@ -147,6 +147,17 @@ declare class FileDescriptor {
   erase(): Wasi.errno
 }
 
+/**Similar to FileDescriptor, provides interaceto list files and get parent.  */
+declare class DirectoryDescriptor extends FileDescriptor {
+  /**
+   * Returns list of names of entries in the directory.
+   */
+  listDir(): string[];
+
+  /**Path of parent directory */
+  parent: string;
+}
+
 declare class File {
   static DefaultSize: u32;
   data: usize;
@@ -166,6 +177,7 @@ declare class Directory extends File {
 }
 
 declare class fs {
+  cwd: fd;
   /**
    * A simplified interface to open a file for read operations
    * @param path Path
@@ -185,7 +197,7 @@ declare class fs {
    */
   static createFile(path: string): WasiResult<FileDescriptor>;
   /**
-   * 
+   * Equivalient to openFileAt, passing Wasi.oflags.CREAT
    * @param dirfd base Directory
    * @param path 
    */
@@ -196,17 +208,25 @@ declare class fs {
    * @param options optional, default Wasi.oflags.CREAT
    */
   static openFile(path: string, options?: Wasi.oflags): WasiResult<FileDescriptor>;
-
+  /**
+   * Open file relative to a passed directory
+   * @param dirfd 
+   * @param path 
+   * @param options 
+   */
   static openFileAt(dirfd: fd, path: string, options?: Wasi.oflags): WasiResult<FileDescriptor>;
 
-  static openDirectory(path: string, dirfd?: fd): WasiResult<FileDescriptor>;
-  /**
-   *
-   * @param path path of new directory
-   * @param dirfd File fd for
-   */
-  static createDirectory(path: string, dirfd?: fd): WasiResult<FileDescriptor>;
+  /**Create directory relative to the cwd */
+  static createDirectory(path: string): WasiResult<DirectoryDescriptor>;
 
+  /**Create directory relative to passed directory*/
+  static createDirectoryAt(dirfd: fd, path: string): WasiResult<DirectoryDescriptor>;
+
+  /**Open a directory relative to cwd */
+  static openDirectory(path: string): WasiResult<DirectoryDescriptor>;
+
+  /**Open a directory relative to passed directory */
+  static openDirectoryAt(path: string, dirfd: fd): WasiResult<DirectoryDescriptor>;
   /**
    * Close a file descriptor
    * @param fd file descriptor
@@ -283,20 +303,48 @@ declare class fs {
    */
   static seek(fd: fd, offset: Wasi.filedelta, whence?: Wasi.whence): WasiResult<usize>;
 
+  /**
+   * Get wrapper class for file descriptor.
+   * @param fd 
+   */
   static get(fd: fd): WasiResult<FileDescriptor>;
 
+  /**
+   * Get wrapper class for directory descriptor.
+   * @param fd 
+   */
+  static getDir(fd: fd): WasiResult<DirectoryDescriptor>;
+
+  /**Deletes contents of file. */
   static erase(fd: fd): WasiResult<void>;
 
-  static listdir(fd: fd): WasiResult<Array<File>>;
+  /**Returns a list of DirectoryEntry */
+  static listdir(fd: fd): WasiResult<DirectoryEntry>;
 
+  /**
+   * Deletes a file and will throw an error if passed a directory.
+   * @param path 
+   */
   static delete(path: string): WasiResult<void>;
 
+  /**Deletes a directory. */
   static deleteDirectory(path: string): WasiResult<void>;
+
+  /** Amount to set the new file size to.  It doubles in size by default. */
+  static grow(fd: fd, amount?: usize): WasiResult<void>;
 
 
 }
 
+/** Describes a Directory Entry */
+declare class DirectoryEntry {
+  path: string;
+  type: Wasi.filetype;
+}
 
+/**
+ * Provides function to exit.
+ */
 declare class Process {
   static exit(code: number): void;
 }

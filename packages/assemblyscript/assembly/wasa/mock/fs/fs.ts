@@ -134,6 +134,15 @@ export class FileDescriptor {
     private hasSpace(bytes: Array<u8>): bool {
         return this.offset + bytes.length < this.length;
     }
+
+    grow(amount?: usize): Wasi.errno {
+        let length = this.file!.length;
+        this.file!.grow(amount)
+        if (this.file!.length > length) {
+            return Wasi.errno.SUCCESS;
+        }
+        return Wasi.errno.NOMEM;
+    }
 }
 
 export class DirectoryDescriptor extends FileDescriptor {
@@ -146,8 +155,16 @@ export class DirectoryDescriptor extends FileDescriptor {
         return this.directory.children;
     }
 
-    listDir(): File[] {
-        return this.children;
+    listDir(): DirectoryEntry[] {
+        let files = new Array<DirectoryEntry>();
+        for (let i: i32 = 0; i < this.children.length; i++) {
+            files.push(new DirectoryEntry(path.basename(this.children[i].path), this.children[i].type))
+        }
+        return files;
+    }
+
+    get parent(): string {
+        return this.directory.parent.path;
     }
 }
 
@@ -177,8 +194,8 @@ export class File {
         return this._data.data;
     }
 
-    grow(): File {
-        let newData = new ArrayBuffer(this._data.byteLength * 2);
+    grow(amount: usize = this._data.byteLength * 2): File {
+        let newData = new ArrayBuffer(amount);
         memory.copy(newData.data, this.data, this._data.byteLength);
         return this;
     }
@@ -205,6 +222,10 @@ class Directory extends File {
         this.children = new Array<File>()
     }
 
+}
+
+class DirectoryEntry {
+    constructor(public path: string, public type: Wasi.filetype) { }
 }
 
 
@@ -373,8 +394,9 @@ export class FileSystem {
         return res.result.writeString(data, newline);
     }
 
-    close(fd: fd): void {
-        this.files.delete(fd);
+    close(fd: fd): Wasi.errno {
+        if (!this.files.has(fd)) { return Wasi.errno.BADF; }
+        return this.files.delete(fd) ? Wasi.errno.SUCCESS : Wasi.errno.BADF;
     }
 
     erase(fd: fd): WasiResult<void> {
@@ -426,21 +448,29 @@ export class FileSystem {
         return _path;
     }
 
-    dirfdPath(dirfd: fd): string {
+    private dirfdPath(dirfd: fd): string {
         return this.get(dirfd).result.file!.path;
     }
 
-    listdir(fd: fd, dirfd: fd = this.cwd): WasiResult<Array<File>> {
+    listdir(fd: fd, dirfd: fd = this.cwd): WasiResult<DirectoryEntry[]> {
         let dir = this.get(fd) as WasiResult<DirectoryDescriptor>
         if (dir.failed) {
-            return WasiResult.fail<Array<File>>(dir.error)
+            return WasiResult.fail<DirectoryEntry[]>(dir.error)
         }
-        return WasiResult.resolve<Array<File>>(dir.result.children);
+        return WasiResult.resolve<DirectoryEntry[]>(dir.result.listDir());
 
     }
 
     private freshfd(): fd {
         return this.lastFD++;
+    }
+
+    grow(fd: fd, amount?: usize): WasiResult<void> {
+        let res = this.get(fd);
+        if (res.failed) {
+            return WasiResult.fail<void>(res.error);
+        }
+        return WasiResult.void(res.result.grow(amount));
     }
 }
 
