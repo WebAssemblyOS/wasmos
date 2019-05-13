@@ -1,5 +1,5 @@
-import { JSONDecoder, JSONEncoder } from "../../node_modules/assemblyscript-json/assembly";
-import { JSONHandler } from "../../node_modules/assemblyscript-json/assembly/decoder";
+import { JSONDecoder,  JSONHandler} from "./decoder";
+
 
 export namespace JSON {
     export enum Val_Type {
@@ -31,6 +31,31 @@ export namespace JSON {
         static Object(): Value {
             return new Object();
         }
+
+        get isString(): bool {
+            return this.type == Val_Type.STRING;
+        }
+
+        get isObject(): bool {
+            return this.type == Val_Type.OBJECT;
+        }
+
+        get isArray(): bool {
+            return this.type == Val_Type.ARRAY;
+        }
+
+        get isNumber(): bool {
+            return this.type == Val_Type.NUMBER;
+        }
+
+        get isBool(): bool {
+            return this.type == Val_Type.BOOL;
+        }
+
+        get isNull(): bool {
+            return this.type == Val_Type.NULL;
+        }
+
     }
 
     export class Str extends Value {
@@ -190,11 +215,5 @@ export namespace JSON {
 
     }
 }
-
-//@ts-ignore
-// @global
-export { JSONDecoder as Decoder, JSONEncoder as Encoder }
-
-
 
 

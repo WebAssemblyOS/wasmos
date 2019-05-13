@@ -1,5 +1,5 @@
-import { JSONDecoder } from "../../node_modules/assemblyscript-json/assembly/decoder";
-import { JSONEncoder } from "../../node_modules/assemblyscript-json/assembly/encoder";
+import { JSONDecoder } from "../json/decoder";
+import { JSONEncoder } from "../json/encoder";
 import { JSON } from '../json';
 
 var encoder: JSONEncoder;
