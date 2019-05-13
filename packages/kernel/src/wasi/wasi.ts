@@ -11,8 +11,8 @@ type ptr<T> = usize; // all pointers are usize'd
 type struct<T> = T;  // structs are references already in AS
 
 
-
-
+// @ts-ignore
+@global
 export namespace Wasi {
 
     export interface Wasi {

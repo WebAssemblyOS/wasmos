@@ -1,326 +1,208 @@
+import { FileSystem, FileDescriptor, fd, DirectoryDescriptor } from "./fs";
 import { WasiResult } from '../..';
-import { Wasi } from '../../../wasi/index';
-import { hasFlag } from '../../../flag';
-import { StringUtils } from '..';
+import { Wasi } from "../../../wasi";
+export * from "./fs";
 
+let DefaultFS = FileSystem.Default();
 
+const BASE_RIGHTS: Wasi.rights = Wasi.rights.FD_READ | Wasi.rights.FD_WRITE | Wasi.rights.FD_READDIR
 
-export type path = string;
-export type fd = usize;
-
-export class Ref<T>{
-    constructor(public val: T) { }
-}
-
-//@ts-ignore
+// @ts-ignore decorator is valid
 @global
-export class FileDescriptor {
-    stat: Wasi.fdstat;
+export class fs {
+    public static _fs: FileSystem = DefaultFS;
+    private static initialized: bool = false;
 
-    constructor(public fd: fd, public file: File | null, public offset: usize) { }
-
-    write(bytes: Array<u8>): Wasi.errno {
-        memory.copy(this.data + this.offset, bytes.buffer_.data, bytes.length)
-        this.offset += bytes.length;
-        return Wasi.errno.SUCCESS;
+    static set fs(_fs: FileSystem) {
+        fs._fs = _fs;
     }
 
-    writeString(str: string, newline: boolean = false): Wasi.errno {
-        // TODO: Add error checking
-        let _str = str + (newline ? "\n" : "");
-        memory.copy(this.data + this.offset, _str.toUTF8(), _str.lengthUTF8);
-        this.offset += str.lengthUTF8 + 1;
-        return Wasi.errno.SUCCESS;
-    }
-
-    copyByte(ptr: usize): void {
-        this.writeByte(load<u8>(ptr));
-    }
-
-    writeByte(byte: u8): void {
-        store<u8>(this.data + this.offset++, byte);
-    }
-
-    read(bytes: Array<u8>): Wasi.errno {
-        memory.copy(bytes.buffer_.data, this.data + this.offset, bytes.length);
-        return Wasi.errno.SUCCESS;
-    }
-
-    readByte(): u8 {
-        return load<u8>(this.data + this.offset++);
-    }
-
-    pread(bytes: Array<u8>): void {
-        let offset = this.offset;
-        this.read(bytes);
-        this.offset = offset;
-    }
-
-    readString(max: usize = 4096): string {
-        let str = StringUtils.fromCString(this.data + this.offset, max);
-        this.offset += str.lengthUTF8 + 1; //For null character
-        return str;
-    }
-
-    readLine(max?: usize): string {
-        let str = StringUtils.fromCStringTilNewLine(this.data + this.offset, max);
-        this.offset += str.lengthUTF8 + 1; //For null character
-        return str;
-    }
-
-    /**
-     * Resets the offset to 0
-     */
-    reset(): void {
-        this.seek(0, Wasi.whence.SET);
-    }
-
-    /**
-     * set seek (offset)
-     */
-    seek(offset: Wasi.filedelta, whence: Wasi.whence = Wasi.whence.CUR): usize {
-        let newOffset: usize = 0;
-        switch (whence) {
-            case Wasi.whence.CUR: {
-                newOffset = <usize>(this.offset + offset);
-                break;
-            }
-            case Wasi.whence.END: {
-                newOffset = <usize>(this.length - <u64>Math.abs(<f64>offset));
-                break;
-            }
-            case Wasi.whence.SET: {
-                newOffset = <usize>Math.abs(<f64>offset);
-                break;
-            }
-            default: {
-                Process.exit(1)
-            }
+    static get fs(): FileSystem {
+        if (!fs.initialized) {
+            fs._fs.init();
         }
-        this.offset = newOffset;
-        return newOffset
+        return fs._fs;
+    }
+    /**
+     * A simplified interface to open a file for read operations
+     * @param path Path
+     * @param dirfd Base directory descriptor (will be automatically set soon)
+     */
+    static openForRead(path: string, dirfd: fd = fs.fs.cwd): WasiResult<FileDescriptor> {
+        return this.fs.openFileAt(dirfd, path);
     }
 
-    get length(): usize {
-        return (this.file != null) ? this.file.length : 0
+    static createFile(path: string): WasiResult<FileDescriptor> {
+        return this.fs.createFile(path);
     }
 
-    get data(): usize {
-        return (this.file != null) ? this.file.data : 0;
+    static createFileAt(dirfd: fd, path: string): WasiResult<FileDescriptor> {
+        return this.fs.createFileAt(dirfd, path)
     }
 
-    tell(): u32 {
-        return this.offset;
+    /**
+     * A simplified interface to open a file for write operations
+     * @param path Path
+     * @param dirfd Base directory descriptor (will be automatically set soon)
+     */
+    static openForWrite(path: string, dirfd: fd = fs.fs.cwd): WasiResult<FileDescriptor> {
+        return this.fs.openFileAt(dirfd, path);
     }
 
-    get ptr(): usize {
-        return changetype<usize>(this) + offsetof<FileDescriptor>("fd");
+
+    static openFile(path: string, options: Wasi.oflags = 0): WasiResult<FileDescriptor> {
+        return this.fs.openFile(path, options);
     }
 
-    erase(): Wasi.errno {
-        //TODO: Make return error type
-        return this.file!.erase()
-    }
-}
-
-export class DirectoryDescriptor extends FileDescriptor {
-
-    get directory(): Directory {
-        return this.file as Directory;
+    static openFileAt(dirfd: fd, path: string, options?: Wasi.oflags): WasiResult<FileDescriptor> {
+        return this.fs.openFileAt(dirfd, path, options)
     }
 
-    get children(): File[] {
-        return this.directory.children;
+
+    static open(path: string, type: Wasi.filetype, options: Wasi.oflags): WasiResult<FileDescriptor> {
+        return this.fs.open(path, type, options);
     }
 
-    addFile(file: File): void {
-        this.directory.children.push(file);
-    }
-}
-
-export class File {
-    constructor(public path: string) {
-        this._data = new ArrayBuffer(File.DefaultSize);
-    }
     /**
      * 
-     * @param type File Type see Wasi.filetype
-     * @param path Path
-     * @param dirfd 
+     * @param path path of new directory
      */
-    static create(type: Wasi.filetype, path: string, dirfd: fd, options: Wasi.oflags): File {
-        switch (type) {
-            case Wasi.filetype.DIRECTORY: {
-                return new Directory(path)
-            }
-        }
-        return new File(path);
-    }
-    private _data: ArrayBuffer;
-    static DefaultSize: u32 = 1024;
-
-    get data(): usize {
-        return this._data.data;
+    static createDirectory(path: string): WasiResult<DirectoryDescriptor> {
+        return this.fs.createDirectory(path);
     }
 
-    grow(): File {
-        let newData = new ArrayBuffer(this._data.byteLength * 2);
-        memory.copy(newData.data, this.data, this._data.byteLength);
-        return this;
+    static createDirectoryAt(dirfd: fd, path: string): WasiResult<DirectoryDescriptor> {
+        return this.fs.createDirectoryAt(dirfd, path);
     }
 
-    erase(): Wasi.errno {
-        this._data = new ArrayBuffer(File.DefaultSize);
-        return Wasi.errno.SUCCESS;
+    static openDirectory(path: string): WasiResult<DirectoryDescriptor> {
+        return this.fs.openDirectory(path);
     }
 
-    get length(): usize {
-        return this._data.byteLength;
+    static openDirectoryAt(path: string, dirfd: fd): WasiResult<DirectoryDescriptor> {
+        return this.fs.openDirectoryAt(dirfd, path)
+    }
+    /**
+     * Close a file descriptor
+     * @param fd file descriptor
+     */
+    static close(fd: fd): void {
+        this.fs.close(fd);
     }
 
-    stat: Wasi.filestat
+    /**
+     * Write data to a file descriptor
+     * @param fd file descriptor
+     * @param data data
+     */
+    static write(fd: fd, data: Array<u8>): Wasi.errno {
+        return this.fs.write(fd, data);
+    }
+
+    /**
+     * Write a string to a file descriptor, after encoding it to UTF8
+     * @param fd file descriptor
+     * @param s string
+     * @param newline `true` to add a newline after the string
+     */
+    static writeString(fd: fd, s: string, newline: boolean = false): Wasi.errno {
+        return this.fs.writeString(fd, s, newline);
+    }
+
+    /**
+     * Write a string to a file descriptor, after encoding it to UTF8, with a newline
+     * @param fd file descriptor
+     * @param s string
+     */
+    static writeStringLn(fd: fd, s: string): Wasi.errno {
+        return this.writeString(fd, s, true);
+    }
+
+    /**
+     * Read data from a file descriptor
+     * @param fd file descriptor
+     * @param data existing array to push data to
+     * @param chunk_size chunk size (default: 4096)
+     */
+    static read(fd: fd, data: Array<u8> = [], chunk_size: usize = 4096): Wasi.errno {
+        return this.fs.read(fd, data);
+    }
+
+    /**
+     * Read from a file descriptor until the end of the stream
+     * @param fd file descriptor
+     * @param data existing array to push data to
+     * @param chunk_size chunk size (default: 4096)
+     */
+    static readAll(fd: fd, data: Array<u8> = [], chunk_size: usize = 4096): Wasi.errno {
+        return this.fs.read(fd, data);
+    }
+
+    /**
+     * Read an UTF8 string from a file descriptor, convert it to a native string
+     * @param fd file descriptor
+     * @param chunk_size chunk size (default: 4096)
+     */
+    static readString(fd: fd, chunk_size: usize = 4096): WasiResult<string> {
+        return this.fs.readString(fd, chunk_size)
+    }
+
+    /**
+     * Reach an UTF8 String from a file descriptor until a new line is reached.
+     */
+    static readLine(fd: fd, chunk_size: usize = 4096): WasiResult<string> {
+        return this.fs.readline(fd, chunk_size)
+    }
+
+    static reset(fd: fd): void {
+        this.seek(fd, 0, Wasi.whence.SET);
+    }
+
+    /**
+     * 
+     * @param fd File fd
+     * returns the current offset of the file descriptor
+     */
+    static tell(fd: fd): WasiResult<usize> {
+        return this.fs.tell(fd);
+    }
+
+    /**
+     * 
+     * @param fd File fd
+     * @param offset The number of bytes to move
+     * @param whence The base from which the offset is relative
+     */
+    static seek(fd: fd, offset: Wasi.filedelta, whence: Wasi.whence = Wasi.whence.CUR): WasiResult<usize> {
+        return this.fs.seek(fd, offset, whence);
+    }
+
+    static get(fd: fd): WasiResult<FileDescriptor> {
+        return this.fs.get(fd);
+    }
+
+    static getDir(fd: fd): WasiResult<DirectoryDescriptor> {
+        return this.fs.getDir(fd);
+    }
+
+    static erase(fd: fd): WasiResult<void> {
+        return this.fs.erase(fd);
+    }
+
+    static listdir(fd: fd): WasiResult<DirectoryEntry[]> {
+        return this.fs.listdir(fd);
+    }
+
+    static delete(path: string): WasiResult<void> {
+        return this.fs.delete(path);
+    }
+
+    static deleteDirectory(path: string): WasiResult<void> {
+        return this.fs.deleteDirectory(path);
+    }
+
+    static grow(fd: fd, amount?: usize): WasiResult<void> {
+        return this.fs.grow(fd, amount);
+    }
+
 }
-
-class Directory extends File {
-    parent: Directory;
-    children: Array<File>;
-}
-
-
-export class FileSystem {
-    files: Map<fd, FileDescriptor> = new Map<fd, FileDescriptor>();
-    paths: Map<path, File> = new Map<path, File>();
-    highestFD: usize = 77;
-    nextFD: FileDescriptor;
-    private _cwd: fd;
-    get cwd(): fd {
-        return this._cwd
-    }
-
-    set cwd(cwd: fd) {
-        this._cwd = cwd;
-    }
-
-    static Default(): FileSystem {
-        return new FileSystem();
-    }
-
-    set(fd: fd, FD: FileDescriptor): void {
-        this.files.set(fd, FD);
-    }
-
-    get(fd: fd): WasiResult<FileDescriptor> {
-        if (!this.files.has(fd) || fd <= Wasi.errno.NOTCAPABLE) return WasiResult.fail<FileDescriptor>(Wasi.errno.BADF);
-        return WasiResult.resolve<FileDescriptor>(this.files.get(fd));
-    }
-
-    private _open(path: path, type: Wasi.filetype, dirfd: fd, options: Wasi.oflags): WasiResult<FileDescriptor> {
-        let fd = this.highestFD++;
-        if (!this.paths.has(path)) {
-            if (hasFlag(options, Wasi.oflags.CREAT)) {
-                log<usize>(options)
-                this.paths.set(path, File.create(type, path, fd, options));
-            } else {
-                return WasiResult.fail<FileDescriptor>(Wasi.errno.NOENT);
-            }
-        }
-        this.set(fd, new FileDescriptor(fd, this.paths.get(path), 0));
-        return this.get(fd);
-    }
-
-    openAt(path: path, type: Wasi.filetype, dirfd: fd, options: Wasi.oflags): WasiResult<FileDescriptor> {
-        return this._open(path, type, dirfd, options);
-    }
-
-    open(path: path, type: Wasi.filetype, options: Wasi.oflags): WasiResult<FileDescriptor> {
-        return this.openAt(path, type, this.cwd, options)
-    }
-
-    openFileAt(dirfd: fd, path: path): WasiResult<FileDescriptor> {
-        return this.openAt(path, Wasi.filetype.REGULAR_FILE, dirfd, Wasi.oflags.CREAT);
-    }
-
-    openFile(path: path): WasiResult<FileDescriptor> {
-        return this.openFileAt(this.cwd, path);
-    }
-
-    write(fd: fd, data: Array<u8>): Wasi.errno {
-        let res = this.get(fd)
-        if (res.error) {
-            return res.error;
-
-        }
-        return res.result.write(data);
-
-    }
-
-    read(fd: fd, data: Array<u8>): Wasi.errno {
-        let res = this.get(fd);
-        if (res.failed) {
-            return res.error;
-        }
-        return res.result.read(data);
-    }
-
-    readString(fd: fd, offset: usize = 0): WasiResult<string> {
-        let res = this.get(fd);
-        if (res.failed) {
-            return WasiResult.fail(res.error);
-        }
-        return WasiResult.resolve(res.result.readString());
-    }
-
-    readline(fd: fd, max?: usize): WasiResult<string> {
-        let res = this.get(fd);
-        if (res.failed) {
-            return WasiResult.fail(res.error);
-        }
-        return WasiResult.resolve(res.result.readLine(max));
-    }
-
-    writeString(fd: fd, data: string, newline: boolean): Wasi.errno {
-        let res = this.get(fd);
-        if (res.failed) {
-            return res.error;
-        }
-        return res.result.writeString(data, newline);
-    }
-
-    close(fd: fd): void {
-        this.files.delete(fd);
-    }
-
-    openDirectoryAt(dirfd: fd, path: string, create: boolean = false): WasiResult<FileDescriptor> {
-        return this.openAt(path, Wasi.filetype.DIRECTORY, dirfd, Wasi.oflags.DIRECTORY | (create ? Wasi.oflags.CREAT : 0));
-    }
-
-    createDirectoryAt(dirfd: fd, path: string): WasiResult<FileDescriptor> {
-        return this.openDirectoryAt(dirfd, path, true);
-    }
-
-    openDirectory(path: string, create: boolean = false): WasiResult<FileDescriptor> {
-        return this.openDirectoryAt(this.cwd, path, create);
-    }
-
-    createDirectory(path: string): WasiResult<FileDescriptor> {
-        return this.createDirectoryAt(this.cwd, path);
-    }
-
-    erase(fd: fd): WasiResult<void> {
-        let res = this.get(fd);
-        if (res.failed) {
-            return WasiResult.fail(res.error);
-        }
-        return WasiResult.void(this.get(fd).result.erase());
-    }
-
-    seek(fd: fd, offset: Wasi.filedelta, whence: Wasi.whence = Wasi.whence.CUR): WasiResult<Ref<usize>> {
-        let res = this.get(fd);
-        if (res.failed) {
-            return WasiResult.fail(res.error);
-        }
-        return WasiResult.resolve(new Ref(res.result.seek(offset, whence)));
-    }
-}
-
-
