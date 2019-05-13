@@ -1,6 +1,6 @@
 import { Console, fs, Process, CommandLine } from '../../../assemblyscript/assembly/wasa/mock';
 import { FileDescriptor, FileSystem } from '../../../assemblyscript/assembly/wasa/mock/fs';
-import { parseJSON, openStdout, Hello, World, testFile, open } from './fixtures';
+import { parseJSON as addJSONtoFS, openStdout, Hello, World, testFile, open } from './fixtures';
 import { Wasi } from "../../../assemblyscript/assembly/wasi";
 import { fs_str } from "./simple_fs";
 
@@ -13,13 +13,13 @@ describe("fs from JSON", (): void => {
 
     it("Should handle just a top level file", (): void => {
         let s = `{"hello": "world"}`;
-        parseJSON(s);
+        addJSONtoFS(s);
         expect<string>(open("/hello").readString().result).toStrictEqual("world");
     });
 
     it("Should handle just a top level directory", (): void => {
         let s = `{"www": { "hello": "world"}}`;
-        parseJSON(s);
+        addJSONtoFS(s);
         expect<string>(open("/www/hello").readString().result).toStrictEqual("world");
     });
 
@@ -30,7 +30,7 @@ describe("fs from JSON", (): void => {
                           { "hello": "world"}\
                 }\
          }`;
-        parseJSON(s);
+        addJSONtoFS(s);
         expect<string>(open("/www/test/hello").readString().result).toStrictEqual("world");
     });
 
@@ -41,7 +41,7 @@ describe("fs from JSON", (): void => {
     });
 
     it("should handle imported string", () => {
-        parseJSON(fs_str);
+        addJSONtoFS(fs_str);
         expect<string>(open("/home/bob/documents/secret.txt").readString().result).toStrictEqual("For my eyes only.\n No one else")
     })
 });
