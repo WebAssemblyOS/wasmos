@@ -15,24 +15,23 @@ export class FileDescriptor {
     constructor(public fd: fd, public file: File | null, public offset: usize = 0) { }
 
     write(bytes: Array<u8>): Wasi.errno {
-        if (bytes.length + this.offset > this.length) {
-            return Wasi.errno.NOMEM
+        let res = this.file!.writeBytes(this.offset, bytes.buffer_.data, bytes.length);
+        if (res == Wasi.errno.SUCCESS) {
+            this.offset += bytes.length;
         }
-        memory.copy(this.data + this.offset, bytes.buffer_.data, bytes.length)
-        this.offset += bytes.length;
-        return Wasi.errno.SUCCESS;
+        return res;
     }
 
     writeString(str: string, newline: boolean = false): Wasi.errno {
         // TODO: Add error checking
         let _str = str + (newline ? "\n" : "");
-        if (_str.lengthUTF8 as usize + this.offset > this.length) {
-            return Wasi.errno.NOMEM
+        let res = this.file!.writeBytes(this.offset, _str.toUTF8(), _str.lengthUTF8);
+        if (res == Wasi.errno.SUCCESS) {
+            this.offset += _str.lengthUTF8;
         }
-        memory.copy(this.data + this.offset, _str.toUTF8(), _str.lengthUTF8);
-        this.offset += str.lengthUTF8 + 1;
-        return Wasi.errno.SUCCESS;
+        return res;
     }
+
 
     read(bytes: Array<u8>): Wasi.errno {
         if (!this.hasSpace(bytes)) {
@@ -57,16 +56,19 @@ export class FileDescriptor {
     }
 
     readString(max: usize = 4096): WasiResult<string> {
-        let str = StringUtils.fromCString(this.data + this.offset, this.length - this.offset);
+        let _max = <usize>Math.min(max, this.length - this.offset);
+        let str = StringUtils.fromCString(this.data + this.offset, _max);
+        log<string>(str);
         if (str == null) {
             return WasiResult.fail<string>(Wasi.errno.NOMEM)
         }
-        this.offset += str.lengthUTF8 + 1; //For null character
+        this.offset += str.lengthUTF8; //For null character
         return WasiResult.resolve<string>(str);
     }
 
-    readLine(): WasiResult<string> {
-        let str = StringUtils.fromCStringTilNewLine(this.data + this.offset, this.length - this.offset);
+    readLine(max: usize = 4096): WasiResult<string> {
+        let _max = <usize>Math.min(max, this.length - this.offset);
+        let str = StringUtils.fromCStringTilNewLine(this.data + this.offset, _max);
         if (str == null) {
             return WasiResult.fail<string>(Wasi.errno.NOMEM)
         }
@@ -147,6 +149,11 @@ export class FileDescriptor {
         }
         return Wasi.errno.NOMEM;
     }
+
+    get size(): usize {
+        return this.file!.size;
+    }
+
 }
 
 export class DirectoryDescriptor extends FileDescriptor {
@@ -162,7 +169,8 @@ export class DirectoryDescriptor extends FileDescriptor {
     listDir(): DirectoryEntry[] {
         let files = new Array<DirectoryEntry>();
         for (let i: i32 = 0; i < this.children.length; i++) {
-            files.push(new DirectoryEntry(path.basename(this.children[i].path), this.children[i].type))
+            let child = this.children[i];
+            files.push(new DirectoryEntry(path.basename(child.path), child.type, child.size))
         }
         return files;
     }
@@ -175,8 +183,11 @@ export class DirectoryDescriptor extends FileDescriptor {
 export class File {
     private _data: ArrayBuffer;
     static DefaultSize: u32 = 1024;
+    size: usize = 0;
+
     constructor(public path: string, public type: Wasi.filetype = Wasi.filetype.REGULAR_FILE) {
         this._data = new ArrayBuffer(File.DefaultSize);
+        this.writeEOT(0);
     }
     /**
      * 
@@ -206,11 +217,38 @@ export class File {
 
     erase(): Wasi.errno {
         this._data = new ArrayBuffer(File.DefaultSize);
+        this.size = 0;
+        this.writeEOT(0);
         return Wasi.errno.SUCCESS;
     }
 
     get length(): usize {
         return this._data.byteLength;
+    }
+
+    writeEOT(offset: usize): Wasi.errno {
+        return this.writeByte(offset, StringUtils.EOT);
+    }
+
+    writeByte(offset: usize, byte: u8): Wasi.errno {
+        if (offset >= this.length) {
+            return Wasi.errno.NOMEM;
+        }
+        store<u8>(this.data + offset, byte);
+        return Wasi.errno.SUCCESS;
+    }
+
+    writeBytes(offset: usize, ptr: usize, size: usize): Wasi.errno {
+        if (offset + size >= this.length) {
+            return Wasi.errno.NOMEM;
+        }
+        let dst = offset + this.data;
+        memory.copy(dst, ptr, size);
+        if (offset + size > this.size) {
+            this.size = offset + size;
+            this.writeEOT(this.size);
+        }
+        return Wasi.errno.SUCCESS;
     }
 
 
@@ -229,7 +267,7 @@ class Directory extends File {
 }
 
 class DirectoryEntry {
-    constructor(public path: string, public type: Wasi.filetype) { }
+    constructor(public path: string, public type: Wasi.filetype, public size: usize) { }
 }
 
 
@@ -374,12 +412,12 @@ export class FileSystem {
         return res.result.read(data);
     }
 
-    readString(fd: fd, offset: usize = 0): WasiResult<string> {
+    readString(fd: fd, max?: usize): WasiResult<string> {
         let res = this.get(fd);
         if (res.failed) {
             return WasiResult.fail<string>(res.error);
         }
-        return res.result.readString();
+        return res.result.readString(max);
     }
 
     readline(fd: fd, max?: usize): WasiResult<string> {
@@ -387,7 +425,7 @@ export class FileSystem {
         if (res.failed) {
             return WasiResult.fail<string>(res.error);
         }
-        return res.result.readLine();
+        return res.result.readLine(max);
     }
 
     writeString(fd: fd, data: string, newline: boolean): Wasi.errno {

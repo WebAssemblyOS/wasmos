@@ -84,6 +84,7 @@ declare class FileDescriptor {
   file: File | null;
   fd: u32;
   offset: u32;
+  size: usize;
 
   /**
    * Write an array of bytes to a file;
@@ -152,7 +153,7 @@ declare class DirectoryDescriptor extends FileDescriptor {
   /**
    * Returns list of names of entries in the directory.
    */
-  listDir(): string[];
+  listDir(): DirectoryEntry[];
 
   /**Path of parent directory */
   parent: string;
@@ -342,6 +343,7 @@ declare class fs {
 declare class DirectoryEntry {
   path: string;
   type: Wasi.filetype;
+  size: usize;
 }
 
 /**
