@@ -1,9 +1,7 @@
 import { main as cat } from "../bin/cat";
-
 import { Console, fs, Process, CommandLine } from '../../../assemblyscript/assembly/wasa/mock';
 import { FileDescriptor } from '../../../assemblyscript/assembly/wasa/mock/fs';
-import { openStdout, Hello, World, testFile } from './mocks';
-
+import { openStdout, Hello, World, testFile } from './fixtures';
 
 
 
@@ -32,10 +30,10 @@ describe("cat", (): void => {
         cat(CommandLine.all())
         let str = Hello + " " + World + "\n";
         expect<u32>(Console.stdout.tell()).toBe(str.lengthUTF8, "Two extra characters for space and \\n")
+        fs.reset(Console.stdout.fd)
+        expect<string>(fs.readString(Console.stdout.fd).result).toBe(Hello + " " + World + "\n")
         Console.stdout.reset()
-        expect<string>(Console.stdout.readString()).toBe(Hello + " " + World + "\n")
-        Console.stdout.reset()
-        expect<string>(Console.stdout.readString()).toBe(stdout2.readString());
+        expect<string>(Console.stdout.readString().result).toBe(stdout2.readString().result);
     })
 
 })
