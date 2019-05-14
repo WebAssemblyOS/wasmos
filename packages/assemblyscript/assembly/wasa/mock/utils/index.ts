@@ -1,33 +1,41 @@
 
-const newLine: u8 = 10;
 
 export class StringUtils {
-  static isNewLine(ptr: usize): boolean {
-    return load<u8>(ptr) == newLine;
-  }
+    static readonly NUL: u8 = 0;
+    static readonly EOT: u8 = 4;
+    static readonly LF: u8 = 10;
 
-  static fromCString(cstring: usize, max: usize = 4096): string | null {
-    let size: usize = 0;
-    while (load<u8>(cstring + size) != 0 && size < max) {
-      size++;
+    static isNewLine(ptr: usize): boolean {
+        return load<u8>(ptr) == this.LF;
     }
-    if (size >= max && load<u8>(cstring + size) != 0) {
-      return null;
-    }
-    return String.fromUTF8(cstring, size);
-  }
 
-  static fromCStringTilNewLine(cstring: usize, max: usize): string | null {
-    let size: usize = 0;
-    while (load<u8>(cstring + size) != 0 && size < max) {
-      size++;
-      if (this.isNewLine(cstring + size - 1)) {
-        break;
-      }
+    private static terminates(ptr: usize): bool {
+        let char: u8 = load<u8>(ptr);
+        return char == this.NUL || char == this.EOT
     }
-    if (size >= max && load<u8>(cstring + size) != 0) {
-      return null;
+
+    static fromCString(cstring: usize, max: usize = 4096): string | null {
+        let size: usize = 0;
+        while (!this.terminates(cstring + size) && size < max - 1) {
+            size++;
+        }
+        if (size == 0) {
+            return null
+        }
+        return String.fromUTF8(cstring, size);
     }
-    return String.fromUTF8(cstring, size);
-  }
+
+    static fromCStringTilNewLine(cstring: usize, max: usize): string | null {
+        let size: usize = 0;
+        while (!this.terminates(cstring + size) && size < max - 1) {
+            size++;
+            if (this.isNewLine(cstring + size - 1)) {
+                break;
+            }
+        }
+        if (size == 0) {
+            return null
+        }
+        return String.fromUTF8(cstring, size);
+    }
 }
