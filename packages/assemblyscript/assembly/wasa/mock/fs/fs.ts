@@ -128,7 +128,11 @@ export class FileDescriptor {
 
     erase(): Wasi.errno {
         //TODO: Make return error type
-        return this.file!.erase()
+        let errno = this.file!.erase()
+        if (errno == Wasi.errno.SUCCESS) {
+            this.reset();
+        }
+        return errno;
     }
 
     private hasSpace(bytes: Array<u8>): bool {
