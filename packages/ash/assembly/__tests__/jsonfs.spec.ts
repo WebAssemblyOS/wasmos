@@ -1,6 +1,6 @@
-import { Console, fs, Process, CommandLine } from '../../../assemblyscript/assembly/wasa/mock';
-import { FileDescriptor, FileSystem } from '../../../assemblyscript/assembly/wasa/mock/fs';
-import { addJSONtoFS as addJSONtoFS, openStdout, Hello, World, testFile, open } from './fixtures';
+import { fs } from '../../../assemblyscript/assembly/wasa/mock';
+import { FileSystem } from '../../../assemblyscript/assembly/wasa/mock/fs';
+import { addJSONtoFS, createFile } from './fixtures';
 import { Wasi } from "../../../assemblyscript/assembly/wasi";
 import { fs_str } from "./simple_fs";
 
@@ -14,13 +14,13 @@ describe("fs from JSON", (): void => {
     it("Should handle just a top level file", (): void => {
         let s = `{"hello": "world"}`;
         addJSONtoFS(s);
-        expect<string>(open("/hello").readString().result).toStrictEqual("world");
+        expect<string>(createFile("/hello").readString().result).toStrictEqual("world");
     });
 
     it("Should handle just a top level directory", (): void => {
         let s = `{"www": { "hello": "world"}}`;
         addJSONtoFS(s);
-        expect<string>(open("/www/hello").readString().result).toStrictEqual("world");
+        expect<string>(createFile("/www/hello").readString().result).toStrictEqual("world");
     });
 
     it("Should handle just a multi-level level directory", (): void => {
@@ -31,7 +31,7 @@ describe("fs from JSON", (): void => {
                 }\
          }`;
         addJSONtoFS(s);
-        expect<string>(open("/www/test/hello").readString().result).toStrictEqual("world");
+        expect<string>(createFile("/www/test/hello").readString().result).toStrictEqual("world");
     });
 
     it("should reset fs each time", () => {
@@ -42,6 +42,6 @@ describe("fs from JSON", (): void => {
 
     it("should handle imported string", () => {
         addJSONtoFS(fs_str);
-        expect<string>(open("/home/bob/documents/secret.txt").readString().result).toStrictEqual("For my eyes only.\n No one else")
+        expect<string>(createFile("/home/bob/documents/secret.txt").readString().result).toStrictEqual("For my eyes only.\n No one else")
     })
 });

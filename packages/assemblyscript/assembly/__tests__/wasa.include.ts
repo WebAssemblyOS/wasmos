@@ -1,5 +1,5 @@
 
-import { Console, fs, Process, CommandLine, fd } from '../wasa/mock/index';
+import { Console, fs, Process, CommandLine, fd, FileDescriptor } from '../wasa/mock/index';
 import { Wasi } from "../wasi";
 
 beforeAll(() => {

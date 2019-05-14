@@ -58,9 +58,9 @@ declare class Console {
    */
   static error(s: string, newline?: boolean): void;
 
-  static stdout: fd;
-  static stdin: fd;
-  static stderr: fd;
+  static stdout: FileDescriptor;
+  static stdin: FileDescriptor;
+  static stderr: FileDescriptor;
 }
 // // declare const Cons: number;
 // // declare function Cons1(): void;
@@ -178,6 +178,7 @@ declare class Directory extends File {
 
 declare class fs {
   cwd: fd;
+
   /**
    * A simplified interface to open a file for read operations
    * @param path Path
@@ -333,6 +334,7 @@ declare class fs {
   /** Amount to set the new file size to.  It doubles in size by default. */
   static grow(fd: fd, amount?: usize): WasiResult<void>;
 
+  static init(): void
 
 }
 
