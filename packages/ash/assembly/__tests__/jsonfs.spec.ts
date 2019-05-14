@@ -1,6 +1,6 @@
 import { Console, fs, Process, CommandLine } from '../../../assemblyscript/assembly/wasa/mock';
 import { FileDescriptor, FileSystem } from '../../../assemblyscript/assembly/wasa/mock/fs';
-import { parseJSON as addJSONtoFS, openStdout, Hello, World, testFile, open } from './fixtures';
+import { addJSONtoFS as addJSONtoFS, openStdout, Hello, World, testFile, open } from './fixtures';
 import { Wasi } from "../../../assemblyscript/assembly/wasi";
 import { fs_str } from "./simple_fs";
 

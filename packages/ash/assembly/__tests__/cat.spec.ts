@@ -23,7 +23,7 @@ describe("cat", (): void => {
         Console.stdout.erase()
         CommandLine.reset();
         CommandLine.push("cat");
-    })
+    });
 
     it("should print newline by default", (): void => {
         CommandLine.push("/test")
@@ -34,6 +34,12 @@ describe("cat", (): void => {
         expect<string>(fs.readString(Console.stdout.fd).result).toBe(Hello + " " + World + "\n")
         Console.stdout.reset()
         expect<string>(Console.stdout.readString().result).toBe(stdout2.readString().result);
-    })
+    });
+
+    it("should write to stdout if file not found", () => {
+        CommandLine.push("/doesnotexist");
+        cat(CommandLine.all())
+        expect<usize>(Console.stderr.tell()).toBeGreaterThan(0);
+    });
 
 })

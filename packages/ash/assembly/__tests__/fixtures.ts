@@ -46,7 +46,7 @@ export function readString(FD: FileDescriptor): string {
     return res.result;
 }
 
-export function parseJSON(str: string): void {
+export function addJSONtoFS(str: string): void {
     let root = JSON.parse(str);
     toFS(root, "/")
 }
