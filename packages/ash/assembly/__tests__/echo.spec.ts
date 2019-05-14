@@ -3,6 +3,7 @@ import { stdout, Hello, World, readString } from './fixtures';
 import { main as echo } from "../bin/echo";
 
 describe("echo", (): void => {
+
   beforeEach((): void => {
     stdout.reset();
     Console.stdout.erase();
@@ -34,5 +35,14 @@ describe("echo", (): void => {
     expect<string>(Console.stdout.readString().result).toBe(str)
     Console.stdout.reset();
     expect<string>(Console.stdout.readString().result).toBe(stdout.readString().result);
-  })
+  });
+
+  it("should print $PATH environment variable", () => {
+    CommandLine.push("$PATH");
+    let path = "/usr/bin:/bin";
+    Environ.add("$PATH", path);
+    echo(CommandLine.all())
+    expect<string>(readString(stdout)).toBe(path + "\n")
+
+  });
 })

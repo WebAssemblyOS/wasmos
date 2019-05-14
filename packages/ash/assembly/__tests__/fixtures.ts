@@ -3,25 +3,31 @@ import { JSON } from '../../../assemblyscript/assembly/json';
 import * as path from '../../../assemblyscript/assembly/wasa/mock/path';
 import { fs_str } from "./simple_fs";
 
-
+export var stdin: FileDescriptor;
 export var stdout: FileDescriptor;
 export var stderr: FileDescriptor;
 
+
 beforeAll(() => {
+    addJSONtoFS(fs_str);
     fs.init();
     Console.stdout;
     Console.stdin;
     Console.stderr;
-    addJSONtoFS(fs_str);
+    stdin = openStdin();
     stdout = openStdout();
     stderr = openStderr();
 })
 
-function openStdout(): FileDescriptor {
+export function openStdin(): FileDescriptor {
+    return openFile("/dev/fd/0");
+}
+
+export function openStdout(): FileDescriptor {
     return openFile("/dev/fd/1");
 }
 
-function openStderr(): FileDescriptor {
+export function openStderr(): FileDescriptor {
     return openFile("/dev/fd/2");
 }
 

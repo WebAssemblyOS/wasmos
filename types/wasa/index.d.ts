@@ -350,3 +350,20 @@ declare class DirectoryEntry {
 declare class Process {
   static exit(code: number): void;
 }
+
+
+declare class Environ {
+  /** Add environment variable */
+  static add(key: string, value: string): void;
+
+  /**
+   * Return the value for an environment variable
+   * @param key environment variable name
+   */
+  static get(key: string): string;
+
+  /**
+   * Removes all entries;
+   */
+  static reset(): void;
+}
