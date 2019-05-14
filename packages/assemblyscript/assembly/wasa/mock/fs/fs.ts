@@ -94,7 +94,7 @@ export class FileDescriptor {
                 break;
             }
             case Wasi.whence.END: {
-                newOffset = <usize>(this.length - <u64>Math.abs(<f64>offset));
+                newOffset = <usize>(this.size - <u64>Math.abs(<f64>offset));
                 break;
             }
             case Wasi.whence.SET: {

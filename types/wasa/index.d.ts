@@ -84,6 +84,9 @@ declare class FileDescriptor {
   file: File | null;
   fd: u32;
   offset: u32;
+  /**
+   * Number of bytes written to the file.
+   */
   size: usize;
 
   /**
