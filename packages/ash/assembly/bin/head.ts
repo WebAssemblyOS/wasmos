@@ -1,17 +1,17 @@
-import {StringUtils} from "../../../assemblyscript/assembly/wasa/mock"
-//creates string from array
 
 
 export function main(args: string[]): void {
-  let fd = fs.open(args[1]);
-
-  let arr: Array<u8> = new Array<u8>(512);
-  fs.read(fd, arr);
-
-  let str = StringUtils.fromCString(changetype<usize>(arr.buffer_));
-  let lines = str.split('\n');
-
+  let res = fs.openFile(args[1]);
+  if (res.failed) {
+    //print `head: file: No such file or directory
+    return;
+  }
+  let file = res.result;
   for (let i = 0; i < 10; i++) {
-    Console.log(lines[i]);
+    let line = file.readLine();
+    if (line.failed) {
+      break;
+    }
+    Console.write(line.result);
   }
 }
