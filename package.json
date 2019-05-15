@@ -5,7 +5,8 @@
   "main": "dist/index.js",
   "scripts": {
     "test:jest": "jest",
-    "test:as": "asp",
+    "test:as": "asp --reporter=SummaryTestReporter",
+    "asp": "asp",
     "test": "npm-run-all test:jest test:as",
     "check": "tsc -p tsconfig.ts.json --noEmit",
     "bootstrap": "lerna bootstrap && npm run linkDev",
@@ -32,9 +33,11 @@
   },
   "homepage": "https://github.com/WebAssemblyOS/wasmos#readme",
   "devDependencies": {
+    "@types/assembly": "file:./types",
     "@types/fs-extra": "^5.0.5",
     "@types/node": "^11.9.5",
     "@types/webassembly-js-api": "0.0.2",
+    "@wasmos/utils": "file:./utils",
     "as-pect": "github:jtenner/as-pect",
     "browserfs": "git:github.com/jvilk/browserfs",
     "dropbox": "~4.0.9",
@@ -48,15 +51,13 @@
     "typescript": "^3.4.2",
     "webpack": "^4.29.5",
     "webpack-cli": "^3.2.3",
-    "webpack-dev-server": "^3.2.0",
-    "@wasmos/utils": "file:./utils",
-    "@types/assembly": "file:./types"
+    "webpack-dev-server": "^3.2.0"
   },
   "dependencies": {
     "@types/filesystem": "0.0.28",
     "@types/jest": "^24.0.11",
     "@types/shelljs": "^0.8.4",
-    "lerna": "^3.13.0",
+    "lerna": "^3.13.4",
     "shelljs": "^0.8.3",
     "shx": "^0.3.2"
   }
