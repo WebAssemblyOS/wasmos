@@ -58,9 +58,9 @@ declare class Console {
    */
   static error(s: string, newline?: boolean): void;
 
-  static stdout: fd;
-  static stdin: fd;
-  static stderr: fd;
+  static stdout: FileDescriptor;
+  static stdin: FileDescriptor;
+  static stderr: FileDescriptor;
 }
 // // declare const Cons: number;
 // // declare function Cons1(): void;
@@ -84,6 +84,10 @@ declare class FileDescriptor {
   file: File | null;
   fd: u32;
   offset: u32;
+  /**
+   * Number of bytes written to the file.
+   */
+  size: usize;
 
   /**
    * Write an array of bytes to a file;
@@ -152,7 +156,7 @@ declare class DirectoryDescriptor extends FileDescriptor {
   /**
    * Returns list of names of entries in the directory.
    */
-  listDir(): string[];
+  listDir(): DirectoryEntry[];
 
   /**Path of parent directory */
   parent: string;
@@ -178,6 +182,7 @@ declare class Directory extends File {
 
 declare class fs {
   cwd: fd;
+
   /**
    * A simplified interface to open a file for read operations
    * @param path Path
@@ -333,6 +338,7 @@ declare class fs {
   /** Amount to set the new file size to.  It doubles in size by default. */
   static grow(fd: fd, amount?: usize): WasiResult<void>;
 
+  static init(): void
 
 }
 
@@ -340,6 +346,7 @@ declare class fs {
 declare class DirectoryEntry {
   path: string;
   type: Wasi.filetype;
+  size: usize;
 }
 
 /**
@@ -347,4 +354,21 @@ declare class DirectoryEntry {
  */
 declare class Process {
   static exit(code: number): void;
+}
+
+
+declare class Environ {
+  /** Add environment variable */
+  static add(key: string, value: string): void;
+
+  /**
+   * Return the value for an environment variable
+   * @param key environment variable name
+   */
+  static get(key: string): string;
+
+  /**
+   * Removes all entries;
+   */
+  static reset(): void;
 }

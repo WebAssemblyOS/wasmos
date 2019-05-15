@@ -23,6 +23,11 @@ export class fs {
         }
         return fs._fs;
     }
+
+    static init(): void {
+        fs.fs;
+    }
+
     /**
      * A simplified interface to open a file for read operations
      * @param path Path

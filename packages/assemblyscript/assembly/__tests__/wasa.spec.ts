@@ -52,10 +52,16 @@ describe("readLine", (): void => {
     expect<string>(StringUtils.fromCStringTilNewLine(utfStr, str.lengthUTF8)).toStrictEqual("Hello\n")
   });
 
-  it("should read return null after no more lines", (): void => {
+  it("should read null when reading from a terminating char", (): void => {
     let str = "Hello World";
     let utfStr = str.toUTF8();
-    expect<string>(StringUtils.fromCStringTilNewLine(utfStr, str.lengthUTF8 - 2)).toBeNull();
+    expect<string>(StringUtils.fromCStringTilNewLine(utfStr + str.lengthUTF8, str.lengthUTF8)).toBeNull();
+  });
+
+  it("should read chunk", () => {
+    let hello = "Hello ";
+    let world = hello + "World";
+    expect<string>(StringUtils.fromCString(world.toUTF8(), hello.lengthUTF8)).toStrictEqual(hello);
   });
 });
 
@@ -86,3 +92,35 @@ describe("Open", (): void => {
   });
 
 });
+
+describe("read", (): void => {
+  it("read string should return error if offset is at the eof", () => {
+    let file = _fs.createFile("./tmp");
+    file.result.erase();
+    expect<Wasi.errno>(file.result.readString().error).toBe(Wasi.errno.NOMEM);
+  });
+})
+
+let file: FileDescriptor;
+describe("write", (): void => {
+
+  beforeEach(() => {
+    file = _fs.createFile("./tmp").result;
+    file.erase();
+  });
+
+  it("should update size after a write", () => {
+    expect<usize>(file.size).toBe(0);
+    let str = "hello world";
+    expect<Wasi.errno>(file.writeString("hello world")).toBe(Wasi.errno.SUCCESS)
+    expect<usize>(file.size).toBe(str.lengthUTF8);
+  });
+
+  it("should not update size if offset is less than size", (): void => {
+    let str = "hello world";
+    expect<Wasi.errno>(file.writeString("hello world")).toBe(Wasi.errno.SUCCESS)
+    file.reset();
+    expect<Wasi.errno>(file.writeString("HELLO")).toBe(Wasi.errno.SUCCESS)
+    expect<usize>(file.size).toBe(str.lengthUTF8);
+  })
+})
