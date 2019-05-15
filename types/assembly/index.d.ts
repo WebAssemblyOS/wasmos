@@ -1524,32 +1524,32 @@ declare abstract class TypedArray<T> implements ArrayBufferView<T> {
 }
 
 /** An array of twos-complement 8-bit signed integers. */
-declare class Int8Array extends TypedArray<i8> {}
+declare class Int8Array extends TypedArray<i8> { }
 /** An array of 8-bit unsigned integers. */
-declare class Uint8Array extends TypedArray<u8> {}
+declare class Uint8Array extends TypedArray<u8> { }
 /** A clamped array of 8-bit unsigned integers. */
-declare class Uint8ClampedArray extends TypedArray<u8> {}
+declare class Uint8ClampedArray extends TypedArray<u8> { }
 /** An array of twos-complement 16-bit signed integers. */
-declare class Int16Array extends TypedArray<i16> {}
+declare class Int16Array extends TypedArray<i16> { }
 /** An array of 16-bit unsigned integers. */
-declare class Uint16Array extends TypedArray<u16> {}
+declare class Uint16Array extends TypedArray<u16> { }
 /** An array of twos-complement 32-bit signed integers. */
-declare class Int32Array extends TypedArray<i32> {}
+declare class Int32Array extends TypedArray<i32> { }
 /** An array of 32-bit unsigned integers. */
-declare class Uint32Array extends TypedArray<u32> {}
+declare class Uint32Array extends TypedArray<u32> { }
 /** An array of twos-complement 64-bit signed integers. */
-declare class Int64Array extends TypedArray<i64> {}
+declare class Int64Array extends TypedArray<i64> { }
 /** An array of 64-bit unsigned integers. */
-declare class Uint64Array extends TypedArray<u64> {}
+declare class Uint64Array extends TypedArray<u64> { }
 /** An array of 32-bit floating point numbers. */
-declare class Float32Array extends TypedArray<f32> {}
+declare class Float32Array extends TypedArray<f32> { }
 /** An array of 64-bit floating point numbers. */
-declare class Float64Array extends TypedArray<f64> {}
+declare class Float64Array extends TypedArray<f64> { }
 
 /** Class representing a sequence of values of type `T`. */
 declare class Array<T> {
   static isArray<U>(value: any): value is Array<any>;
-
+  buffer_: ArrayBuffer
   [key: number]: T;
   /** Current length of the array. */
   length: i32;
@@ -1652,20 +1652,20 @@ declare class Error {
 }
 
 /** Class for indicating an error when a value is not in the set or range of allowed values. */
-declare class RangeError extends Error {}
+declare class RangeError extends Error { }
 
 /** Class for indicating an error when a value is not of the expected type. */
-declare class TypeError extends Error {}
+declare class TypeError extends Error { }
 
 /** Class for indicating an error when trying to interpret syntactically invalid code. */
-declare class SyntaxError extends Error {}
+declare class SyntaxError extends Error { }
 
-interface Boolean {}
-interface Function {}
-interface IArguments {}
-interface Number {}
-interface Object {}
-interface RegExp {}
+interface Boolean { }
+interface Function { }
+interface IArguments { }
+interface Number { }
+interface Object { }
+interface RegExp { }
 
 declare class Map<K, V> {
   readonly size: i32;
@@ -1899,10 +1899,10 @@ declare function operator(
     | "/"
     | "%"
 ): (
-  target: any,
-  propertyKey: string,
-  descriptor: TypedPropertyDescriptor<any>
-) => TypedPropertyDescriptor<any> | void;
+    target: any,
+    propertyKey: string,
+    descriptor: TypedPropertyDescriptor<any>
+  ) => TypedPropertyDescriptor<any> | void;
 
 declare namespace operator {
   /** Annotates a method as a binary operator overload for the specified `token`. */
@@ -1931,26 +1931,26 @@ declare namespace operator {
       | "/"
       | "%"
   ): (
-    target: any,
-    propertyKey: string,
-    descriptor: TypedPropertyDescriptor<any>
-  ) => TypedPropertyDescriptor<any> | void;
+      target: any,
+      propertyKey: string,
+      descriptor: TypedPropertyDescriptor<any>
+    ) => TypedPropertyDescriptor<any> | void;
   /** Annotates a method as an unary prefix operator overload for the specified `token`. */
   export function prefix(
     token: "!" | "~" | "+" | "-" | "++" | "--"
   ): (
-    target: any,
-    propertyKey: string,
-    descriptor: TypedPropertyDescriptor<any>
-  ) => TypedPropertyDescriptor<any> | void;
+      target: any,
+      propertyKey: string,
+      descriptor: TypedPropertyDescriptor<any>
+    ) => TypedPropertyDescriptor<any> | void;
   /** Annotates a method as an unary postfix operator overload for the specified `token`. */
   export function postfix(
     token: "++" | "--"
   ): (
-    target: any,
-    propertyKey: string,
-    descriptor: TypedPropertyDescriptor<any>
-  ) => TypedPropertyDescriptor<any> | void;
+      target: any,
+      propertyKey: string,
+      descriptor: TypedPropertyDescriptor<any>
+    ) => TypedPropertyDescriptor<any> | void;
 }
 
 /** Annotates a class as being unmanaged with limited capabilities. */
@@ -1971,17 +1971,17 @@ declare function external(
   namespace: string,
   name: string
 ): (
-  target: any,
-  propertyKey: string,
-  descriptor: TypedPropertyDescriptor<any>
-) => TypedPropertyDescriptor<any> | void;
+    target: any,
+    propertyKey: string,
+    descriptor: TypedPropertyDescriptor<any>
+  ) => TypedPropertyDescriptor<any> | void;
 
 /** Annotates a global for lazy compilation. */
 declare function lazy(
-  target: any,
-  propertyKey: string,
-  descriptor: TypedPropertyDescriptor<any>
-): TypedPropertyDescriptor<any> | void;
+  target?: any,
+  propertyKey?: string,
+  descriptor?: TypedPropertyDescriptor<any>
+): TypedPropertyDescriptor<any>;
 
 /** Annotates a function as the explicit start function. */
 declare function start(
@@ -1989,3 +1989,5 @@ declare function start(
   propertyKey: string,
   descriptor: TypedPropertyDescriptor<any>
 ): TypedPropertyDescriptor<any> | void;
+
+declare function abort(str?: string): void
