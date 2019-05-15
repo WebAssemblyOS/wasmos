@@ -19,15 +19,18 @@ export class FileDescriptor {
         if (res == Wasi.errno.SUCCESS) {
             this.offset += bytes.length;
         }
+
         return res;
     }
 
     writeString(str: string, newline: boolean = false): Wasi.errno {
-        // TODO: Add error checking
         let _str = str + (newline ? "\n" : "");
-        let res = this.file!.writeBytes(this.offset, _str.toUTF8(), _str.lengthUTF8);
+        /**
+         * Don't include the null character in the length
+         */
+        let res = this.file!.writeBytes(this.offset, _str.toUTF8(), _str.lengthUTF8 - 1);
         if (res == Wasi.errno.SUCCESS) {
-            this.offset += _str.lengthUTF8;
+            this.offset += _str.lengthUTF8 - 1;
         }
         return res;
     }
@@ -42,7 +45,7 @@ export class FileDescriptor {
     }
 
     readByte(): WasiResult<u8> {
-        if (this.offset + 1 >= this.length) {
+        if (this.offset + 1 >= this.size) {
             return WasiResult.fail<u8>(Wasi.errno.NOMEM);
         }
         return WasiResult.resolve<u8>(load<u8>(this.data + this.offset++));
@@ -56,23 +59,22 @@ export class FileDescriptor {
     }
 
     readString(max: usize = 4096): WasiResult<string> {
-        let _max = <usize>Math.min(max, this.length - this.offset);
+        let _max = <usize>Math.min(max, this.size - this.offset + 1);//Count the EOT character
         let str = StringUtils.fromCString(this.data + this.offset, _max);
-        log<string>(str);
         if (str == null) {
             return WasiResult.fail<string>(Wasi.errno.NOMEM)
         }
-        this.offset += str.lengthUTF8; //For null character
+        this.offset += str.lengthUTF8 - 1;
         return WasiResult.resolve<string>(str);
     }
 
     readLine(max: usize = 4096): WasiResult<string> {
-        let _max = <usize>Math.min(max, this.length - this.offset);
+        let _max = <usize>Math.min(max, this.size - this.offset + 1); //Conut the EOT character
         let str = StringUtils.fromCStringTilNewLine(this.data + this.offset, _max);
         if (str == null) {
             return WasiResult.fail<string>(Wasi.errno.NOMEM)
         }
-        this.offset += str.lengthUTF8 + 1; //For null character
+        this.offset += str.lengthUTF8 - 1;
         return WasiResult.resolve<string>(str);
     }
 

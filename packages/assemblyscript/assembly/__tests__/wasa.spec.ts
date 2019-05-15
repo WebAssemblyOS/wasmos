@@ -32,7 +32,7 @@ describe("Console", (): void => {
     );
 
     expect<u32>(Console.stdout.offset).toBe(
-      jsonStr.lengthUTF8 + 1, //Plus nil
+      jsonStr.lengthUTF8, //No NUL character at the end of the string
       "length of string + \\n"
     );
     // expect<u32>(stdout.offset).toBe(0); //"new line addded"
@@ -113,7 +113,7 @@ describe("write", (): void => {
     expect<usize>(file.size).toBe(0);
     let str = "hello world";
     expect<Wasi.errno>(file.writeString("hello world")).toBe(Wasi.errno.SUCCESS)
-    expect<usize>(file.size).toBe(str.lengthUTF8);
+    expect<usize>(file.size).toBe(str.lengthUTF8 - 1, "No NUL character at the end of the string")
   });
 
   it("should not update size if offset is less than size", (): void => {
@@ -121,6 +121,6 @@ describe("write", (): void => {
     expect<Wasi.errno>(file.writeString("hello world")).toBe(Wasi.errno.SUCCESS)
     file.reset();
     expect<Wasi.errno>(file.writeString("HELLO")).toBe(Wasi.errno.SUCCESS)
-    expect<usize>(file.size).toBe(str.lengthUTF8);
+    expect<usize>(file.size).toBe(str.lengthUTF8 - 1, "No NUL character at the end of the string")
   })
 })

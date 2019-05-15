@@ -17,7 +17,7 @@ describe("echo", (): void => {
     echo(CommandLine.all())
     let str = Hello + " " + World + "\n";
     let stdoutStr = readString(stdout)
-    expect<u32>(Console.stdout.tell()).toBe(str.lengthUTF8)
+    expect<u32>(Console.stdout.tell()).toBe(str.lengthUTF8 - 1, "No NUL character at the end of the string")
     Console.stdout.reset();
     expect<string>(readString(Console.stdout)).toBe(Hello + " " + World + "\n")
     Console.stdout.reset();
@@ -30,7 +30,7 @@ describe("echo", (): void => {
     CommandLine.push(World)
     echo(CommandLine.all())
     let str = Hello + " " + World;
-    expect<u32>(Console.stdout.tell()).toBe(str.lengthUTF8)
+    expect<u32>(Console.stdout.tell()).toBe(str.lengthUTF8 - 1, "No NUL character at the end of the string")
     Console.stdout.reset();
     expect<string>(Console.stdout.readString().result).toBe(str)
     Console.stdout.reset();

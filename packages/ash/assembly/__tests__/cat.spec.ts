@@ -17,7 +17,7 @@ describe("cat", (): void => {
         CommandLine.push("/test")
         cat(CommandLine.all())
         let str = Hello_World + "\n";
-        expect<u32>(Console.stdout.tell()).toBe(str.lengthUTF8, "Two extra characters for space and \\n")
+        expect<u32>(Console.stdout.tell()).toBe(str.lengthUTF8 - 1, "String doesn't have a terminating NUL")
         fs.reset(Console.stdout.fd)
         expect<string>(fs.readString(Console.stdout.fd).result).toBe(Hello + " " + World + "\n")
         Console.stdout.reset()
@@ -35,7 +35,7 @@ describe("cat", (): void => {
         CommandLine.push("/test")
         CommandLine.push("/numbers")
         cat(CommandLine.all())
-        expect<usize>(Console.stdout.tell()).toBeGreaterThan(Hello_World.lengthUTF8 + 1);
+        expect<usize>(Console.stdout.tell()).toBeGreaterThan(Hello_World.lengthUTF8 - 1);
     });
 
 })

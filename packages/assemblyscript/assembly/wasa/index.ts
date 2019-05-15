@@ -11,7 +11,8 @@ export class Ref<T>{
     constructor(public val: T) { }
 }
 
-
+//@ts-ignore
+@global
 /**
  * Helper class for dealing with errors.
  */
