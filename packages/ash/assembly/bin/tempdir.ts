@@ -26,16 +26,13 @@ function writeableDir(dir: string): bool {
   log<string>("in writeableDir function");
   // directory exists - try making a file inside it
   if (dirExists(dir)) {
-    log<string>("dir: " + dir + " exists");
     let dirFd = fs.openDirectory(dir).result.fd;
     let tempFileName = '/testfile';
     let tempFilePath = dir + tempFileName;
     let writeFileToDir = fs.createFileAt(dirFd, tempFilePath);
     if (!writeFileToDir.failed) {
-      log<string>("dir: " + dir + " can be written to");
       return true;
     } else {
-      log<string>("temp file: " + dir + " CANNOT be created due to error: " + Wasi.errno.toString(writeFileToDir.error));
       Console.error("tempdir: Could not write to tempdir at " + dir + ". Error: " + Wasi.errno.toString(writeFileToDir.error));
       return false;
     }
@@ -44,7 +41,6 @@ function writeableDir(dir: string): bool {
 }
 
 export function main(args: string[]): void {
-  log<string>("in tempdir command");
   let tempdir = writeableDir('/tmp');
   if (tempdir) {
     Console.write('/tmp', false);
