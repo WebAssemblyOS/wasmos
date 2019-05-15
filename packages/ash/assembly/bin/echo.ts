@@ -2,11 +2,19 @@
 
 
 export function main(args: string[]): void {
+  let newLine: bool = true;
+  let _args: string[] = new Array<string>();
+  let start: i32 = 1
   if (args[1] == "-n") {
-    let _args = args.slice(2).join(" ");
-    Console.write(_args, false)
-  } else {
-    let _args = args.slice(1).join(" ")
-    Console.log(_args);
+    start = 2;
+    newLine = false
   }
+  for (let i = start; i < args.length; i++) {
+    if (args[i] == "$PATH") {
+      _args.push(Environ.get("$PATH"));
+    } else {
+      _args.push(args[i]);
+    }
+  }
+  Console.write(_args.join(" "), newLine);
 }
