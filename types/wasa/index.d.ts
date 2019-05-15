@@ -1,30 +1,43 @@
-
-declare class Ref<T>{
-  val: T;
-}
-declare class Tuple<T1, T2> {
-  first: T1;
-  second: T2;
-}
-declare class WasiResult<T> extends Tuple<T | null, Wasi.errno> {
+/**
+ * Helper class for dealing with errors.
+ */
+declare class WasiResult<T> {
   constructor(first: T | null, second?: Wasi.errno);
-
+  /**
+ * Tests if the error is not a success.
+ */
   failed: boolean;
   error: Wasi.errno;
   result: T;
+  /**
+   * Passes value if system call was successful.
+   * @param result - Value returned 
+   */
   static resolve<T>(result: T): WasiResult<T>;
+  /**
+   * Called if an error was encountered.
+   * @param err 
+   */
   static fail<T>(err: Wasi.errno): WasiResult<T>;
+
+  /**
+   * Special case where there is no result type just the error.
+   * @param res error
+   */
   static void<T>(res: Wasi.errno): WasiResult<T>;
 }
 
 declare type fd = usize;
 declare type path = string;
 
+/**
+ * Global console class to access std input/output streams.
+ */
 declare class Console {
   /**
    * Write a string to the console
    * @param s string
-   * @param newline `false` to avoid inserting a newline after the string
+   * @param newline `false` by default to avoid inserting a newline after the string.
    */
   static write(s: string, newline?: boolean): void;
 
@@ -45,9 +58,9 @@ declare class Console {
    */
   static error(s: string, newline?: boolean): void;
 
-  static stdout: fd;
-  static stdin: fd;
-  static stderr: fd;
+  static stdout: FileDescriptor;
+  static stdin: FileDescriptor;
+  static stderr: FileDescriptor;
 }
 // // declare const Cons: number;
 // // declare function Cons1(): void;
@@ -62,30 +75,61 @@ declare class CommandLine {
   static reset(): void;
 }
 
+/**
+ * Wrapper class for file descriptors.  
+ * Tracks offset within a file and provides methods to read and write.
+ */
 declare class FileDescriptor {
 
-  file: File;
+  file: File | null;
   fd: u32;
   offset: u32;
+  /**
+   * Number of bytes written to the file.
+   */
+  size: usize;
 
-  write(bytes: Array<u8>): void;
+  /**
+   * Write an array of bytes to a file;
+   */
+  write(bytes: Array<u8>): Wasi.errno;
 
-  writeString(str: string): void;
+  /**
+   * write string to file.
+   * @str: string
+   * newline: bool
+   */
+  writeString(str: string, newline?: bool): Wasi.errno;
 
-  copyByte(ptr: usize): void;
+  /**
+   * Read data into byte array.
+   */
+  read(bytes: Array<u8>): Wasi.errno;
 
-  writeByte(byte: u8): void;
+  /**
+   * Read data into byte array without moving the offset.
+   */
+  pread(bytes: Array<u8>): Wasi.errno;
 
-  read(bytes: Array<u8>): void;
+  /**
+   * read string from file.
+   */
+  readString(): WasiResult<string>;
 
-  readByte(): u8;
+  /**
+   * Read byte from file.
+   */
+  readByte(): WasiResult<u8>;
 
-  pread(bytes: Array<u8>): void;
+  /**
+   * Read a string up until a new line.
+   */
+  readLine(): WasiResult<string>;
 
-  readString(): string;
-
+  /**
+   * Current offset within the file
+   */
   tell(): u32;
-
 
   /**
    * Resets the offset to 0
@@ -93,13 +137,30 @@ declare class FileDescriptor {
   reset(): void;
 
   /**
-   * set seek (offset)
+   * set seek (offset) relative to whence.
+   * whence can be:
+   * - Wasi.whence.CUR - Current offset
+   * - Wasi.whence.END - End of file
+   * - Wasi.whence.SET - Start of file
    */
-  seek(offset: usize): void;
+  seek(offset: Wasi.filedelta, whence?: Wasi.whence): WasiResult<usize>;
 
-  data: usize;
+  /**
+   * Removes all data from the file
+   */
+  erase(): Wasi.errno
 }
 
+/**Similar to FileDescriptor, provides interaceto list files and get parent.  */
+declare class DirectoryDescriptor extends FileDescriptor {
+  /**
+   * Returns list of names of entries in the directory.
+   */
+  listDir(): DirectoryEntry[];
+
+  /**Path of parent directory */
+  parent: string;
+}
 
 declare class File {
   static DefaultSize: u32;
@@ -109,11 +170,19 @@ declare class File {
 
 
 declare class Directory extends File {
+  /**
+   * Reference to parent directory.
+   */
   parent: Directory;
+  /**
+   * Array of Files contained in directory.
+   */
   children: Array<File>;
 }
 
 declare class fs {
+  cwd: fd;
+
   /**
    * A simplified interface to open a file for read operations
    * @param path Path
@@ -127,15 +196,42 @@ declare class fs {
    * @param dirfd Base directory descriptor (will be automatically set soon)
    */
   static openForWrite(path: string, dirfd?: fd): WasiResult<FileDescriptor>;
-
-  static openDirectory(path: string, dirfd?: fd): WasiResult<FileDescriptor>;
   /**
-   * 
-   * @param path path of new directory
-   * @param dirfd File fd for 
+   * Creates a new file and returning its new File Descriptor
+   * @param path 
    */
-  static createDirectory(path: string, dirfd?: fd): WasiResult<FileDescriptor>;
+  static createFile(path: string): WasiResult<FileDescriptor>;
+  /**
+   * Equivalient to openFileAt, passing Wasi.oflags.CREAT
+   * @param dirfd base Directory
+   * @param path 
+   */
+  static createFileAt(dirfd: fd, path: string): WasiResult<FileDescriptor>;
+  /**
+   * Open file relative to the cwd if not absolute.
+   * @param path 
+   * @param options optional, default Wasi.oflags.CREAT
+   */
+  static openFile(path: string, options?: Wasi.oflags): WasiResult<FileDescriptor>;
+  /**
+   * Open file relative to a passed directory
+   * @param dirfd 
+   * @param path 
+   * @param options 
+   */
+  static openFileAt(dirfd: fd, path: string, options?: Wasi.oflags): WasiResult<FileDescriptor>;
 
+  /**Create directory relative to the cwd */
+  static createDirectory(path: string): WasiResult<DirectoryDescriptor>;
+
+  /**Create directory relative to passed directory*/
+  static createDirectoryAt(dirfd: fd, path: string): WasiResult<DirectoryDescriptor>;
+
+  /**Open a directory relative to cwd */
+  static openDirectory(path: string): WasiResult<DirectoryDescriptor>;
+
+  /**Open a directory relative to passed directory */
+  static openDirectoryAt(path: string, dirfd: fd): WasiResult<DirectoryDescriptor>;
   /**
    * Close a file descriptor
    * @param fd file descriptor
@@ -192,30 +288,87 @@ declare class fs {
    */
   static readLine(fd: fd, chunk_size: usize): WasiResult<string>;
 
+  /**
+   * Equivalent to seek(fd, 0 Wasi.whence.SET) or reseting the offset to 0
+   * @param fd file descriptor
+   */
   static reset(fd: fd): void;
   /**
-   * 
+   *
    * @param fd File fd
    * returns the current offset of the file descriptor
    */
-  static tell(fd: fd): usize;
+  static tell(fd: fd): WasiResult<usize>;
 
   /**
-   * 
+   *
    * @param fd File fd
    * @param offset The number of bytes to move
    * @param whence The base from which the offset is relative
    */
-  static seek(fd: fd, offset: Wasi.filedelta, whence?: Wasi.whence): WasiResult<Ref<usize>>;
+  static seek(fd: fd, offset: Wasi.filedelta, whence?: Wasi.whence): WasiResult<usize>;
 
+  /**
+   * Get wrapper class for file descriptor.
+   * @param fd 
+   */
   static get(fd: fd): WasiResult<FileDescriptor>;
 
-  static erase(fd: fd): void;
+  /**
+   * Get wrapper class for directory descriptor.
+   * @param fd 
+   */
+  static getDir(fd: fd): WasiResult<DirectoryDescriptor>;
 
+  /**Deletes contents of file. */
+  static erase(fd: fd): WasiResult<void>;
+
+  /**Returns a list of DirectoryEntry */
+  static listdir(fd: fd): WasiResult<DirectoryEntry>;
+
+  /**
+   * Deletes a file and will throw an error if passed a directory.
+   * @param path 
+   */
+  static delete(path: string): WasiResult<void>;
+
+  /**Deletes a directory. */
+  static deleteDirectory(path: string): WasiResult<void>;
+
+  /** Amount to set the new file size to.  It doubles in size by default. */
+  static grow(fd: fd, amount?: usize): WasiResult<void>;
+
+  static init(): void
 
 }
 
+/** Describes a Directory Entry */
+declare class DirectoryEntry {
+  path: string;
+  type: Wasi.filetype;
+  size: usize;
+}
 
+/**
+ * Provides function to exit.
+ */
 declare class Process {
   static exit(code: number): void;
+}
+
+
+declare class Environ {
+  /** Add environment variable */
+  static add(key: string, value: string): void;
+
+  /**
+   * Return the value for an environment variable
+   * @param key environment variable name
+   */
+  static get(key: string): string;
+
+  /**
+   * Removes all entries;
+   */
+  static reset(): void;
 }
