@@ -28,14 +28,14 @@ export class StringUtils {
     static fromCStringTilNewLine(cstring: usize, max: usize): string | null {
         let size: usize = 0;
         while (!this.terminates(cstring + size) && size < max - 1) {
-            size++;
-            if (this.isNewLine(cstring + size - 1)) {
+            if (this.isNewLine(cstring + size)) {
                 break;
             }
+            size++;
         }
         if (size == 0) {
             return null
         }
-        return String.fromUTF8(cstring, size);
+        return String.fromUTF8(cstring, size + 1);
     }
 }

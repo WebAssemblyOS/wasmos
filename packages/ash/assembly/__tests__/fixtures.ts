@@ -7,18 +7,23 @@ export var stdin: FileDescriptor;
 export var stdout: FileDescriptor;
 export var stderr: FileDescriptor;
 
-
 beforeAll(() => {
-    addJSONtoFS(fs_str);
+    init();
+})
+
+
+export function init(): void {
     fs.init();
+    addJSONtoFS(fs_str);
+    log<string>("added FS")
     Console.stdout;
     Console.stdin;
     Console.stderr;
     stdin = openStdin();
     stdout = openStdout();
     stderr = openStderr();
-})
 
+}
 export function openStdin(): FileDescriptor {
     return openFile("/dev/fd/0");
 }
