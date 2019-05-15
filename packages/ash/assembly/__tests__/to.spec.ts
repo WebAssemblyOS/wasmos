@@ -1,53 +1,74 @@
 
-import { Console, fs, Process, CommandLine } from '../../../assemblyscript/assembly/wasa/mock';
-import { FileDescriptor } from '../../../assemblyscript/assembly/wasa/mock/fs';
-import { openStdout, Hello, World, readString } from './fixtures';
+import { stdout, Hello, World, readString, Hello_World } from './fixtures';
 import { main as to } from "../bin/to";
 
-type fd = usize;
-
-
-
-// var stdout2: FileDescriptor;
-// let stdout = Console.stdout;
-
-const testtxt1: string = "testtxt1";
-const testtxt2: string = "This is some text.";
-
-const testfile1: string = "./testfile1.txt";
-const testfile2: string = "./testfile2.txt";
+const testtext1 = "This is some new text.";
+const testtext2 = "This is even newer text.";
 
 describe("to", (): void => {
-  beforeAll(
-    (): void => {
-      // stdout2 = openStdout();
-    }
-  );
 
   beforeEach((): void => {
-    Console.stdout.reset();
-    // stdout2.reset();
-    Console.stdout.erase()
-    // fs.delete(testfile1);
-    // fs.delete(testfile2);
+    stdout.reset();
+    Console.stdout.erase();
     CommandLine.reset();
     CommandLine.push("to");
   })
 
-  it("should print testtxt1", (): void => {
-    CommandLine.push(testtxt1)
-    CommandLine.push(testfile1)
+  it("should print testtext1 to std out", (): void => {
+    CommandLine.push(testtext1)
+    CommandLine.push("/test")
     to(CommandLine.all());
-    // let stdoutStr: string = stdout2.readString().result
-    // let stdoutStr: string = Console.stdout.readString().result;
-    // let stderrStr: string = Console.stderr.readString().result;
-    // let stdoutStr: string = readString(Console.stdout);
-    // let stderrStr: string = readString(Console.stderr);
-    let stdoutStr: string = fs.readString(Console.stdout.fd).result;
-    let stderrStr: string = fs.readString(Console.stderr.fd).result;
-    log<string>("stdoutStr: " + stdoutStr);
-    log<string>("stderrStr: " + stderrStr);
-    expect<string>(stderrStr).toBe("");
-    expect<string>(stdoutStr).toBe(testtxt1);
-  })
+    let stdoutStr = readString(stdout)
+    expect<string>(stdoutStr).toBe(testtext1);
+  });
+
+  it("test file should contain testtext1", (): void => {
+    CommandLine.push(testtext1)
+    CommandLine.push("/test")
+    to(CommandLine.all());
+    let stdoutStr = readString(stdout)
+    expect<string>(stdoutStr).toBe(testtext1);
+    let openTextFile = fs.openForRead("/test");
+    expect<bool>(openTextFile.failed).toBeFalsy("test file should be able to be read");
+    let readTextFile = openTextFile.result.readString();
+    expect<bool>(readTextFile.failed).toBeFalsy();
+    let fileText = readTextFile.result;
+    expect<string>(fileText).toBe(testtext1);
+  });
+
+  it("should print out and write the most recent text to the same file", (): void => {
+    CommandLine.push(testtext1)
+    CommandLine.push("/test")
+    to(CommandLine.all());
+    let stdoutStr = readString(stdout)
+    expect<string>(stdoutStr).toBe(testtext1);
+    expect<string>(fs.openForRead("/test").result.readString().result).toBe(testtext1);
+
+    stdout.reset();
+    Console.stdout.erase();
+    CommandLine.reset();
+    CommandLine.push("to");
+
+    CommandLine.push(testtext2)
+    CommandLine.push("/test")
+    to(CommandLine.all());
+    let newStdoutStr = readString(stdout)
+    expect<string>(newStdoutStr).toBe(testtext2);
+    expect<string>(fs.openForRead("/test").result.readString().result).toBe(testtext2);
+  });
+
+  it("should create a new file if the file doesn't exist", (): void => {
+    CommandLine.push(testtext1)
+    CommandLine.push("/test2")
+    to(CommandLine.all());
+    let stdoutStr = readString(stdout)
+    expect<string>(stdoutStr).toBe(testtext1);
+    let openTextFile = fs.openForRead("/test2");
+    expect<bool>(openTextFile.failed).toBeFalsy("test file should be able to be read");
+    let readTextFile = openTextFile.result.readString();
+    expect<bool>(readTextFile.failed).toBeFalsy();
+    let fileText = readTextFile.result;
+    expect<string>(fileText).toBe(testtext1);
+  });
+
 })
