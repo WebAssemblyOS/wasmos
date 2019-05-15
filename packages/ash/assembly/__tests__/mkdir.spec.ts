@@ -1,13 +1,10 @@
 import { main as mkdir } from "../bin/mkdir";
 
-import { Console, fs, Process, CommandLine } from '../../../assemblyscript/assembly/wasa/mock';
-import { FileDescriptor } from '../../../assemblyscript/assembly/wasa/mock/fs';
-import { openStdout, Hello, World, testFile } from './mocks';
 
 describe("mkdir", (): void => {
 
     beforeEach((): void => {
-        Console.stderr.reset()
+        Console.stderr.erase()
         Console.stderr.erase()
         CommandLine.reset();
         CommandLine.push("mkdir");
