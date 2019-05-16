@@ -25,9 +25,8 @@ describe("nl", (): void => {
 
     it("with words", () => {
         CommandLine.push("/home/bob/documents/secret.txt");
-        let str = "    1  For my eyes only.\n    2  No one else"
+        let str = "    1  For my eyes only.\n    2   No one else"
         nl(CommandLine.all());
-        log<string>(stdout.readString().result)
         stdout.reset();
         expect<string>(stdout.readString().result).toStrictEqual(str);
         expect<u32>(Console.stdout.tell()).toBe(str.lengthUTF8 - 1, "Two extra characters for space and \\n");
@@ -39,4 +38,27 @@ describe("nl", (): void => {
         expect<usize>(Console.stderr.tell()).toBeGreaterThan(0);
         expect<string>(stderr.readString().result).toStrictEqual("nl: /doesnotexist: No such file or directory\n")
     });
+
+    it("options - t", () => {
+        CommandLine.push("-b")
+        CommandLine.push("t")
+        CommandLine.push("/home/bob/documents/secret.txt");
+        let str = "    1  For my eyes only.\n    2   No one else"
+        nl(CommandLine.all());
+        stdout.reset();
+        expect<string>(stdout.readString().result).toStrictEqual(str);
+        expect<u32>(Console.stdout.tell()).toBe(str.lengthUTF8 - 1, "Two extra characters for space and \\n");
+    })
+
+    it("options - n", () => {
+        CommandLine.push("-b")
+        CommandLine.push("n")
+        CommandLine.push("/home/bob/documents/secret.txt")
+        nl(CommandLine.all())
+        stdout.reset()
+        let str = "       For my eyes only.\n        No one else"
+        expect<string>(stdout.readString().result).toStrictEqual(str);
+        expect<u32>(Console.stdout.tell()).toBe(str.lengthUTF8 - 1, "Two extra characters for space and \\n");
+    })
+
 })
