@@ -29,8 +29,8 @@ describe("nl", (): void => {
         nl(CommandLine.all());
         log<string>(stdout.readString().result)
         stdout.reset();
-        expect<u32>(Console.stdout.tell()).toBe(str.lengthUTF8 - 1, "Two extra characters for space and \\n");
         expect<string>(stdout.readString().result).toStrictEqual(str);
+        expect<u32>(Console.stdout.tell()).toBe(str.lengthUTF8 - 1, "Two extra characters for space and \\n");
     })
 
     it("should write to stderr if file not found", () => {
