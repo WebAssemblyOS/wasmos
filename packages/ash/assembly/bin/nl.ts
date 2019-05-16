@@ -1,6 +1,7 @@
 export function main(args: string[]): void {
     let res = fs.openFile(args[1]);
     if (res.error) {
+        //This is just the log for testing need to use Console.error
         log<string>(`head: file: No such file or directory`);
         return;
     }
@@ -12,7 +13,9 @@ export function main(args: string[]): void {
         return;
     }
     while (!line.failed) {
-        let intro: string = `    ${num} `;
+        log<string>(line.result + "-")
+        //@ts-ignore  Integer does have to string method.
+        let intro: string = "    " + num.toString() + "  ";
 
         Console.write(intro.concat(line.result));
         line = file.readLine();
