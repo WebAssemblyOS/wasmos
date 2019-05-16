@@ -1,55 +1,48 @@
-import { Console, IO, fs, CommandLine } from "../../../assemblyscript/assembly/wasa/mock";
-import { FileDescriptor, File } from "../../../assemblyscript/assembly/wasa/mock/fs";
 
-import { main } from "../bin/echo";
-
-let Hello = "Hello";
-let World = "World";
-
-function openFile(path: string): FileDescriptor {
-  return fs.get(fs.openFile(path));
-}
-
-function openStdout(): FileDescriptor {
-  return openFile("/dev/fd/1");
-}
-
-var stdout: FileDescriptor;
-var stdout2: FileDescriptor;
+import { stdout, Hello, World, readString } from './fixtures';
+import { main as echo } from "../bin/echo";
 
 describe("echo", (): void => {
-  beforeEach((): void => {
-    stdout = fs.get(Console.stdout)
-    stdout.reset()
-    stdout2 = openStdout();
-    stdout.file.erase();
-    CommandLine._args = new Array<string>();
-    CommandLine.push("echo");
 
+  beforeEach((): void => {
+    stdout.reset();
+    Console.stdout.erase();
+    CommandLine.reset();
+    CommandLine.push("echo");
   })
 
   it("should print newline by default", (): void => {
     CommandLine.push(Hello)
     CommandLine.push(World)
-    main(CommandLine.all())
+    echo(CommandLine.all())
     let str = Hello + " " + World + "\n";
-    expect<u32>(stdout.offset).toBe(str.lengthUTF8, "Two extra characters for space and \\n")
-    stdout.reset();
-    expect<string>(stdout.readString()).toBe(Hello + " " + World + "\n")
-    stdout.reset();
-    expect<string>(stdout.readString()).toBe(stdout2.readString());
-  })
+    let stdoutStr = readString(stdout)
+    expect<u32>(Console.stdout.tell()).toBe(str.lengthUTF8 - 1, "No NUL character at the end of the string")
+    Console.stdout.reset();
+    expect<string>(readString(Console.stdout)).toBe(Hello + " " + World + "\n")
+    Console.stdout.reset();
+    expect<string>(readString(Console.stdout)).toBe(stdoutStr);
+  });
 
   it("should print no newline with -n", () => {
     CommandLine.push("-n")
     CommandLine.push(Hello)
     CommandLine.push(World)
-    log(CommandLine.all())
-    main(CommandLine.all())
-    let offset = stdout.offset
+    echo(CommandLine.all())
     let str = Hello + " " + World;
-    expect<u32>(offset).toBe(str.lengthUTF8, "One extra character for space")
-    stdout.reset()
-    expect<string>(stdout.readString()).toBe(Hello + " " + World)
-  })
+    expect<u32>(Console.stdout.tell()).toBe(str.lengthUTF8 - 1, "No NUL character at the end of the string")
+    Console.stdout.reset();
+    expect<string>(Console.stdout.readString().result).toBe(str)
+    Console.stdout.reset();
+    expect<string>(Console.stdout.readString().result).toBe(stdout.readString().result);
+  });
+
+  it("should print $PATH environment variable", () => {
+    CommandLine.push("$PATH");
+    let path = "/usr/bin:/bin";
+    Environ.add("$PATH", path);
+    echo(CommandLine.all())
+    expect<string>(readString(stdout)).toBe(path + "\n")
+
+  });
 })

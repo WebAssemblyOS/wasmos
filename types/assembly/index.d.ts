@@ -1978,10 +1978,10 @@ declare function external(
 
 /** Annotates a global for lazy compilation. */
 declare function lazy(
-  target: any,
-  propertyKey: string,
-  descriptor: TypedPropertyDescriptor<any>
-): TypedPropertyDescriptor<any> | void;
+  target?: any,
+  propertyKey?: string,
+  descriptor?: TypedPropertyDescriptor<any>
+): TypedPropertyDescriptor<any>;
 
 /** Annotates a function as the explicit start function. */
 declare function start(
@@ -1989,3 +1989,5 @@ declare function start(
   propertyKey: string,
   descriptor: TypedPropertyDescriptor<any>
 ): TypedPropertyDescriptor<any> | void;
+
+declare function abort(str?: string): void
