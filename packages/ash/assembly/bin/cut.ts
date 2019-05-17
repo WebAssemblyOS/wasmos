@@ -1,0 +1,1 @@
+// implementing unix cut utility in ts
