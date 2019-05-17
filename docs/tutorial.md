@@ -37,8 +37,9 @@ If you have fastforwarded to the new HEAD from the main repo, you should do `git
 ## Making a new branch
 For this tutorial, I'll be implementing `echo.ts`, which will be in the `packages/ash/assembly/bin`
 
-Now that you are caught up, you need to make a new branch for what task you are working on. If you haven't already pick one from [here](https://github.com/WebAssemblyOS/wasmos/issues/19) to work on and make an issue [here](https://github.com/WebAssemblyOS/wasmos/issues).
-For example,
+Now that you are caught up, you need to make a new branch for what task you are working on. If you haven't already pick one from [here](https://github.com/WebAssemblyOS/wasmos/issues/19) to work on and make an issue [here](https://github.com/WebAssemblyOS/wasmos/issues) that references the first issue, e.g. "see #19" this will create a link in #19 that points to the new issue, this way you can look at #19 to see which ones have been taken.
+
+Next:
 
 ```
 git checkout -b dev-echo # this creates and switches to the new branch
