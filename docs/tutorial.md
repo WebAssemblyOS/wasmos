@@ -54,18 +54,49 @@ git commit -m "added empty file"
 git push origin dev-echo ## Again this will be different for you
 ```
 
-After filling out the file, add it again, commit, and push it.  Then you can open a pull request to merge with `wasmos/ash` branch. Make sure that in your pull request you include `fixes #issueNumber`, a handy drop down will help you find the right one after you type `#`.
 
-Then open another issue to write tests for echo.  Checkout `packages/ash/assembly/__tests__/echo.spec.ts` as a place to start. To test your AssemblyScript run `npx asp`
+Next write tests for echo.  Copy `packages/ash/assembly/__tests__/echo.spec.ts` to a new file with the name of your program. 
+
+Now go ahead and also commit and push this as well.
+
+## Making a Pull Request
+Once you have your initial commit to your development branch you can open a pull request, which starts the process of merging this branch with in this case `wasmos/ash`.  This doesn't mean that the branch has to completely ready for merge, just that you intend of merging it.  It also allows others, like me, to look at it and even colloborate with you on it.
+
+To get started make sure your pushed your branch, then head over to your fork of the repo, "https://github.com/githubusername/wasmos" and you should see above the contents a green button that asks if you want to open a pull request with the new branch you made.  If this is not the case then just head over to the [main repo](https://github.com/WebAssemblyOS/wasmos) and click on Pull Requests above the contents (not the very top).
+
+Next it will ask you which branch to merge with pick `wasmos/ash`.  Give it the name of your program and in the comment section include `fixes #YourIssueNumber`, a handy drop down will help you find the right one after you type `#`.  If there are any conflict errors it's okay to still create the pull request as once you make it I can help correct it.
+
+
+## Running tests
+
+To test your AssemblyScript run `npx asp -f "filename regex"`, e.g. `npx asp -f echo` would run just `echo.spec.ts` or any test with echo in the name.  If this doesn't work try running `npm clean-install`, which will make sure you're using the latest verson of the testing framework, `as-pect`.
+
 
 ## Other things to know
 
-To access the file system there is a global that your file named `fs`, however, it is important that you include this in your tests, which defines it as the mock.  This shouldn't be an issue if you copied `echo.spec.ts`.
+To access the file system there is a global named `fs`.
 
-`fs.open(path: string): fd` this returns a file descriptor, which is a 32 bit unsigned integer.  It is the identifer a FileDescriptor class, which you can access by using `fs.get(fd: fd): FileDescriptor`.  However, this is only for the mock so the "proper" api to pass it when reading or writing to the file.
+`fs.openFile(path: string): fd` this returns a `WasiResult<FileDescriptor>` , which either failed or contains the resulting file descriptor class.
 
-e.g.
 ```ts
-fs.writeString(fd: fd, str: string): void
+let res = fs.openFile("/hello");
+if (res.failed){
+    Console.Error(result.error.toString()) //prints the error code
+    return;
+}
+let file = res.result;  //Now have access to the FileDescriptor
+
 ```
-A FileDescriptor is a new reference to the file and an offset.  This means if you can have two FileDescriptor's open for the same file.  Then each time you read or write to the file you move the offset or "seek".
+A FileDescriptor is a reference to a file and an offset.  This means if you can have two FileDescriptor's open for the same file.  Then each time you read or write to the file you move the offset or "seek".
+```ts
+file.writeString("Hello World\n"); //Writes a line to the file, which moves the file offset
+
+file.reset() // uses file.seek to move file offset to 0.
+let line = file.readLine(); // Returns a WasiResult<string> as the read could have fail, e.g. at end of file.
+let hello = line.result; //Access the string.
+```
+
+To see the complete interface look at [types/wasa/index.d.ts](https://github.com/WebAssemblyOS/wasmos/blob/master/types/wasa/index.d.ts).
+
+Your test can import a premade file descriptor for stdout, stderr, and stdin is `packages/ash/assembly/__tests__/fixtures.ts`.  This is handy because when print to stdout using `Console.write` or `Console.log`, Console has it's own file descriptor which updates it's offset after each write, whereas `stdout` will still point to the beginning of the file.
+
