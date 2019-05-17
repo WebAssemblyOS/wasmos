@@ -20,10 +20,8 @@ export function main(args: string[]): void {
         }
         let dstFile = fs.openFile(args[2]);
         if (!dstFile.failed) {
-          // File exists, we need to overwrite its contents
-          // One way is to erase/delete it, then recreate
-          // Erase and delete currently don't work well for me
-          //dstFile.result.erase();
+          // File exists, erase it so that we can recreate it
+          dstFile.result.erase();
         }
         fs.createFile(args[2]);
         dstFile = fs.openFile(args[2]);
