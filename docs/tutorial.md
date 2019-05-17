@@ -72,6 +72,7 @@ Next it will ask you which branch to merge with pick `wasmos/ash`.  Give it the 
 
 To test your AssemblyScript run `npx asp -f "filename regex"`, e.g. `npx asp -f echo` would run just `echo.spec.ts` or any test with echo in the name.  If this doesn't work try running `npm clean-install`, which will make sure you're using the latest verson of the testing framework, `as-pect`.
 
+You can use `as-pect`'s build in print function using `log<string>("hello world")`. It's very handy and can be used in your program.  If you need to print something other than a string you have to provide the type, e.g. `log<usize>(42)`.
 
 ## Other things to know
 
