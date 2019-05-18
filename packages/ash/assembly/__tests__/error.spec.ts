@@ -14,7 +14,8 @@ describe("error", (): void => {
   })
 
   it("cat should cause an error if the file doesn't exist", (): void => {
-    CommandLine.push("")
+    CommandLine.push("cat");
+    CommandLine.push("test");
     cat(CommandLine.all());
 
     let status = error();
@@ -27,9 +28,9 @@ describe("error", (): void => {
   });
 
   it("echo should not cause any error", (): void => {
-    CommandLine.push(Hello)
-    CommandLine.push(World)
-    echo(CommandLine.all())
+    CommandLine.push("echo");
+    CommandLine.push("test");
+    echo(CommandLine.all());
 
     let status = error();
 
