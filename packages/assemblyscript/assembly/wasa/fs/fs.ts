@@ -1,71 +1,204 @@
 import { WasiResult } from '../..';
-import { Wasi } from '../../../wasi';
-import { hasFlag } from '../../../flag';
-import { StringUtils } from '../../utils';
+import { hasFlag } from '../../flag';
+import { StringUtils } from '../utils';
 import * as path from "../path";
+import { fd_write, fd_close, fd_read } from 'bindings/wasi';
+import { fd_pread, fd_tell } from '../../std/bindings/wasi_unstable';
 export type fd = usize;
 
-
+function failed(errno: Wasi.errno): bool {
+    return errno != Wasi.errno.SUCCESS;
+}
 
 //@ts-ignore
 @global
 export class FileDescriptor {
-    private stat: Wasi.fdstat;
 
     constructor(public fd: fd, public file: File | null, public offset: usize = 0) { }
 
-    write(bytes: Array<u8>): Wasi.errno {
-        let res = this.file!.writeBytes(this.offset, bytes.buffer_.data, bytes.length);
-        if (res == Wasi.errno.SUCCESS) {
-            this.offset += bytes.length;
-        }
-
-        return res;
+    /**
+     * Close a file descriptor
+     * @param fd file descriptor
+     */
+    close(): void {
+        fd_close(this.fd);
     }
 
-    writeString(str: string, newline: boolean = false): Wasi.errno {
-        let _str = str + (newline ? "\n" : "");
-        /**
-         * Don't include the null character in the length
-         */
-        let res = this.file!.writeBytes(this.offset, _str.toUTF8(), _str.lengthUTF8 - 1);
-        if (res == Wasi.errno.SUCCESS) {
-            this.offset += _str.lengthUTF8 - 1;
+    /**
+     * Write data to a file descriptor
+     * @param fd file descriptor
+     * @param data data
+     */
+    write(data: Array<u8>): Wasi.errno {
+        let data_buf_len = data.length;
+        let data_buf = memory.allocate(data_buf_len);
+        for (let i = 0; i < data_buf_len; i++) {
+            store<u8>(data_buf + i, unchecked(data[i]));
         }
-        return res;
+        let iov = memory.allocate(2 * sizeof<usize>());
+        store<u32>(iov, data_buf);
+        store<u32>(iov + sizeof<usize>(), data_buf_len);
+        let written_ptr = memory.allocate(sizeof<usize>());
+        let errno = fd_write(this.fd, iov, 1, written_ptr);
+        memory.free(written_ptr);
+        memory.free(data_buf);
+        return errno;
+    }
+
+    /**
+     * Write a string to a file descriptor, after encoding it to UTF8
+     * @param fd file descriptor
+     * @param s string
+     * @param newline `true` to add a newline after the string
+     */
+    writeString(s: string, newline: bool = false): Wasi.errno {
+        if (newline) {
+            return this.writeStringLn(s);
+        }
+        let s_utf8_len: usize = s.lengthUTF8 - 1;
+        let s_utf8 = s.toUTF8();
+        let iov = memory.allocate(2 * sizeof<usize>());
+        store<u32>(iov, s_utf8);
+        store<u32>(iov + sizeof<usize>(), s_utf8_len);
+        let written_ptr = memory.allocate(sizeof<usize>());
+        let errno = fd_write(this.fd, iov, 1, written_ptr);
+        memory.free(written_ptr);
+        memory.free(s_utf8);
+        return errno;
+    }
+
+    /**
+     * Write a string to a file descriptor, after encoding it to UTF8, with a newline
+     * @param fd file descriptor
+     * @param s string
+     */
+    writeStringLn(s: string): Wasi.errno {
+        let s_utf8_len: usize = s.lengthUTF8 - 1;
+        let s_utf8 = s.toUTF8();
+        let iov = memory.allocate(4 * sizeof<usize>());
+        store<u32>(iov, s_utf8);
+        store<u32>(iov + sizeof<usize>(), s_utf8_len);
+        let lf = memory.allocate(1);
+        store<u8>(lf, 10);
+        store<u32>(iov + sizeof<usize>() * 2, lf);
+        store<u32>(iov + sizeof<usize>() * 3, 1);
+        let written_ptr = memory.allocate(sizeof<usize>());
+        let errno = fd_write(this.fd, iov, 2, written_ptr);
+        memory.free(written_ptr);
+        memory.free(s_utf8);
+        return errno;
+    }
+
+    /**
+     * Read data from a file descriptor
+     * @param fd file descriptor
+     * @param data existing array to push data to
+     * @param chunk_size chunk size (default: 4096)
+     */
+    read(data: Array<u8> = [], chunk_size: usize = 4096, pread: boolean = false): WasiResult<Array<u8>> {
+        let data_partial_len = chunk_size;
+        let data_partial = memory.allocate(data_partial_len);
+        let iov = memory.allocate(2 * sizeof<usize>());
+        store<u32>(iov, data_partial);
+        store<u32>(iov + sizeof<usize>(), data_partial_len);
+        let read_ptr = memory.allocate(sizeof<usize>());
+        let errno: Wasi.errno;
+        if (pread) {
+            let tell = this.tell();
+            if (tell.failed) {
+                return WasiResult.fail<Array<u8>>(tell.error);
+            }
+            errno = fd_pread(this.fd, iov, 1, this.offset, read_ptr);
+        } else {
+            errno = fd_read(this.fd, iov, 1, read_ptr);
+        }
+        let read: usize = 0;
+        if (!failed(errno)) {
+            read = load<usize>(read_ptr);
+            if (read > 0) {
+                for (let i: usize = 0; i < read; i++) {
+                    data.push(load<u8>(data_partial + i));
+                }
+            }
+        }
+        memory.free(read_ptr);
+        memory.free(data_partial);
+        if (failed(errno)) {
+            return WasiResult.fail<Array<u8>>(errno);
+        }
+
+        if (read < 0) {
+            return WasiResult.fail<Array<u8>>(Wasi.errno.BADF);
+        }
+        return WasiResult.resolve<Array<u8>>(data);
+    }
+
+    /**
+     * Read from a file descriptor until the end of the stream
+     * @param fd file descriptor
+     * @param data existing array to push data to
+     * @param chunk_size chunk size (default: 4096)
+     */
+    readAll(data: Array<u8> = [], chunk_size: usize = 4096): WasiResult<Array<u8>> {
+        let data_partial_len = chunk_size;
+        let data_partial = memory.allocate(data_partial_len);
+        let iov = memory.allocate(2 * sizeof<usize>());
+        store<u32>(iov, data_partial);
+        store<u32>(iov + sizeof<usize>(), data_partial_len);
+        let read_ptr = memory.allocate(sizeof<usize>());
+        let read: usize = 0;
+        for (; ;) {
+            let errno = fd_read(this.fd, iov, 1, read_ptr)
+            if (errno != Wasi.errno.SUCCESS) {
+                if (errno == Wasi.errno.NOENT) {
+                    memory.free(read_ptr);
+                    memory.free(data_partial);
+                    return WasiResult.fail<Array<u8>>(errno)
+                }
+                break;
+            }
+            read = load<usize>(read_ptr);
+            if (read <= 0) {
+                break;
+            }
+            for (let i: usize = 0; i < read; i++) {
+                data.push(load<u8>(data_partial + i));
+            }
+        }
+        memory.free(read_ptr);
+        memory.free(data_partial);
+
+        if (read < 0) {
+            return WasiResult.fail<Array<u8>>(Wasi.errno.BADF);
+        }
+        return WasiResult.resolve<Array<u8>>(data);
+    }
+
+    /**
+     * Read an UTF8 string from a file descriptor, convert it to a native string
+     * @param fd file descriptor
+     * @param chunk_size chunk size (default: 4096)
+     */
+    readString(chunk_size: usize = 4096): WasiResult<string> {
+        let s_utf8_ = this.readAll([], chunk_size);
+        if (s_utf8_.failed) {
+            return WasiResult.fail<string>(s_utf8_.error);
+        }
+        let s_utf8 = s_utf8_.result;
+        let s_utf8_len = s_utf8.length;
+        let s_utf8_buf = memory.allocate(s_utf8_len);
+        for (let i = 0; i < s_utf8_len; i++) {
+            store<u8>(s_utf8_buf + i, s_utf8[i]);
+        }
+        let s = String.fromUTF8(s_utf8_buf, s_utf8.length);
+        memory.free(s_utf8_buf);
+
+        return WasiResult.resolve<string>(s);
     }
 
 
-    read(bytes: Array<u8>): Wasi.errno {
-        if (!this.hasSpace(bytes)) {
-            return Wasi.errno.NOMEM;
-        }
-        memory.copy(bytes.buffer_.data, this.data + this.offset, bytes.length);
-        return Wasi.errno.SUCCESS;
-    }
-
-    readByte(): WasiResult<u8> {
-        if (this.offset + 1 >= this.size) {
-            return WasiResult.fail<u8>(Wasi.errno.NOMEM);
-        }
-        return WasiResult.resolve<u8>(load<u8>(this.data + this.offset++));
-    }
-
-    pread(bytes: Array<u8>): Wasi.errno {
-        let offset = this.offset;
-        this.read(bytes);
-        this.offset = offset;
-        return Wasi.errno.SUCCESS;
-    }
-
-    readString(max: usize = 4096): WasiResult<string> {
-        let _max = <usize>Math.min(max, this.size - this.offset + 1);//Count the EOT character
-        let str = StringUtils.fromCString(this.data + this.offset, _max);
-        if (str == null) {
-            return WasiResult.fail<string>(Wasi.errno.NOMEM)
-        }
-        this.offset += str.lengthUTF8 - 1;
-        return WasiResult.resolve<string>(str);
+    pread(data: Array<u8> = [], chunk_size: usize = 4096): WasiResult<Array<u8>> {
+        return this.read(data, chunk_size, true);
     }
 
     readLine(max: usize = 4096): WasiResult<string> {
@@ -90,24 +223,6 @@ export class FileDescriptor {
      */
     seek(offset: Wasi.filedelta, whence: Wasi.whence = Wasi.whence.CUR): WasiResult<usize> {
         let newOffset: usize = 0;
-        switch (whence) {
-            case Wasi.whence.CUR: {
-                newOffset = <usize>(this.offset + offset);
-                break;
-            }
-            case Wasi.whence.END: {
-                newOffset = <usize>(this.size - <u64>Math.abs(<f64>offset));
-                break;
-            }
-            case Wasi.whence.SET: {
-                newOffset = <usize>Math.abs(<f64>offset);
-                break;
-            }
-            default: {
-                return WasiResult.fail<usize>(Wasi.errno.INVAL)
-            }
-        }
-        this.offset = newOffset;
         return WasiResult.resolve<usize>(newOffset);
     }
 
@@ -119,15 +234,24 @@ export class FileDescriptor {
         return (this.file != null) ? this.file.data : 0;
     }
 
-    tell(): u32 {
-        return this.offset;
+    tell(): WasiResult<void> {
+        let errno = fd_tell(this.fd, this._offset)
+        return WasiResult.void(errno);
     }
+
 
     /**
      * Pointer to the fd field in memory
      */
     private get ptr(): usize {
         return changetype<usize>(this) + offsetof<FileDescriptor>("fd");
+    }
+
+    /**
+     * Pointer offset field in memory
+     */
+    private get _offset(): usize {
+        return changetype<usize>(this) + offsetof<FileDescriptor>("offset");
     }
 
     erase(): Wasi.errno {
@@ -406,10 +530,10 @@ export class FileSystem {
 
     }
 
-    read(fd: fd, data: Array<u8>): Wasi.errno {
+    read(fd: fd, data: Array<u8>): WasiResult<Array<u8>> {
         let res = this.get(fd);
         if (res.failed) {
-            return res.error;
+            return WasiResult.fail<Array<u8>>(res.error);
         }
         return res.result.read(data);
     }

@@ -1,6 +1,14 @@
 
-import * as mock from "./mock";
+
 import { Wasi } from '../wasi';
+export * from "./fs";
+export * from "./random";
+export * from "./process";
+export * from "./console";
+export * from "./environ";
+export * from "./cmdline";
+export * from "./date";
+export * from "./performance";
 
 class Tuple<T1, T2> {
     constructor(public first: T1, public second: T2) { }
@@ -65,4 +73,3 @@ export class WasiResult<T> extends Tuple<Ref<T> | null, Wasi.errno> {
     }
 }
 
-export { mock };
