@@ -26,19 +26,22 @@ describe("fold", (): void => {
         expect<string>(output[3]).toBe("");
         Console.stdout.reset()
         expect<string>(Console.stdout.readString().result).toBe(stdout.readString().result);
+        Console.stdout.reset();
+        Console.stdout.erase();
+        expect<string>(Console.stdout.readString().result).toBe(stdout.readString().result);
     });
 
     it("use default length", (): void => {
         CommandLine.push("/test");
         fold(CommandLine.all())
         fs.reset(Console.stdout.fd)
-        // let output = fs.readString(Console.stdout.fd).result.split('\n');
-        log<string>(fs.readString(Console.stdout.fd).result);
-        // expect<number>(output.length).toBe(2);
-        // expect<string>(output[0]).toBe(Hello_World);
-        // expect<string>(output[1]).toBe("");
-        // Console.stdout.reset()
-        // expect<string>(Console.stdout.readString().result).toBe(stdout.readString().result);
+        let output = fs.readString(Console.stdout.fd).result.split('\n');
+        // log<string>(fs.readString(Console.stdout.fd).result);
+        expect<number>(output.length).toBe(2);
+        expect<string>(output[0]).toBe(Hello_World);
+        expect<string>(output[1]).toBe("");
+        Console.stdout.reset()
+        expect<string>(Console.stdout.readString().result).toBe(stdout.readString().result);
     });
 
 })

@@ -17,13 +17,12 @@ export function main(args: string[]): void {
     }
     let data = file.result.readString().result;
     let lines = data.split('\n');
-    let newLines: string[] = [];
+    let newLines: string[] = new Array();
     for (let i = 0; i < lines.length; i++) {
         let arr = lines[i].split('');
         while (arr.length > 0) {
             newLines.push(arr.splice(0, width).join(''));
         }
     }
-    // log<string>(newLines.join('\n'));
     Console.log(newLines.join('\n'));
 }
