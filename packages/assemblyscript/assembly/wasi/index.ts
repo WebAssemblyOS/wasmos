@@ -1,4 +1,5 @@
-
+//@ts-ignore
+@global
 export namespace Wasi {
 
     // === Types ======================================================================================
@@ -74,6 +75,89 @@ export namespace Wasi {
 
     /** Error codes returned by functions. */
     export namespace errno {
+        export function toString(errno: errno): string {
+            switch (errno) {
+                case SUCCESS: return "No error occurred. System call completed successfully.";
+                case TOOBIG: return "Argument list too long.";
+                case ACCES: return "Permission denied.";
+                case ADDRINUSE: return "Address in use.";
+                case ADDRNOTAVAIL: return "Address not available.";
+                case AFNOSUPPORT: return "Address family not supported.";
+                case AGAIN: return "Resource unavailable, or operation would block.";
+                case ALREADY: return "Connection already in progress.";
+                case BADF: return "Bad file descriptor.";
+                case BADMSG: return "Bad message.";
+                case BUSY: return "Device or resource busy.";
+                case CANCELED: return "Operation canceled.";
+                case CHILD: return "No child processes.";
+                case CONNABORTED: return "Connection aborted.";
+                case CONNREFUSED: return "Connection refused.";
+                case CONNRESET: return "Connection reset.";
+                case DEADLK: return "Resource deadlock would occur.";
+                case DESTADDRREQ: return "Destination address required.";
+                case DOM: return "Mathematics argument out of domain of function.";
+                case DQUOT: return "Reserved.";
+                case EXIST: return "File exists.";
+                case FAULT: return "Bad address.";
+                case FBIG: return "File too large.";
+                case HOSTUNREACH: return "Host is unreachable.";
+                case IDRM: return "Identifier removed.";
+                case ILSEQ: return "Illegal byte sequence.";
+                case INPROGRESS: return "Operation in progress.";
+                case INTR: return "Interrupted function.";
+                case INVAL: return "Invalid argument.";
+                case IO: return "I/O error.";
+                case ISCONN: return "Socket is connected.";
+                case ISDIR: return "Is a directory.";
+                case LOOP: return "Too many levels of symbolic links.";
+                case MFILE: return "File descriptor value too large.";
+                case MLINK: return "Too many links.";
+                case MSGSIZE: return "Message too large.";
+                case MULTIHOP: return "Reserved.";
+                case NAMETOOLONG: return "Filename too long.";
+                case NETDOWN: return "Network is down.";
+                case NETRESET: return "Connection aborted by network.";
+                case NETUNREACH: return "Network unreachable.";
+                case NFILE: return "Too many files open in system.";
+                case NOBUFS: return "No buffer space available.";
+                case NODEV: return "No such device.";
+                case NOENT: return "No such file or directory.";
+                case NOEXEC: return "Executable file format error.";
+                case NOLCK: return "No locks available.";
+                case NOLINK: return "Reserved.";
+                case NOMEM: return "Not enough space.";
+                case NOMSG: return "No message of the desired type.";
+                case NOPROTOOPT: return "Protocol not available.";
+                case NOSPC: return "No space left on device.";
+                case NOSYS: return "Function not supported.";
+                case NOTCONN: return "The socket is not connected.";
+                case NOTDIR: return "Not a directory or a symbolic link to a directory.";
+                case NOTEMPTY: return "Directory not empty.";
+                case NOTRECOVERABLE: return "State not recoverable.";
+                case NOTSOCK: return "Not a socket.";
+                case NOTSUP: return "Not supported, or operation not supported on socket.";
+                case NOTTY: return "Inappropriate I/O control operation.";
+                case NXIO: return "No such device or address.";
+                case OVERFLOW: return "Value too large to be stored in data type.";
+                case OWNERDEAD: return "Previous owner died.";
+                case PERM: return "Operation not permitted.";
+                case PIPE: return "Broken pipe.";
+                case PROTO: return "Protocol error.";
+                case PROTONOSUPPORT: return "Protocol not supported.";
+                case PROTOTYPE: return "Protocol wrong type for socket.";
+                case RANGE: return "Result too large.";
+                case ROFS: return "Read-only file system.";
+                case SPIPE: return "Invalid seek.";
+                case SRCH: return "No such process.";
+                case STALE: return "Reserved.";
+                case TIMEDOUT: return "Connection timed out.";
+                case TXTBSY: return "Text file busy.";
+                case XDEV: return "Cross-device link.";
+                case NOTCAPABLE: return "Extension: Capabilities insufficient.";
+                default: return "error doesn't exist";
+            }
+        }
+
         /** No error occurred. System call completed successfully. */
         // @ts-ignore: decorator
         @inline

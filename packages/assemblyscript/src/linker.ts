@@ -1,10 +1,10 @@
 import * as path from "path";
-import { glob, fs, mkdirp, assemblyFolders } from "@wasmos/fs/src/index";
+import { fs, assemblyFolders } from "@wasmos/fs/src/index";
 
 export async function linkLibrary(rootPath: string): Promise<string> {
   let folders = await assemblyFolders(rootPath);
   let assemblyFolder = path.join(rootPath, "node_modules", ".assembly");
-  await mkdirp(assemblyFolder);
+  await fs.mkdirp(assemblyFolder);
   let pwd = process.cwd();
   process.chdir(assemblyFolder);
   await Promise.all(
@@ -17,7 +17,7 @@ export async function linkLibrary(rootPath: string): Promise<string> {
         grandFolder = path.dirname(grandFolder);
       }
       if (path.basename(path.dirname(folder)) != "node_modules") {
-        await mkdirp(path.dirname(folder));
+        await fs.mkdirp(path.dirname(folder));
       }
       let folderExists = await fs.pathExists(folder);
       if (!folderExists) {
