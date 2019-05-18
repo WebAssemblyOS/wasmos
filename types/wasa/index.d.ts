@@ -354,6 +354,7 @@ declare class DirectoryEntry {
  */
 declare class Process {
   static exit(code: number): void;
+  static error(code: number): void;
 }
 
 

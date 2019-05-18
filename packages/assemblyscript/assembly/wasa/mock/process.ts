@@ -6,8 +6,12 @@ import { Wasi } from "../../wasi";
 export class Process {
     static _singleton: Process;
 
+    // Error status flag 
+    public static error_flag: Wasi.errno;
+
     constructor(cwd: fd) {
         this._cwd = cwd;
+        Process.error_flag = Wasi.errno.SUCCESS;
         Process._singleton = this;
     }
     _cwd: fd;
@@ -21,6 +25,18 @@ export class Process {
         }
         abort();
     }
+
+    /**
+     * Set Process error flag without aborting
+     * @param status exit code
+     */
+    static error(status: Wasi.errno): void {
+        Process.error_flag = status;
+    }
+
+    
+
+
 
     static get cwd(): fd {
         return Process._singleton._cwd;

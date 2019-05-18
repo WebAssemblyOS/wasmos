@@ -1,6 +1,7 @@
-import { stdout, readString } from './fixtures';
+import { stdout, readString, stderr } from './fixtures';
 import { main as error } from "../bin/error";
 import { main as cat } from "../bin/cat";
+import { main as echo } from "../bin/echo";
 
 
 describe("error", (): void => {
@@ -16,9 +17,23 @@ describe("error", (): void => {
     CommandLine.push("test");
     cat(CommandLine.all());
 
-    let stdoutStr = readString(stdout)
+    let status = error();
 
-    expect<string>(readString(Console.stdout)).toBe("The last command produced an error.")
+    log<i32>(status);
+
+    expect<i32>(status).toBeGreaterThan(1);
+
+
+  });
+
+  it("echo should not cause any error", (): void => {
+    CommandLine.push("test");
+    echo(CommandLine.all());
+
+    let status = error();
+
+    log<i32>(status);
+    expect<i32>(status).toBe(1);
 
   });
 
