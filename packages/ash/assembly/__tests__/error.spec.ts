@@ -15,12 +15,12 @@ describe("error", (): void => {
 
   it("cat should cause an error if the file doesn't exist", (): void => {
     CommandLine.push("cat");
-    CommandLine.push("test");
+    CommandLine.push("thisshouldn'twork");
     cat(CommandLine.all());
 
     let status = error();
 
-    log<i32>(status);
+    expect<i32>(status).toBe(1);
 
 
 
@@ -34,7 +34,7 @@ describe("error", (): void => {
 
     let status = error();
 
-    log<i32>(status);
+    expect<i32>(status).toBe(0);
 
 
   });
