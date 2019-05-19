@@ -1,9 +1,9 @@
-import { os } from "../../../../packages/os";
+//import { os } from "../../../../packages/os";
 
 export function main(args: string[]): void {
   let dir = args[1]; //or fs.getDir(file);
   if(!dir) {
-    //os.homedir
+//    os.cwd();
   }
 
 /*
