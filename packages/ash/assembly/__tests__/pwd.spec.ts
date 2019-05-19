@@ -36,11 +36,10 @@ describe("to", (): void => {
 
   it("switch directory", ():void => {
     //Creates directory test and switches into it
-    CommandLine.push("mkdir test")
-    CommandLine.push("cd test")
+    fs.createDirectory("test")
+    fs.openDirectory("test")
     CommandLine.push("pwd")
-    
-    let testDir = "test"
-    expect<u32>(Console.stdout.readString()).toBe("test")
+    let testDir = "/test"
+    expect<u32>(Console.stdout.readString()).toBe(testDir)
   })
 })
