@@ -1,4 +1,4 @@
-
+import * as path from "../../../assemblyscript/assembly/wasa/mock/path";
 import { stdout, Hello, World, readString } from './fixtures';
 import { main as cd } from "../bin/cd";
 
@@ -12,23 +12,22 @@ describe("cd", (): void => {
   })
 
   it("home directory when no arguemnts", (): void => {
-    CommandLine.push("/");
+    CommandLine.push('');
     cd(CommandLine.all());
-    expect<bool>(fs.openDirectory('/').failed).toStrictEqual(false);
+    expect<bool>(fs.openDirectory('').failed).toStrictEqual(false);
   });
 
   it("go to nonexisting directory", (): void => {
-    //returns 1
     CommandLine.push("changeDir/");
     cd(CommandLine.all());
-    expect<bool>(fs.openDirectory("changeDir/").failed).toStrictEqual(true);
+    let dir = fs.openDirectory("changeDir/");
+    expect<bool>(dir.failed).toStrictEqual(true);
   });
 
   it("go to existing directory", (): void => {
-  
-  //  CommandLine.push("/");
-  //  cd(CommandLine.all());
-  //  expect<bool>(fs.openDirectory('/').failed).toStrictEqual(false);
+   CommandLine.push("/dev");
+   cd(CommandLine.all());
+   expect<bool>(fs.openDirectory('/dev').failed).toStrictEqual(false);
   });
 
 })
