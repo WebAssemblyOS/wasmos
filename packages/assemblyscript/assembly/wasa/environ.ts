@@ -1,6 +1,6 @@
 import { environ_sizes_get, environ_get } from "bindings/wasi";
 import { StringUtils } from "./utils";
-
+import { Wasi } from "../wasi";
 
 class EnvironEntry {
     constructor(readonly key: string, readonly value: string) { }
@@ -9,7 +9,7 @@ class EnvironEntry {
 //@ts-ignore
 @global
 export class Environ {
-    env: Array<EnvironEntry>;
+    private env: Array<EnvironEntry>;
 
     constructor() {
         this.env = [];
@@ -34,6 +34,10 @@ export class Environ {
         }
         memory.free(buf);
         memory.free(env_ptrs);
+    }
+
+    private static init(): Environ {
+        return new Environ();
     }
 
     /**

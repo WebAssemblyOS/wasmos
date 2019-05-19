@@ -14,7 +14,8 @@
     "clean:soft": "lerna exec \"rm -rf node_modules/**/node_modules\" ",
     "linkDev": "lerna exec \"ldev\"",
     "ci": "npm-run-all clean bootstrap check ci:test test:as",
-    "ci:test": "npm run test:jest -- -i || npm run test:jest -- -i"
+    "ci:test": "npm run test:jest -- -i || npm run test:jest -- -i",
+    "echo:test": "asc packages/ash/assembly/bin/echo.ts packages/assemblyscript/assembly/wasa/index.ts  --binaryFile dist/echo.wasm --textFile dist/echo.wat --use abort=wasiabort && RUST_BACKTRACE=1 wasmer run dist/echo.wasm hello aozz"
   },
   "repository": {
     "type": "git",

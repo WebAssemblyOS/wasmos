@@ -34,33 +34,34 @@ declare type path = string;
  * Global console class to access std input/output streams.
  */
 declare class Console {
+  static init(): Console;
   /**
    * Write a string to the console
    * @param s string
    * @param newline `false` by default to avoid inserting a newline after the string.
    */
-  static write(s: string, newline?: boolean): void;
+  write(s: string, newline?: boolean): void;
 
   /**
    * Read an UTF8 string from the console, convert it to a native string
    */
-  static readAll(): string | null;
+  readAll(): string | null;
 
   /**
    * Alias for `Console.write()`
    */
-  static log(s: string): void;
+  log(s: string): void;
 
   /**
    * Write an error to the console
    * @param s string
    * @param newline `false` to avoid inserting a newline after the string
    */
-  static error(s: string, newline?: boolean): void;
+  error(s: string, newline?: boolean): void;
 
-  static stdout: FileDescriptor;
-  static stdin: FileDescriptor;
-  static stderr: FileDescriptor;
+  stdout: FileDescriptor;
+  stdin: FileDescriptor;
+  stderr: FileDescriptor;
 }
 // // declare const Cons: number;
 // // declare function Cons1(): void;
@@ -70,9 +71,10 @@ declare function abort(): void;
 
 
 declare class CommandLine {
-  static all(): Array<string>
-  static push(s: string): void;
-  static reset(): void;
+  static init(): CommandLine;
+  all(): Array<string>
+  push(s: string): void;
+  reset(): void;
 }
 
 /**
@@ -358,14 +360,15 @@ declare class Process {
 
 
 declare class Environ {
+  static init(): Environ;
   /** Add environment variable */
-  static add(key: string, value: string): void;
+  add(key: string, value: string): void;
 
   /**
    * Return the value for an environment variable
    * @param key environment variable name
    */
-  static get(key: string): string;
+  get(key: string): string;
 
   /**
    * Removes all entries;

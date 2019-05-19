@@ -1,7 +1,8 @@
 
-
-
+//@ts-ignore
+@global
 export function main(args: string[]): void {
+  let console = Console.init();
   let newLine: bool = true;
   let _args: string[] = new Array<string>();
   let start: i32 = 1
@@ -11,10 +12,11 @@ export function main(args: string[]): void {
   }
   for (let i = start; i < args.length; i++) {
     if (args[i] == "$PATH") {
-      _args.push(Environ.get("$PATH"));
+      let env = Environ.init();
+      _args.push(env.get("$PATH"));
     } else {
       _args.push(args[i]);
     }
   }
-  Console.write(_args.join(" "), newLine);
+  console.write(_args.join(" "), true);
 }

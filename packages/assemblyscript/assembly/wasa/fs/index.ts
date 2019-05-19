@@ -1,7 +1,6 @@
 import { FileSystem, FileDescriptor, fd, DirectoryDescriptor } from "./fs";
-import { WasiResult } from '../..';
-import { Wasi } from "../../../wasi";
 export * from "./fs";
+import { Wasi } from "../../wasi";
 
 let DefaultFS = FileSystem.Default();
 
@@ -10,12 +9,12 @@ const BASE_RIGHTS: Wasi.rights = Wasi.rights.FD_READ | Wasi.rights.FD_WRITE | Wa
 // @ts-ignore decorator is valid
 @global
 export class fs {
-    public static _fs: FileSystem = DefaultFS;
+    public static readonly _fs: FileSystem = DefaultFS;
     private static initialized: bool = false;
 
-    static set fs(_fs: FileSystem) {
-        fs._fs = _fs;
-    }
+    // static set fs(_fs: FileSystem) {
+    //     fs._fs = _fs;
+    // }
 
     static get fs(): FileSystem {
         if (!fs.initialized) {
@@ -130,7 +129,7 @@ export class fs {
      * @param chunk_size chunk size (default: 4096)
      */
     static read(fd: fd, data: Array<u8> = [], chunk_size: usize = 4096): Wasi.errno {
-        return this.fs.read(fd, data);
+        return this.fs.read(fd, data).error;
     }
 
     /**
@@ -140,7 +139,7 @@ export class fs {
      * @param chunk_size chunk size (default: 4096)
      */
     static readAll(fd: fd, data: Array<u8> = [], chunk_size: usize = 4096): Wasi.errno {
-        return this.fs.read(fd, data);
+        return this.fs.read(fd, data).error;
     }
 
     /**

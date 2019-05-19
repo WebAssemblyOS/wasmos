@@ -1,4 +1,4 @@
-import { WasiResult } from '../..';
+import { Wasi } from "../../wasi";
 import { hasFlag } from '../../flag';
 import { StringUtils } from '../utils';
 import * as path from "../path";
@@ -308,7 +308,7 @@ export class DirectoryDescriptor extends FileDescriptor {
 
 export class File {
     private _data: ArrayBuffer;
-    static DefaultSize: u32 = 1024;
+    static readonly DefaultSize: u32 = 1024;
     size: usize = 0;
 
     constructor(public path: string, public type: Wasi.filetype = Wasi.filetype.REGULAR_FILE) {

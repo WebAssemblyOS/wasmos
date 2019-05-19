@@ -1,7 +1,7 @@
 import { RNG } from "./xor";
 
 export class Random {
-    static RNG: RNG = RNG.fromSeed(84);
+    static readonly RNG: RNG = RNG.fromSeed(84);
 
     /**
      * Fill a buffer with random data

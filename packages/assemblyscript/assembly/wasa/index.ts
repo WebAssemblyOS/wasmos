@@ -1,75 +1,43 @@
 
-
-import { Wasi } from '../wasi';
-export * from "./fs";
-export * from "./random";
-export * from "./process";
+import "allocator/arena";
+import { Console } from './console';
+// export * from "./fs";
+// export * from "./random";
+// export * from "./process";
 export * from "./console";
 export * from "./environ";
 export * from "./cmdline";
-export * from "./date";
-export * from "./performance";
+// export * from "./date";
+// export * from "./performance";
+// Any Env overrides
+// import { main } from "../../../ash/assembly/bin/echo";
+import { proc_exit } from 'bindings/wasi';
 
-class Tuple<T1, T2> {
-    constructor(public first: T1, public second: T2) { }
-}
 
-/** Simple generic reference for wrapping non reference types*/
-export class Ref<T>{
-    constructor(public val: T) { }
-}
 
+// https://github.com/AssemblyScript/assemblyscript/blob/master/std/assembly/env.ts
+// https://github.com/AssemblyScript/assemblyscript/issues/388
 //@ts-ignore
 @global
-/**
- * Helper class for dealing with errors.
- */
-export class WasiResult<T> extends Tuple<Ref<T> | null, Wasi.errno> {
-    /**
-     * 
-     * @param first 
-     * @param second 
-     * @param isReference: bool - Whether the value passed to first is T or Ref<T>
-     */
-    private constructor(first: Ref<T> | null,
-        second: Wasi.errno = Wasi.errno.SUCCESS,
-        private isReference: bool = true) {
-        super(first, second);
-    }
-
-    /**
-     * Tests if the error is not a success.
-     */
-    get failed(): boolean {
-        return this.error != Wasi.errno.SUCCESS;
-    }
-
-    get error(): Wasi.errno {
-        return this.second
-    }
-
-    get result(): T {
-        if (this.isReference) {
-            return changetype<T>(this.first!);
-        }
-        return (this.first!).val;
-    }
-
-    static resolve<T>(result: T): WasiResult<T> {
-        let res: Ref<T> = isInteger(result) ? new Ref<T>(result) : changetype<Ref<T>>(result);
-        return new WasiResult<T>(res, Wasi.errno.SUCCESS, isReference<T>(result));
-    }
-
-    static fail<T>(err: Wasi.errno): WasiResult<T> {
-        return new WasiResult<T>(null, err);
-    }
-
-    /**
-     * Special case where there is no result type just the error.
-     * @param res error
-     */
-    static void(res: Wasi.errno): WasiResult<void> {
-        return this.fail<void>(res);
-    }
+export function wasiabort(
+    message: string | null = "",
+    fileName: string | null = "",
+    lineNumber: u32 = 0,
+    columnNumber: u32 = 0
+): void {
+    let console = Console.init()
+    console.error(message!);
+    proc_exit(1)
 }
 
+
+export function _start(): void {
+    let console = Console.init()
+    let cmd = CommandLine.init();
+    let cmds = cmd.all();
+    // abort(cmds.join(" "));
+    // console.log(cmd.get(1))
+    // console.log(cmd.all()[1]);
+    //@ts-ignore
+    main(cmds);
+}
