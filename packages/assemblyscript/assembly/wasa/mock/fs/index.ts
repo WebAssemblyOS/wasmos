@@ -210,4 +210,12 @@ export class fs {
         return this.fs.grow(fd, amount);
     }
 
+    static get cwd(): fd {
+        return this.fs.cwd;
+    }
+
+    static set cwd(dirfd: fd) {
+        this.fs.cwd = dirfd;
+    }
+
 }

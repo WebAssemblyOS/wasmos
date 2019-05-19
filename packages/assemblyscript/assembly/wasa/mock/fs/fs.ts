@@ -14,6 +14,10 @@ export class FileDescriptor {
 
     constructor(public fd: fd, public file: File | null, public offset: usize = 0) { }
 
+    get path(): string {
+        return this.file!.path;
+    }
+
     write(bytes: Array<u8>): Wasi.errno {
         let res = this.file!.writeBytes(this.offset, bytes.buffer_.data, bytes.length);
         if (res == Wasi.errno.SUCCESS) {
