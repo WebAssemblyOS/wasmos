@@ -211,11 +211,11 @@ export class fs {
     }
 
     static get cwd(): fd {
-        return this.fs.cwd;
+        return fs._fs.cwd;
     }
 
     static set cwd(dirfd: fd) {
-        this.fs.cwd = dirfd;
+        fs._fs.cwd = dirfd;
     }
 
 }

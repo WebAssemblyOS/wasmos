@@ -1,45 +1,35 @@
-import { Console, fs, Process, CommandLine } from '../../../assemblyscript/assembly/wasa/mock';
-import { FileDescriptor } from '../../../assemblyscript/assembly/wasa/mock/fs';
-import { openStdout, Hello, World } from './mocks';
-import { main as to } from "../bin/pwd";
-
-type fd = usize;
+import { main as pwd } from "../bin/pwd";
+import { stdout, stderr } from './fixtures';
 
 
-
-var stdout2: FileDescriptor;
-// let stdout = Console.stdout;
-
-
-describe("to", (): void => {
-  beforeAll(
-    (): void => {
-      stdout2 = openStdout();
-    }
-  );
+describe("pwd", (): void => {
 
   beforeEach((): void => {
-    Console.stdout.reset();
-    stdout2.reset();
-    Console.stdout.erase()
+    stdout.reset()
+    Console.stdout.erase() //Erases and resets
+    stderr.reset();
+    Console.stderr.erase() //Erases and resets
     CommandLine.reset();
-    CommandLine.push("pwd");
-  })
+    CommandLine.push("cat");
+  });
 
   it("should give the root path", (): void => {
-
+    CommandLine.push("pwd")
+    pwd(CommandLine.all());
     // Don't know how to get value of root directory
-    let rootStr = stdout2.readString()
-    exepct<u32>(Console.stdout.readString()).toBe(rootStr)
+    let rootStr = "/\n"
+    expect<string>(stdout.readString().result).toBe(rootStr)
 
   })
 
-  it("switch directory", ():void => {
+  it("switch directory", (): void => {
     //Creates directory test and switches into it
-    fs.createDirectory("test")
-    fs.openDirectory("test")
+    let res = fs.createDirectory("test")
+    let dirfd = res.result.fd
+    fs.cwd = dirfd;
     CommandLine.push("pwd")
-    let testDir = "/test"
-    expect<u32>(Console.stdout.readString()).toBe(testDir)
+    pwd(CommandLine.all());
+    let testDir = "/test\n"
+    expect<string>(stdout.readString().result).toBe(testDir)
   })
 })
