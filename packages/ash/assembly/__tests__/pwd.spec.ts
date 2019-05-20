@@ -16,7 +16,6 @@ describe("pwd", (): void => {
   it("should give the root path", (): void => {
     CommandLine.push("pwd")
     pwd(CommandLine.all());
-    // Don't know how to get value of root directory
     let rootStr = "/\n"
     expect<string>(stdout.readString().result).toBe(rootStr)
 
