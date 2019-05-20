@@ -6,6 +6,8 @@ export function main(args: string[]): void {
         let dd = res.result;
         let pathName = dd.path;
         Console.log(pathName);
+    } else {
+        Console.log("error")
     }
 
 }

@@ -24,7 +24,7 @@ describe("pwd", (): void => {
     //Creates directory test and switches into it
     let res = fs.createDirectory("test")
     let dirfd = res.result.fd
-    fs.cwd = dirfd;
+    fs.cwd = fs.openDirectory("test").result.fd
     CommandLine.push("pwd")
     pwd(CommandLine.all());
     let testDir = "/test\n"
