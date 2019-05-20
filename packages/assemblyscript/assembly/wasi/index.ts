@@ -154,7 +154,8 @@ export namespace Wasi {
                 case TXTBSY: return "Text file busy.";
                 case XDEV: return "Cross-device link.";
                 case NOTCAPABLE: return "Extension: Capabilities insufficient.";
-                default: return "error doesn't exist";
+                //@ts-ignore
+                default: return "error " + errno.toString() + " doesn't exist";
             }
         }
 
@@ -835,6 +836,10 @@ export namespace Wasi {
         // @ts-ignore: decorator
         @inline
         export const SOCK_SHUTDOWN: rights = 268435456;
+        /** All rights. */
+        // @ts-ignore: decorator
+        @inline
+        export const DEFAULT: rights = 0x1FFFFFFF;
     }
     export type rights = u64;
 

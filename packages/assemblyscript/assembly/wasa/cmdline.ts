@@ -11,7 +11,9 @@ export class CommandLine {
         let count_and_size = memory.allocate(2 * sizeof<usize>());
         let ret = args_sizes_get(count_and_size, count_and_size + 4);
         if (ret != Wasi.errno.SUCCESS) {
+            //@ts-ignore
             abort("error was " + ret.toString());
+            return;
         }
         let count = load<usize>(count_and_size);
         let size = load<usize>(count_and_size + sizeof<usize>());
@@ -19,8 +21,9 @@ export class CommandLine {
         let buf = memory.allocate(size);
         ret = args_get(env_ptrs, buf);
         if (ret != Wasi.errno.SUCCESS) {
+            //@ts-ignore
             abort("error was " + ret.toString());
-
+            return;
         }
         for (let i: usize = 0; i < count; i++) {
             let env_ptr = load<usize>(env_ptrs + i * sizeof<usize>());

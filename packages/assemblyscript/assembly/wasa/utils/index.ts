@@ -39,3 +39,53 @@ export class StringUtils {
         return String.fromUTF8(cstring, size + 1);
     }
 }
+
+export class Shape {
+    count: usize;
+    size: usize;
+
+    get count_ptr(): usize {
+        return changetype<usize>(this)
+    }
+
+    get size_ptr(): usize {
+        return changetype<usize>(this) + offsetof<Shape>("size");
+    }
+}
+
+export class Buffer<T> {
+    buffer: ArrayBuffer;
+    constructor(public length: usize) {
+        this.buffer = new ArrayBuffer(length);
+    }
+
+    get ptr(): usize {
+        return this.buffer.data
+    }
+
+    get entrySize(): usize {
+        return sizeof<T>();
+    }
+
+    // get size(): usize {
+    //     return changetype<usize>(this.length / this.entrySize);
+    // }
+}
+
+export class UTF8Buffer extends Buffer<u8> {
+
+    toString(): string {
+        return String.fromUTF8(this.ptr, this.length)
+    }
+}
+
+export class PtrBuffer {
+    buffer: Array<usize>;
+    constructor(length: usize) {
+        this.buffer = new Array<usize>(length);
+    }
+
+    get ptr(): usize {
+        return this.buffer.buffer_.data;
+    }
+}

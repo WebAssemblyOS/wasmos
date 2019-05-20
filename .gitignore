@@ -7,3 +7,5 @@ packages/**/dist/
 lerna-debug\.log
 
 **/.DS_Store
+
+dist/*.wa*
