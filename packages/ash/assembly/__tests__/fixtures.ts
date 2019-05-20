@@ -9,6 +9,7 @@ export var stderr: FileDescriptor;
 
 beforeAll(() => {
     init();
+    log<string>("should be run once")
 })
 
 

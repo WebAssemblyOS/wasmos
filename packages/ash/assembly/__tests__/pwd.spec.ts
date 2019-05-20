@@ -22,12 +22,13 @@ describe("pwd", (): void => {
 
   it("switch directory", (): void => {
     //Creates directory test and switches into it
-    let res = fs.createDirectory("test")
+    let res = fs.createDirectory("/testdir") // /test is alread a file see ./simple_fs.ts
+    expect<bool>(res.failed).toBe(false);
     let dirfd = res.result.fd
-    fs.cwd = fs.openDirectory("test").result.fd
+    fs.cwd = dirfd
     CommandLine.push("pwd")
     pwd(CommandLine.all());
-    let testDir = "/test\n"
+    let testDir = "/testdir\n"
     expect<string>(stdout.readString().result).toBe(testDir)
   })
 })
