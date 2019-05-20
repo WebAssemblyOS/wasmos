@@ -8,6 +8,7 @@ describe("fs from JSON", (): void => {
 
     beforeEach(() => {
         fs.fs = new FileSystem();
+        fs.fs.init();
     });
 
 
