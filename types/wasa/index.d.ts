@@ -84,6 +84,7 @@ declare class FileDescriptor {
   file: File | null;
   fd: u32;
   offset: u32;
+  path: string;
   /**
    * Number of bytes written to the file.
    */
@@ -160,12 +161,14 @@ declare class DirectoryDescriptor extends FileDescriptor {
 
   /**Path of parent directory */
   parent: string;
+
 }
 
 declare class File {
   static DefaultSize: u32;
   data: usize;
   grow(): File;
+  path: string;
 }
 
 
@@ -181,7 +184,10 @@ declare class Directory extends File {
 }
 
 declare class fs {
-  cwd: fd;
+  /**
+   * Current working directory
+   */
+  static cwd: fd;
 
   /**
    * A simplified interface to open a file for read operations
