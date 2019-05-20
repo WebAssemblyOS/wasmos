@@ -10,7 +10,6 @@ describe("pwd", (): void => {
     stderr.reset();
     Console.stderr.erase() //Erases and resets
     CommandLine.reset();
-    CommandLine.push("cat");
   });
 
   it("should give the root path", (): void => {
