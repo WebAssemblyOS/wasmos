@@ -1,34 +1,36 @@
-import { stdout, Hello, World, readString } from './fixtures';
 import { main as cd } from "../bin/cd";
+import { stdout, stderr } from './fixtures';
 
 describe("cd", (): void => {
+    beforeEach((): void => {
+        stdout.reset()
+        Console.stdout.erase()
+        stderr.reset();
+        Console.stderr.erase()
+        CommandLine.reset();
+        CommandLine.push("cd");
+    });
+    it("go to nonexisting directory", () => {
+        CommandLine.push("/doesnotexist");
+        cd(CommandLine.all())
+        expect<usize>(Console.stderr.tell()).toBeGreaterThan(0);
+        expect<string>(stderr.readString().result).toStrictEqual("Unable to open directory.\n")
+    });
 
-  beforeEach((): void => {
-    stdout.reset();
-    Console.stdout.erase();
-    CommandLine.reset();
-    CommandLine.push("cd");
-  })
-
-  it("home directory when no arguemnts", (): void => {
-    CommandLine.push('');
-    cd(CommandLine.all());
-    let dir = fs.openDirectory('');
-    expect<bool>(dir.failed).toStrictEqual(false);
-  });
-
-  it("go to nonexisting directory", (): void => {
-    CommandLine.push("changeDir/");
-    cd(CommandLine.all());
-    let dir = fs.openDirectory("changeDir/");
-    expect<bool>(dir.failed).toStrictEqual(true);
-  });
-
-  it("go to existing directory", (): void => {
-   CommandLine.push("/dev");
-   cd(CommandLine.all());
-   let dir = fs.openDirectory('/dev');
-   expect<bool>(dir.failed).toStrictEqual(false);
-  });
+    it("go to existing directory", (): void => {
+        CommandLine.push("/dev")
+        cd(CommandLine.all())
+        expect<string>(stdout.readString().result).toStrictEqual("Success\n")
+    });
+    it("home directory when no arguemnts", () => {
+      CommandLine.push("")
+      cd(CommandLine.all())
+      expect<string>(stdout.readString().result).toStrictEqual("Success\n")
+    });
+    it("test if it would open a non-directory", (): void => {
+        CommandLine.push("/test")
+        cd(CommandLine.all())
+        expect<string>(stderr.readString().result).toStrictEqual("Unable to open directory.\n")
+    });
 
 })
