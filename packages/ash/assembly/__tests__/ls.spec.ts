@@ -15,7 +15,9 @@ describe("ls", (): void => {
 
     it("ls test", (): void => {
         ls([]);
-        expect<usize>(Console.stdout.tell()).toBeGreaterThan(1);
+
+        log<string>(Console.stdout.readString().result);
+        //expect<string>(Console.stdout.readString().result).toBe(stdout.readString().result);
     });
 
     // it("should print newline by default", (): void => {
