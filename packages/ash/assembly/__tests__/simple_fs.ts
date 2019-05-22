@@ -17,6 +17,7 @@ export const fs_str = `\
         }\
     },\
     "numbers": "0\\n1\\n2\\n3\\n4\\n5\\n6\\n7\\n8\\n9\\n10\\n11\\n12\\n13\\n14\\n15\\n16\\n17\\n18\\n19\\n",\
-    "newLines": "hey\\n\\nhey"\
+    "newLines": "hey\\n\\nhey",\
+    "uniqify": "Hello World\\nHello World\\nHello World\\nHello\\nHello\\World\\nHello"\
 }\
 `
