@@ -310,6 +310,16 @@ export class Dirent {
         return ptr;
     }
 
+    get type(): Wasi.filetype {
+        let ptr = changetype<usize>(this) + offsetof<dirent>("type");
+        return load<Wasi.filetype>(ptr);
+    }
+
+    get ino(): Wasi.inode {
+        let ptr = changetype<usize>(this) + offsetof<dirent>("ino");
+        return load<Wasi.filetype>(ptr);
+    }
+
 
 }
 
@@ -325,78 +335,20 @@ export class DirectoryDescriptor extends FileDescriptor {
         return this.directory.children;
     }
     //TODO
-    firstEntry(): WasiResult<Dirent> {
-        let res = fd_filestat_get(this.fd, this.stat);
-        let stat = changetype<filestat>(this.stat_ptr);
-        //@ts-ignore
-        abort(stat.size.toString());
+    firstEntry(): WasiResult<DirectoryEntry[]> {
+        this.entries = new Buffer<Dirent>(2048);
+        let res = fd_readdir(this.fd, this.entries.ptr, this.entries.length, 0, this.buf_used_ptr);
         if (failed(res)) {
-            return WasiResult.fail<Dirent>(res);
+            return WasiResult.fail<DirectoryEntry[]>(res);
         }
-        let size: usize = <usize>(this.stat.size);
-        //@ts-ignore
-        abort("size " + size.toString())
-        this.entries = new Buffer<Dirent>(10000000);
-        res = fd_readdir(this.fd, this.entries.ptr, this.entries.length, 0, this.buf_used_ptr);
-
-        if (failed(res)) {
-            return WasiResult.fail<Dirent>(res);
-        }
-        //@ts-ignore
-        abort("buf used " + this.buf_used.toString())
-        let first = changetype<Dirent>(this.entries.ptr);
-        let second = changetype<Dirent>(this.entries.ptr + first.next)
+        let entries = new Array<DirectoryEntry>();
         for (let i: usize = this.entries.ptr; i < this.buf_used + this.entries.ptr;) {
             let dirent = changetype<Dirent>(i);
-            let name = dirent.name;
-            abort(name);
-            let next = dirent.next;
-            abort("Next " + next.toString());
+            entries.push(new DirectoryEntry(dirent.next, dirent.name, dirent.type, dirent.ino));
             i = dirent.nextEntry;
-            // if (name == "././") {
-            //     // i = dirent.next
-            //     let nextPtr = ptr - 24;
-            //     let inodePtr = ptr - 16;
-            //     let namelenPtr = ptr - 8;
-            //     let typePtr = ptr - 4
-            //     let next = load<u64>(nextPtr);
-            //     let inode = load<u64>(inodePtr);
-            //     let namelen = load<u32>(namelenPtr);
-            //     let type = load<u8>(typePtr);
-            //     let offsetNext = typePtr - this.entries.ptr;
-            //     let nextPt = dirent.next
-            //     let direntSize = offsetof<dirent>();
-            //     abort("start " + nextPtr.toString())
-            //     abort("Next ptr " + nextPt.toString());
-            //     let actual = ptr + namelen;
-            //     abort("Actual " + actual.toString())
-            //     abort(name.toString());
-            //     abort(ptr.toString());
-            //     abort("typePtr " + offsetNext.toString())
-            //     let offset = ptr - this.entries.ptr;
-            //     abort(offset.toString())
-            //     abort("next " + next.toString());
-            //     abort("Inode " + inode.toString());
-            //     abort(namelen.toString());
-            //     abort(type.toString());
-            //     abort(String.fromUTF8(ptr, namelen))
-            //     i += 5;
-            // } else {
-            //     i++;
-            // }
-            // abort(name);
-            // i += 8 * 2 + 4 + 1 + namelen + 1;
-
-            // let j = i;
-            // i += <usize>(next)
-            // if (i == j) {
-            //     break;
-            // }
         }
-        // abort(first.name)
 
-        // abort(second.name)
-        return WasiResult.resolve<Dirent>(first);
+        return WasiResult.resolve<DirectoryEntry[]>(entries);
     }
 
     listDir(): WasiResult<DirectoryEntry[]> {
@@ -504,7 +456,7 @@ class Directory extends File {
 }
 
 class DirectoryEntry {
-    constructor(public path: string, public type: Wasi.filetype, public size: usize) { }
+    constructor(public next: Wasi.dircookie, public path: string, public type: Wasi.filetype, public inode: Wasi.inode) { }
 }
 
 //@ts-ignore
