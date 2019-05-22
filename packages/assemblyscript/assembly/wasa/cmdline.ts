@@ -13,7 +13,6 @@ export class CommandLine {
         if (ret != Wasi.errno.SUCCESS) {
             //@ts-ignore
             abort("error was " + ret.toString());
-            return;
         }
         let count = load<usize>(count_and_size);
         let size = load<usize>(count_and_size + sizeof<usize>());
@@ -23,7 +22,6 @@ export class CommandLine {
         if (ret != Wasi.errno.SUCCESS) {
             //@ts-ignore
             abort("error was " + ret.toString());
-            return;
         }
         for (let i: usize = 0; i < count; i++) {
             let env_ptr = load<usize>(env_ptrs + i * sizeof<usize>());

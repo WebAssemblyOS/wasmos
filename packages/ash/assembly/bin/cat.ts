@@ -10,7 +10,6 @@ export function main(args: string[]): void {
         for (let i: i32 = 1; i < args.length; i++) {
             let file = fs.openFile(args[i]);
             if (file.failed) {
-                Console.error("cat: " + args[i] + ": No such file or directory");
                 console.error("cat: " + args[i] + ": No such file or directory");
                 continue;
             }

@@ -3,7 +3,7 @@ import { hasFlag } from '../../flag';
 import { StringUtils, Buffer } from '../utils';
 import * as path from "../path";
 import { fd_write, fd_close, fd_read } from 'bindings/wasi';
-import { fd_pread, fd_tell, path_open, fd_readdir, filestat, fd_filestat_get } from '../../std/bindings/wasi_unstable';
+import { fd_pread, fd_tell, path_open, fd_readdir, filestat, fd_filestat_get, dirent } from '../../std/bindings/wasi_unstable';
 export type fd = usize;
 
 function failed(errno: Wasi.errno): bool {
@@ -293,17 +293,21 @@ export class Dirent {
     }
 
     get namlen(): usize {
-        let ptr = changetype<usize>(this) + offsetof<Wasi.dirent>("namlen");
+        let ptr = changetype<usize>(this) + offsetof<dirent>("namlen");
         return load<usize>(ptr);
     }
 
     get namePtr(): usize {
-        return changetype<usize>(this) + sizeof<Dirent>();
+        return changetype<usize>(this) + offsetof<dirent>();
     }
 
     get next(): usize {
-        let ptr = changetype<usize>(this) + offsetof<Wasi.dirent>("next");
-        return <usize>load<u64>(ptr);
+        return load<usize>(changetype<usize>(this));
+    }
+
+    get nextEntry(): usize {
+        let ptr = this.namlen + this.namePtr;
+        return ptr;
     }
 
 
@@ -334,6 +338,7 @@ export class DirectoryDescriptor extends FileDescriptor {
         abort("size " + size.toString())
         this.entries = new Buffer<Dirent>(10000000);
         res = fd_readdir(this.fd, this.entries.ptr, this.entries.length, 0, this.buf_used_ptr);
+
         if (failed(res)) {
             return WasiResult.fail<Dirent>(res);
         }
@@ -341,8 +346,56 @@ export class DirectoryDescriptor extends FileDescriptor {
         abort("buf used " + this.buf_used.toString())
         let first = changetype<Dirent>(this.entries.ptr);
         let second = changetype<Dirent>(this.entries.ptr + first.next)
-        abort(first.name)
-        abort(second.name)
+        for (let i: usize = this.entries.ptr; i < this.buf_used + this.entries.ptr;) {
+            let dirent = changetype<Dirent>(i);
+            let name = dirent.name;
+            abort(name);
+            let next = dirent.next;
+            abort("Next " + next.toString());
+            i = dirent.nextEntry;
+            // if (name == "././") {
+            //     // i = dirent.next
+            //     let nextPtr = ptr - 24;
+            //     let inodePtr = ptr - 16;
+            //     let namelenPtr = ptr - 8;
+            //     let typePtr = ptr - 4
+            //     let next = load<u64>(nextPtr);
+            //     let inode = load<u64>(inodePtr);
+            //     let namelen = load<u32>(namelenPtr);
+            //     let type = load<u8>(typePtr);
+            //     let offsetNext = typePtr - this.entries.ptr;
+            //     let nextPt = dirent.next
+            //     let direntSize = offsetof<dirent>();
+            //     abort("start " + nextPtr.toString())
+            //     abort("Next ptr " + nextPt.toString());
+            //     let actual = ptr + namelen;
+            //     abort("Actual " + actual.toString())
+            //     abort(name.toString());
+            //     abort(ptr.toString());
+            //     abort("typePtr " + offsetNext.toString())
+            //     let offset = ptr - this.entries.ptr;
+            //     abort(offset.toString())
+            //     abort("next " + next.toString());
+            //     abort("Inode " + inode.toString());
+            //     abort(namelen.toString());
+            //     abort(type.toString());
+            //     abort(String.fromUTF8(ptr, namelen))
+            //     i += 5;
+            // } else {
+            //     i++;
+            // }
+            // abort(name);
+            // i += 8 * 2 + 4 + 1 + namelen + 1;
+
+            // let j = i;
+            // i += <usize>(next)
+            // if (i == j) {
+            //     break;
+            // }
+        }
+        // abort(first.name)
+
+        // abort(second.name)
         return WasiResult.resolve<Dirent>(first);
     }
 
