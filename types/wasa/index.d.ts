@@ -166,6 +166,8 @@ declare class File {
   static DefaultSize: u32;
   data: usize;
   grow(): File;
+  path: string;
+
 }
 
 
@@ -181,7 +183,7 @@ declare class Directory extends File {
 }
 
 declare class fs {
-  cwd: fd;
+  static cwd: fd;
 
   /**
    * A simplified interface to open a file for read operations
