@@ -12,24 +12,22 @@ describe("dirname", (): void => {
   })
 
   it("should print newline by default", (): void => {
-    CommandLine.push(Hello)
-    CommandLine.push(World)
-    dirname(CommandLine.all())
-    let str = Hello + " " + World + "\n";
+    CommandLine.push(Hello + "/" + World);
+    dirname(CommandLine.all());
+    let str = Hello + "\n";
     let stdoutStr = readString(stdout)
     expect<u32>(Console.stdout.tell()).toBe(str.lengthUTF8 - 1, "No NUL character at the end of the string")
     Console.stdout.reset();
-    expect<string>(readString(Console.stdout)).toBe(Hello + " " + World + "\n")
+    expect<string>(readString(Console.stdout)).toBe(Hello + "\n")
     Console.stdout.reset();
     expect<string>(readString(Console.stdout)).toBe(stdoutStr);
   });
 
   it("should print no newline with -z", () => {
-    CommandLine.push("-n")
-    CommandLine.push(Hello)
-    CommandLine.push(World)
-    dirname(CommandLine.all())
-    let str = Hello + " " + World;
+    CommandLine.push("-z");
+    CommandLine.push(Hello + "/" + World);
+    dirname(CommandLine.all());
+    let str = Hello;
     expect<u32>(Console.stdout.tell()).toBe(str.lengthUTF8 - 1, "No NUL character at the end of the string")
     Console.stdout.reset();
     expect<string>(Console.stdout.readString().result).toBe(str)
@@ -38,11 +36,10 @@ describe("dirname", (): void => {
   });
 
   it("should print no newline with --zero", () => {
-    CommandLine.push("-n")
-    CommandLine.push(Hello)
-    CommandLine.push(World)
-    dirname(CommandLine.all())
-    let str = Hello + " " + World;
+    CommandLine.push("-z");
+    CommandLine.push(Hello + "/" + World);
+    dirname(CommandLine.all());
+    let str = Hello;
     expect<u32>(Console.stdout.tell()).toBe(str.lengthUTF8 - 1, "No NUL character at the end of the string")
     Console.stdout.reset();
     expect<string>(Console.stdout.readString().result).toBe(str)
@@ -51,29 +48,19 @@ describe("dirname", (): void => {
   });
 
   it("should print '.' when path has no '/'", () => {
-    CommandLine.push("$PATH");
-    let path = "/usr/bin:/bin";
-    Environ.add("$PATH", path);
+    CommandLine.push(Hello);
     dirname(CommandLine.all())
-    expect<string>(readString(stdout)).toBe(path + "\n")
+    expect<string>(readString(stdout)).toBe(".\n")
 
   });
 
   it("should handle multiple paths separated by newline", () => {
-    CommandLine.push("$PATH");
-    let path = "/usr/bin:/bin";
-    Environ.add("$PATH", path);
-    dirname(CommandLine.all())
-    expect<string>(readString(stdout)).toBe(path + "\n")
-
-  });
-
-  it("should handle multiple paths separated by NUL when -z is given", () => {
-    CommandLine.push("$PATH");
-    let path = "/usr/bin:/bin";
-    Environ.add("$PATH", path);
-    dirname(CommandLine.all())
-    expect<string>(readString(stdout)).toBe(path + "\n")
+    CommandLine.push("-z");
+    CommandLine.push(Hello + "/" + World);
+    CommandLine.push(World + "/" + Hello);
+    dirname(CommandLine.all());
+    let str = Hello + " " + World;
+    expect<string>(readString(stdout)).toBe(str);
 
   });
 })
