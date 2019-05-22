@@ -1,5 +1,5 @@
 import { main as ls } from "../bin/ls";
-import { stdout, Hello, World, Hello_World, stderr } from './fixtures';
+import { stdout, stderr, readString } from './fixtures';
 
 
 describe("ls", (): void => {
@@ -14,10 +14,10 @@ describe("ls", (): void => {
     });
 
     it("ls test", (): void => {
-        ls([]);
+        ls(CommandLine.all());
 
-        log<string>(Console.stdout.readString().result);
-        //expect<string>(Console.stdout.readString().result).toBe(stdout.readString().result);
+        log<string>(readString(Console.stdout));
+        expect<string>(Console.stdout.readString().result).toBe("dev test home numbers");
     });
 
     // it("should print newline by default", (): void => {
