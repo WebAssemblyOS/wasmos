@@ -267,6 +267,10 @@ class Directory extends File {
         this.children = new Array<File>()
     }
 
+    addChild(file: File): void {
+        this.children.push(file);
+    }
+
 }
 
 class DirectoryEntry {
@@ -347,8 +351,8 @@ export class FileSystem {
                 this.set(fd, dir)
             }
         }
-        if (parent != null) {
-            parent.children.push(file)
+        if (parent != null && parent.path != file.path) {
+            parent.addChild(file)
             if (type == Wasi.filetype.DIRECTORY) {
                 (file as Directory).parent = parent!;
             }

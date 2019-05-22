@@ -16,11 +16,10 @@ describe("ls", (): void => {
     it("ls test", (): void => {
         ls(CommandLine.all());
         log<string>(CommandLine.all().join(" "));
-        Console.write("Hello", false);
-        Console.log("Hi")
 
-        log<string>(readString(Console.stdout));
-        expect<string>(Console.stdout.readString().result).toBe("dev test home numbers");
+        log<string>(readString(stdout));
+        stdout.reset();
+        expect<string>(stdout.readString().result).toBe("dev test home numbers\n");
     });
 
     // it("should print newline by default", (): void => {
