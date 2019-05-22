@@ -20,6 +20,7 @@ export class fs {
     static get fs(): FileSystem {
         if (!fs.initialized) {
             fs._fs.init();
+            fs.initialized = true;
         }
         return fs._fs;
     }
