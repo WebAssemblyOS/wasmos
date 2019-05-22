@@ -15,6 +15,7 @@ describe("echo", (): void => {
     CommandLine.push(Hello)
     CommandLine.push(World)
     echo(CommandLine.all())
+    log<string>(CommandLine.all().join(" "));
     let str = Hello + " " + World + "\n";
     let stdoutStr = readString(stdout)
     expect<u32>(Console.stdout.tell()).toBe(str.lengthUTF8 - 1, "No NUL character at the end of the string")
