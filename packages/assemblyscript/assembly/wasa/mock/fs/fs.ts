@@ -170,8 +170,9 @@ export class DirectoryDescriptor extends FileDescriptor {
 
     listDir(): DirectoryEntry[] {
         let files = new Array<DirectoryEntry>();
+        let children = this.children;
         for (let i: i32 = 0; i < this.children.length; i++) {
-            let child = this.children[i];
+            let child = children[i];
             files.push(new DirectoryEntry(path.basename(child.path), child.type, child.size))
         }
         return files;
