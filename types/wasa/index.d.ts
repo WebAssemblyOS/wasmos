@@ -11,12 +11,12 @@ declare class WasiResult<T> {
   result: T;
   /**
    * Passes value if system call was successful.
-   * @param result - Value returned 
+   * @param result - Value returned
    */
   static resolve<T>(result: T): WasiResult<T>;
   /**
    * Called if an error was encountered.
-   * @param err 
+   * @param err
    */
   static fail<T>(err: Wasi.errno): WasiResult<T>;
 
@@ -76,7 +76,7 @@ declare class CommandLine {
 }
 
 /**
- * Wrapper class for file descriptors.  
+ * Wrapper class for file descriptors.
  * Tracks offset within a file and provides methods to read and write.
  */
 declare class FileDescriptor {
@@ -198,26 +198,26 @@ declare class fs {
   static openForWrite(path: string, dirfd?: fd): WasiResult<FileDescriptor>;
   /**
    * Creates a new file and returning its new File Descriptor
-   * @param path 
+   * @param path
    */
   static createFile(path: string): WasiResult<FileDescriptor>;
   /**
    * Equivalient to openFileAt, passing Wasi.oflags.CREAT
    * @param dirfd base Directory
-   * @param path 
+   * @param path
    */
   static createFileAt(dirfd: fd, path: string): WasiResult<FileDescriptor>;
   /**
    * Open file relative to the cwd if not absolute.
-   * @param path 
+   * @param path
    * @param options optional, default Wasi.oflags.CREAT
    */
   static openFile(path: string, options?: Wasi.oflags): WasiResult<FileDescriptor>;
   /**
    * Open file relative to a passed directory
-   * @param dirfd 
-   * @param path 
-   * @param options 
+   * @param dirfd
+   * @param path
+   * @param options
    */
   static openFileAt(dirfd: fd, path: string, options?: Wasi.oflags): WasiResult<FileDescriptor>;
 
@@ -310,13 +310,13 @@ declare class fs {
 
   /**
    * Get wrapper class for file descriptor.
-   * @param fd 
+   * @param fd
    */
   static get(fd: fd): WasiResult<FileDescriptor>;
 
   /**
    * Get wrapper class for directory descriptor.
-   * @param fd 
+   * @param fd
    */
   static getDir(fd: fd): WasiResult<DirectoryDescriptor>;
 
@@ -328,7 +328,7 @@ declare class fs {
 
   /**
    * Deletes a file and will throw an error if passed a directory.
-   * @param path 
+   * @param path
    */
   static delete(path: string): WasiResult<void>;
 
