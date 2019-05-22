@@ -1,7 +1,7 @@
 
 export function main(args: string[]): void {
-  //opens the directory with the given name
   if (args.length > 1) {
+    //opens the directory with the given name
       let dir = fs.openDirectory(args[1]);
       //if it fails than it either is not a
       //directory or the directory does not exist
