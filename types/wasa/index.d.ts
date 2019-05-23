@@ -165,6 +165,7 @@ declare class DirectoryDescriptor extends FileDescriptor {
 declare class File {
   static DefaultSize: u32;
   data: usize;
+  path: string;
   grow(): File;
 }
 
