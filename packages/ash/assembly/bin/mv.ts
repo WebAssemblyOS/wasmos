@@ -35,12 +35,8 @@ export function main(args: string[]): void {
                 let srcString = srcFile.readString().result;
                 log<string>(srcString);
                 dstFile.result.writeString(srcString);
-                fs.close(srcFile.fd);
-                let res2 = fs.delete(args[1]);
-                if (res2 != Wasi.errno.SUCCESS) {
-                    Console.error("mv: " + args[1] + ": Is a directory and not a file, need to further implement");
-                    // Try this?
-                    //fs.deleteDirectory(args[1]);
+                if(res.failed) {
+                    fs.delete(args[1]);
                 }
             }
         }
