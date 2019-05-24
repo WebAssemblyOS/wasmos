@@ -12,6 +12,14 @@ describe("wc", (): void => {
     CommandLine.push("wc");
   });
 
+  it("should write to stderr if incorrect number of arguments is passed", () => {
+    CommandLine.push("-l")
+    wc(CommandLine.all())
+    expect<usize>(Console.stderr.tell()).toBeGreaterThan(0);
+    expect<string>(stderr.readString().result).toStrictEqual("wc -l: incorrect number of arguments\n")
+  });
+
+
   it("should write to stderr if file not found", () => {
     CommandLine.push("-l")
     CommandLine.push("/doesnotexist");
