@@ -199,11 +199,11 @@ export class fs {
         return this.fs.listdir(fd);
     }
 
-    static delete(path: string): WasiResult<void> {
+    static delete(path: string): Wasi.errno {
         return this.fs.delete(path);
     }
 
-    static deleteDirectory(path: string): WasiResult<void> {
+    static deleteDirectory(path: string): Wasi.errno {
         return this.fs.deleteDirectory(path);
     }
 

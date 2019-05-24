@@ -331,10 +331,10 @@ declare class fs {
    * Deletes a file and will throw an error if passed a directory.
    * @param path 
    */
-  static delete(path: string): WasiResult<void>;
+  static delete(path: string): Wasi.errno;
 
   /**Deletes a directory. */
-  static deleteDirectory(path: string): WasiResult<void>;
+  static deleteDirectory(path: string): Wasi.errno;
 
   /** Amount to set the new file size to.  It doubles in size by default. */
   static grow(fd: fd, amount?: usize): WasiResult<void>;

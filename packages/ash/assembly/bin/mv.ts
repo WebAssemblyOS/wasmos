@@ -1,4 +1,5 @@
 import * as path from "../../../assemblyscript/assembly/wasa/mock/path"
+import { Wasi } from "../../../assemblyscript/assembly/wasi";
 
 export function main(args: string[]): void {
     if (args.length > 2) {
@@ -32,11 +33,11 @@ export function main(args: string[]): void {
                 }
                 dstFile.result.erase();
                 let srcString = srcFile.readString().result;
-                log<string>(srcString)
+                log<string>(srcString);
                 dstFile.result.writeString(srcString);
                 fs.close(srcFile.fd);
                 let res2 = fs.delete(args[1]);
-                if(res2.failed) {
+                if (res2 != Wasi.errno.SUCCESS) {
                     Console.error("mv: " + args[1] + ": Is a directory and not a file, need to further implement");
                     // Try this?
                     //fs.deleteDirectory(args[1]);
