@@ -16,7 +16,7 @@ describe("mv", (): void => {
     CommandLine.push("/test");
     mv(CommandLine.all())
     expect<usize>(Console.stderr.tell()).toBeGreaterThan(0);
-    expect<string>(stderr.readString().result).toStrictEqual("usage: mv source_file target_file\ncp source_file ... target_directory\n")
+    expect<string>(stderr.readString().result).toStrictEqual("usage: mv source_file target_file\nmv source_file ... target_directory\n")
   });
 
   it("should write to stderr if source file not found", (): void => {
@@ -50,7 +50,7 @@ describe("mv", (): void => {
     expect<bool>(fs.openFile("/home/test").failed).toBeFalsy();
     expect<bool>(fs.openFile("/home/numbers").failed).toBeFalsy();
     expect<string>(openFile("/home/test").readString().result).toStrictEqual("Hello World");
-    expect<string>(openFile("/home/numbers").readString().result).toStrictEqual("0\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n13\n14\n15\n16\n17\n18\n19");
+    expect<string>(openFile("/home/numbers").readString().result).toStrictEqual("0\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n13\n14\n15\n16\n17\n18\n19\n");
   });
 
   it("should copy source file to destination file", (): void => {

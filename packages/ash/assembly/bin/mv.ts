@@ -17,7 +17,7 @@ export function main(args: string[]): void {
             }
         } else {
             if (args.length > 3) {
-                Console.error("usage: mv source_file target_file\ncp source_file ... target_directory");
+                Console.error("usage: mv source_file target_file\nmv source_file ... target_directory");
             } else {
                 let res = fs.openFile(args[1]);
                 if (res.failed) {
@@ -34,13 +34,16 @@ export function main(args: string[]): void {
                 let srcString = srcFile.readString().result;
                 log<string>(srcString)
                 dstFile.result.writeString(srcString);
+                fs.close(srcFile.fd);
                 let res2 = fs.delete(args[1]);
                 if(res2.failed) {
-                    Console.error("mv: " + args[1] + ": Failed to delete");
+                    Console.error("mv: " + args[1] + ": Is a directory and not a file, need to further implement");
+                    // Try this?
+                    //fs.deleteDirectory(args[1]);
                 }
             }
         }
     } else {
-        Console.error("usage: mv source_file target_file\ncp source_file ... target_directory");
+        Console.error("usage: mv source_file target_file\nmv source_file ... target_directory");
     }
 }
