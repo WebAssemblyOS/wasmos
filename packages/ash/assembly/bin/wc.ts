@@ -1,5 +1,3 @@
-import { RegExp } from "regexp";
-
 export function main(args: string[]): void {
   let option: string = "";
   let argnumber = 1;
@@ -27,15 +25,20 @@ export function main(args: string[]): void {
   let resultString = `\\t${numOfLines} ${args[argnumber]}`;
   Console.stdin.reset();
 
-  // covers the case of an empty file
-  if (line.failed) {
-    Console.write(resultString);
-    return;
-  }
+  // the conditional exists to make it explicit that the only 
+  // functionality implemented right now is for wc -l
 
-  while (!line.failed) {
-    numOfLines++;
-    line = file.readLine();
+  if (option == "-l") {
+    // covers the case of an empty file
+    if (line.failed) {
+      Console.write(resultString);
+      return;
+    }
+
+    while (!line.failed) {
+      numOfLines++;
+      line = file.readLine();
+    }
+    Console.write(resultString);
   }
-  Console.write(resultString);
 }
