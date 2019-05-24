@@ -1,36 +1,41 @@
-export function main(args: string[]): void {
-    let option: string = "";
-    let argnumber = 1;
-    if (args[1] == "-b") {
-        option = args[2]
-        argnumber = 3;
-    }
-    let res = fs.openFile(args[argnumber])
-    if (res.error) {
-        //This is just the log for testing need to use Console.error
-        Console.error("nl: " + args[argnumber] + ": No such file or directory");
-        // log<string>(`head: file: No such file or directory`);
-        return;
-    }
-    let file = res.result;
-    let line = file.readLine();
-    let num = 1;
-    Console.stdin.reset();
-    if (line.failed) {
-        return;
-    }
+import { RegExp } from "regexp";
 
-    while (!line.failed) {
-        let intro = "";
-        if (option == "" || option == "t") {
-            //@ts-ignore  Integer does have to string method.
-            intro = "    " + num.toString() + "  ";
-        }
-        else if (option == "n") {
-            intro = "       "
-        }
-        Console.write(intro.concat(line.result));
-        line = file.readLine();
-        num++;
-    }
+export function main(args: string[]): void {
+  let option: string = "";
+  let argnumber = 1;
+  if (args[1] == "-l") {
+    option = args[1]
+    argnumber = 2;
+  }
+
+  if (args.length != 3) {
+    Console.error("wc -l: incorrect number of arguments");
+    // log<string>(`head: file: incorrect number of arguments`);
+    return;
+  }
+  let res = fs.openFile(args[argnumber])
+  if (res.error) {
+    //This is just the log for testing need to use Console.error
+    Console.error("wc -l: " + args[argnumber] + ": No such file or directory");
+    // log<string>(`head: file: No such file or directory`);
+    return;
+  }
+
+  let file = res.result;
+  let line = file.readLine();
+  let numOfLines = 0;
+  let resultString = `\\t${numOfLines} ${args[argnumber]}`;
+  Console.stdin.reset();
+
+  // covers the case of an empty file
+  if (line.failed) {
+    Console.write(resultString);
+    return;
+  }
+
+  while (!line.failed) {
+    numOfLines++;
+    line = file.readLine();
+  }
+  Console.write(resultString);
 }
