@@ -20,26 +20,45 @@ describe("wc", (): void => {
     expect<string>(stderr.readString().result).toStrictEqual("wc: /doesnotexist: open: No such file or directory\n")
   });
 
-  /* it("options - l", () => {
-    CommandLine.push("-b")
-    CommandLine.push("t")
-    CommandLine.push("/home/bob/documents/secret.txt");
-    let str = "    1  For my eyes only.\n    2   No one else"
+  it("with empty file", () => {
+    CommandLine.push("-l")
+    CommandLine.push("/empty.txt");
+    let str = "\\t0: empty.txt";
     wc(CommandLine.all());
     stdout.reset();
     expect<string>(stdout.readString().result).toStrictEqual(str);
     expect<u32>(Console.stdout.tell()).toBe(str.lengthUTF8 - 1, "FD offset should be length of string");
   })
 
-  it("options - n", () => {
-    CommandLine.push("-b")
-    CommandLine.push("n")
-    CommandLine.push("/home/bob/documents/secret.txt")
+
+  it("with file with single line", () => {
+    CommandLine.push("-l")
+    CommandLine.push("/singleLine.txt")
     wc(CommandLine.all())
     stdout.reset()
-    let str = "       For my eyes only.\n        No one else"
+    let str = "\\t1: singleLine.txt";
     expect<string>(stdout.readString().result).toStrictEqual(str);
     expect<u32>(Console.stdout.tell()).toBe(str.lengthUTF8 - 1, "FD offset should be length of string");
-  }) */
+  })
+
+  it("with file with multiple lines", () => {
+    CommandLine.push("-l")
+    CommandLine.push("/multipleLines.txt")
+    wc(CommandLine.all())
+    stdout.reset()
+    let str = "\\t2: multipleLines.txt";
+    expect<string>(stdout.readString().result).toStrictEqual(str);
+    expect<u32>(Console.stdout.tell()).toBe(str.lengthUTF8 - 1, "FD offset should be length of string");
+  })
+
+  it("with file without explicit new line termination", () => {
+    CommandLine.push("-l")
+    CommandLine.push("/withoutExplicitNewLine.txt")
+    wc(CommandLine.all())
+    stdout.reset()
+    let str = "\\t1: withoutExplicitNewLine.txt";
+    expect<string>(stdout.readString().result).toStrictEqual(str);
+    expect<u32>(Console.stdout.tell()).toBe(str.lengthUTF8 - 1, "FD offset should be length of string");
+  })
 
 })

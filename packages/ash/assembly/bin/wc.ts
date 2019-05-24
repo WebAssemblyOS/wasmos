@@ -22,7 +22,8 @@ export function main(args: string[]): void {
   let file = res.result;
   let line = file.readLine();
   let numOfLines = 0;
-  let resultString = "\\t" + numOfLines + " " + args[argnumber];
+  //@ts-ignore  Integer does have to string method.
+  let resultString = "\\t" + numOfLines.toString() + " " + args[argnumber];
   Console.stdin.reset();
 
   // the conditional exists to make it explicit that the only 
