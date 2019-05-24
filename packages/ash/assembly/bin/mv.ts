@@ -8,7 +8,7 @@ export function main(args: string[]): void {
             for (let i: i32 = 1; i < args.length - 1; i++) {
                 let file = fs.openFile(args[i]);
                 if (file.failed) {
-                    Console.error("cp: " + args[i] + ": No such file or directory");
+                    Console.error("mv: " + args[i] + ": No such file or directory");
                     continue;
                 }
                 let dest = fs.createFileAt(dir.result.fd, path.basename(args[i])).result;
@@ -17,11 +17,11 @@ export function main(args: string[]): void {
             }
         } else {
             if (args.length > 3) {
-                Console.error("usage: cp source_file target_file\ncp source_file ... target_directory");
+                Console.error("usage: mv source_file target_file\ncp source_file ... target_directory");
             } else {
                 let res = fs.openFile(args[1]);
                 if (res.failed) {
-                    Console.error("cp: " + args[1] + ": No such file or directory");
+                    Console.error("mv: " + args[1] + ": No such file or directory");
                 }
                 let srcFile = res.result;
                 let dstFile = fs.createFile(args[2]); //You can use create here as it will not care if does exist
@@ -34,9 +34,13 @@ export function main(args: string[]): void {
                 let srcString = srcFile.readString().result;
                 log<string>(srcString)
                 dstFile.result.writeString(srcString);
+                let res2 = fs.delete(args[1]);
+                if(res2.failed) {
+                    Console.error("mv: " + args[1] + ": Failed to delete");
+                }
             }
         }
     } else {
-        Console.error("usage: cp source_file target_file\ncp source_file ... target_directory");
+        Console.error("usage: mv source_file target_file\ncp source_file ... target_directory");
     }
 }
