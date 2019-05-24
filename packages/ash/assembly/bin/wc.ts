@@ -16,7 +16,7 @@ export function main(args: string[]): void {
   let res = fs.openFile(args[argnumber])
   if (res.error) {
     //This is just the log for testing need to use Console.error
-    Console.error("wc -l: " + args[argnumber] + ": No such file or directory");
+    Console.error(`wc: ${args[argnumber]}: open: No such file or directory`)
     // log<string>(`head: file: No such file or directory`);
     return;
   }
