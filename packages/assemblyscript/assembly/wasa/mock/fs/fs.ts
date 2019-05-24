@@ -451,24 +451,24 @@ export class FileSystem {
         return WasiResult.void(this.get(fd).result.erase());
     }
 
-    delete(path: string, type: Wasi.filetype = Wasi.filetype.REGULAR_FILE): WasiResult<void> {
+    delete(path: string, type: Wasi.filetype = Wasi.filetype.REGULAR_FILE): Wasi.errno {
         if (!this.paths.has(path)) {
-            return WasiResult.void(Wasi.errno.NOENT);
+            return Wasi.errno.NOENT;
         }
         if (this.paths.get(path).type != type) {
             switch (type) {
-                case Wasi.filetype.DIRECTORY: return WasiResult.fail<void>(Wasi.errno.NOTDIR);
-                case Wasi.filetype.REGULAR_FILE: return WasiResult.fail<void>(Wasi.errno.ISDIR);
-                default: return WasiResult.fail<void>(Wasi.errno.NOENT);
+                case Wasi.filetype.DIRECTORY: return Wasi.errno.NOTDIR;
+                case Wasi.filetype.REGULAR_FILE: return Wasi.errno.ISDIR;
+                default: return Wasi.errno.NOENT;
             }
         }
         this.paths.delete(path);
-        return WasiResult.fail<void>(Wasi.errno.SUCCESS)
+        return Wasi.errno.SUCCESS;
     }
 
-    deleteDirectory(path: string): WasiResult<void> {
+    deleteDirectory(path: string): Wasi.errno {
         if (this.paths.get(path).type != Wasi.filetype.DIRECTORY) {
-            return WasiResult.void(Wasi.errno.NOTDIR);
+            return Wasi.errno.NOTDIR;
         }
         return this.delete(path, Wasi.filetype.DIRECTORY);
     }
