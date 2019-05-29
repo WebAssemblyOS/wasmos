@@ -5,7 +5,7 @@ import { Console } from './console';
 // export * from "./random";
 // export * from "./process";
 export * from "./console";
-// export * from "./environ";
+export * from "./environ";
 export * from "./cmdline";
 // export * from "./date";
 // export * from "./performance";

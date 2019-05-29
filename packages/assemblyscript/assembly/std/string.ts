@@ -577,7 +577,8 @@ export class String {
   }
 }
 
-// export type string = String;
+//@ts-ignore
+export type string = String;
 
 export function parseInt(str: String, radix: i32 = 0): f64 {
   return parse<f64>(str, radix);

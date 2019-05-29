@@ -1,3 +1,17 @@
 {
-  "extends": "../../../tsconfig.ts.json"
+  "include": [
+    "./asc.ts"
+  ],
+  "exclude": [
+    "../node_modules/**/*",
+    "../../../node_modules/**/*"
+  ],
+  "compilerOptions": {
+    "target": "es6",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "module": "commonjs",
+    "allowJs": false,
+    "outDir": "../dist"
+  }
 }
