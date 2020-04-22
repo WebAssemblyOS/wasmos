@@ -13,7 +13,7 @@
     "clean": "lerna clean -y",
     "clean:soft": "lerna exec \"rm -rf node_modules/**/node_modules\" ",
     "linkDev": "lerna exec \"ldev\"",
-    "ci": "npm-run-all clean bootstrap check ci:test test:as",
+    "ci": "npm-run-all clean bootstrap ci:test test:as",
     "ci:test": "npm run test:jest -- -i || npm run test:jest -- -i"
   },
   "repository": {
@@ -57,6 +57,7 @@
     "@types/filesystem": "0.0.28",
     "@types/jest": "^24.0.11",
     "@types/shelljs": "^0.8.4",
+    "acorn-dynamic-import": "^4.0.0",
     "lerna": "^3.13.4",
     "shelljs": "^0.8.3",
     "shx": "^0.3.2"

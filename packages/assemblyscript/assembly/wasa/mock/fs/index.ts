@@ -25,6 +25,14 @@ export class fs {
         return fs._fs;
     }
 
+    static get cwd(): fd {
+        return fs.fs.cwd
+    }
+
+    static set cwd(dirfd: fd) {
+        fs.fs.cwd = dirfd;
+    }
+
     static init(): void {
         fs.fs;
     }
